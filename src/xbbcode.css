@@ -1,0 +1,68 @@
+.bbcode{
+  word-break: break-all;
+  color: var(--text-color);
+  line-height: 1.5em;
+}
+.bbcode span{
+  margin: 0.1em 0;
+  line-height: initial;
+  display: inline-block;
+}
+.bbcode .size-m{
+  font-size: 100%;
+}
+.bbcode .size-l{
+  font-size: 150%;
+}
+.bbcode .size-xl{
+  font-size: 200%;
+}
+.bbcode .black{
+  position: relative;
+  background: var(--text-color);
+  color: var(--text-color);
+  transition: background 0.3s;
+}
+.bbcode .black span{
+  color: var(--text-color);
+}
+.bbcode .black:hover{
+  background: none;
+  color: inherit;
+}
+.bbcode .black:hover span{
+  color: inherit;
+}
+.bbcode a{
+  color: var(--main-color);
+}
+.red{
+  color: #e3527d;
+}
+.red:hover{
+  color: #e3527d !important;
+}
+.yellow{
+  color: #f6a231;
+}
+.yellow:hover{
+  color: #f6a231 !important;
+}
+.green{
+  color: #4ebc55;
+}
+.green{
+  color: #4ebc55 !important;
+}
+.blue{
+  color: #3179db;
+}
+.blue:hover{
+  color: #3179db !important;
+}
+.purple{
+  color: #ac48a2;
+}
+.purple:hover{
+  color: #ac48a2 !important;
+}
