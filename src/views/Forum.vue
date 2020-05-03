@@ -5,6 +5,7 @@
   </div>
 -->
 <div class="para-content">
+  <UserCard style="display: none" ref="userCard" />
   <transition name="up">
     <Editor v-if="showEditor"/>
   </transition>
@@ -44,12 +45,12 @@
         </div>
         <div class="post-other">
           <div class="post-info">
-            <p>作者：{{included['users.' + post.relationships.user.data.id].attributes.username}}</p>
+            <p>作者：<span class="user" tippy-user>{{included['users.' + post.relationships.user.data.id].attributes.username}}</span></p>
             <p>{{post.attributes.postCount}} 回复 / {{post.attributes.viewCount}} 浏览</p>
           </div>
           <div class="post-time">
-            <p>最后一次回复：{{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}</p>
-            <p v-html="getTime(post.attributes.updatedAt)"></p>
+            <p>最后一次回复：<span class="user" tippy-user>{{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}</span></p>
+            <p class="time" v-html="getTime(post.attributes.updatedAt)" :data-tippy-content="new Date(post.attributes.updatedAt).toLocaleString()"></p>
           </div>
         </div>
       </li>
@@ -68,12 +69,12 @@
         </div>
         <div class="post-other">
           <div class="post-info">
-            <p>作者：{{included['users.' + post.relationships.user.data.id].attributes.username}}</p>
+            <p>作者：<span class="user" tippy-user>{{included['users.' + post.relationships.user.data.id].attributes.username}}</span></p>
             <p>{{post.attributes.postCount}} 回复 / {{post.attributes.viewCount}} 浏览</p>
           </div>
           <div class="post-time">
-            <p>最后一次回复：{{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}</p>
-            <p v-html="getTime(post.attributes.updatedAt)"></p>
+            <p>最后一次回复：<span class="user" tippy-user>{{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}</span></p>
+            <p class="time" v-html="getTime(post.attributes.updatedAt)" :data-tippy-content="new Date(post.attributes.updatedAt).toLocaleString()"></p>
           </div>
         </div>
       </li>
@@ -95,14 +96,19 @@
 <script>
 import { mapState, mapMutations } from 'vuex'
 import Editor from './../components/Editor.vue'
+import UserCard from './../components/UserCard.vue'
 import axios from 'axios'
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css'; // optional for styling
 export default {
   name: 'forum',
   components: {
-    Editor
+    Editor,
+    UserCard
   },
   data() {
     return {
+      test: '666',
       topPost: null,
       post: null,
       included: {},
@@ -136,17 +142,21 @@ export default {
     ]),
     getTime(time) {
       let second = new Date() - new Date(time)
+      console.log(second)
       if(second < 10000){
         return '刚刚'
-      }
-      if(second < 3600000){
+      }else if(second < 60000){
+        return new Date(time).getSeconds() + '秒前'
+      }else if(second < 3600000){
         return new Date(time).getMinutes() + '分钟前'
       }else if(second < 86400000){
         return new Date(time).getHours() + '小时前'
-      }else if(second < 5184000000){
-        return new Date(time).getMonth() + '个月前'
+      }else if(second < 2678400000){
+        return Math.floor((new Date() - new Date('2020-04-30T16:24:31+08:00')) / (24 * 3600 * 1000)) + '天前'
       }else if(second < 31622400000){
-        return new Date().getFullYear() - new Date().getFullYear() + '年前'
+        return new Date(time).getMonth() + '月前'
+      }else{
+        return new Date().getFullYear() - new Date(time).getFullYear() + '年前'
       }
     },
     getPostTag(id, title, star) {
@@ -224,6 +234,24 @@ export default {
           this.included[item.type + '.' + item.id] = item
         })
       }
+      this.$nextTick(() => {
+        let vue = this
+        tippy('[tippy-user]', {
+          onShow(instance) {
+            // vue.setData({
+            //   key: 'username',
+            //   value: '12345'
+            // })
+            vue.$nextTick(() => {
+              instance.setContent(vue.$refs.userCard.$el.innerHTML)
+            })
+          },
+          allowHTML: true,
+          arrow: false,
+          theme: 'user-card'
+        })
+        tippy('[data-tippy-content]')
+      })
     }
   }
 }
@@ -266,7 +294,7 @@ export default {
 }
 /* 论坛-内容 */
 .forum-content{
-  padding: 1em 2em;
+  padding: 1em 0;
   width: 1200px;
   margin: 0 auto;
 }
@@ -381,6 +409,9 @@ export default {
 .post-time{
   width: 10em;
 }
+.time{
+  display: inline-block;
+}
 .post-btn{
   background: var(--main-color);
   color: #fff;
@@ -392,7 +423,7 @@ export default {
 /* 论坛-主题Tag */
 .tag::before{
   display: inline-block;
-  width: 1em;
+  width: 2em;
   border-radius: 0.2em;
   padding: 0.2em 0.5em;
   margin: 0 1em;

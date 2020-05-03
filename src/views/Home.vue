@@ -332,7 +332,6 @@ export default {
 .block{
   width: 1200px;
   margin-bottom: 1em;
-  padding: 0 1.5em;
   margin: 0 auto;
 }
 .block h2{
@@ -414,10 +413,8 @@ export default {
   border: 0.1em solid #fff;
   transition: opacity 0.3s;
 }
-
 .posts{
-  height: 15em;
-  width: calc(100% - 30em);
+  width: calc(100% - 29em);
   background: var(--bg-color);
   margin-left: 1em;
   padding: 0.5em;
@@ -483,7 +480,6 @@ export default {
   background: var(--bg-color);
   border-radius: 0.2em;
   color: var(--text-color);
-  margin-bottom: 0.75em;
   transition: background 0.3s;
   cursor: pointer;
   margin-right: 0.6em;

@@ -49,6 +49,13 @@ export default {
   padding: 0;
   margin: 0;
 }
+*, *::after, *::before{
+  position: relative;
+  box-sizing: border-box;
+}
+html{
+  font-size: 100%;
+}
 html, body{
   width: 100%;
   height: 100%;
@@ -165,5 +172,12 @@ body::-webkit-scrollbar-thumb {
 .zoom-enter, .zoom-leave-to{
   transform: scale(0.6);
   opacity: 0;
+}
+.tippy-box[data-theme~='user-card']{
+  font-size: 1em;
+  background: none;
+}
+.tippy-box[data-theme~='user-card'] .tippy-content{
+  padding: 0;
 }
 </style>

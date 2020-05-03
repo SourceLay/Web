@@ -9,7 +9,8 @@ export default new Vuex.Store({
       t1: 123,
       t2: 233
     },
-    status: '123',
+    username: 'test',
+    status: '',
     headerAbove: 1,
     showEditor: 0,
     fixedEditor: 0,

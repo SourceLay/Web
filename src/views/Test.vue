@@ -1,43 +1,56 @@
 <template>
-  <div class="home">
-    <!-- <img alt="Vue logo" src="../assets/logo.png"> -->
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-    <p>{{status}}</p>
-    <p>{{colorTheme}}</p>
-    <p>{{test.t2}}</p>
+  <div class="test">
+    <UserCard style="display: none" ref="userCard" />
+    <p data-tippy-content>test</p>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import { mapState } from 'vuex'
-import { mapMutations } from 'vuex'
-import HelloWorld from '@/components/HelloWorld.vue'
-
+import UserCard from './../components/UserCard.vue'
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css'; // optional for styling
+import { mapMutations } from 'vuex';
 export default {
-  name: 'Home',
   components: {
-    HelloWorld
-  },
-  computed: {
-    ...mapState([
-      'status', 'colorTheme', 'test'
-    ])
+    UserCard
   },
   methods: {
     ...mapMutations([
       'setData'
-    ])
+    ]),
   },
   mounted() {
-    this.setData({
-      key: 'status',
-      value: 'test'
-    })
-    this.setData({
-      key: 'colorTheme',
-      value: 'test123'
+    let vue = this
+    tippy('[data-tippy-content]', {
+      onShow(instance) {
+        vue.setData({
+          key: 'username',
+          value: '12345'
+        })
+        vue.$nextTick(() => {
+          instance.setContent(vue.$refs.userCard.$el.innerHTML)
+        })
+      },
+      allowHTML: true,
+      arrow: false,
+      theme: 'user-card'
     })
   }
 }
 </script>
+
+<style>
+  .test{
+    margin: 10em;
+  }
+  p{
+    display: inline-block;
+  }
+  .tippy-box[data-theme~='user-card']{
+    font-size: 1em;
+    background: none;
+  }
+  .tippy-box[data-theme~='user-card'] .tippy-content{
+    padding: 0;
+  }
+</style>

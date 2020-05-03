@@ -325,6 +325,9 @@ export default {
   border-bottom: 0.5em solid #fff;
 }
 .tool-content{
+  position: relative;
+  width: max-content;
+  left: calc(-50% + 1em);
   background: var(--dark-color);
   border-radius: 0.2em;
   overflow: hidden;
@@ -352,7 +355,7 @@ export default {
 .tool-color{
   display: flex;
   flex-wrap: wrap;
-  width: 6em;
+  width: 6.5em;
   padding: 0.25em;
 }
 .tool-color li{
