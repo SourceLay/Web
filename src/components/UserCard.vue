@@ -22,7 +22,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
   .user-card{
     display: flex;
     position: relative;

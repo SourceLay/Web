@@ -2,6 +2,7 @@
   <div class="test">
     <UserCard style="display: none" ref="userCard" />
     <p data-tippy-content>test</p>
+    <p v-html="getPostTitle('[公告][新闻]123123')"></p>
   </div>
 </template>
 
@@ -10,6 +11,7 @@ import UserCard from './../components/UserCard.vue'
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css'; // optional for styling
 import { mapMutations } from 'vuex';
+import { getPostTitle, getPostTag } from './../public'
 export default {
   components: {
     UserCard
@@ -18,6 +20,8 @@ export default {
     ...mapMutations([
       'setData'
     ]),
+    getPostTitle,
+    getPostTag
   },
   mounted() {
     let vue = this

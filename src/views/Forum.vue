@@ -36,23 +36,25 @@
     <ul class="posts">
       <h2 class="part-title">置顶主题</h2>
       <li v-for="post in topPost" :key="post.id" class="post">
-        <div class="post-tag">
-          <p :class="['tag', getPostTag(post.relationships.user.data.id, post.attributes.title, post.attributes.isEssence)]"></p>
-        </div>
-        <div class="post-title">
-          <h2 v-html="getPostTitle(post.attributes.title)"></h2>
-          <p>{{included['posts.' + post.relationships.firstPost.data.id].attributes.content}}</p>
-        </div>
-        <div class="post-other">
-          <div class="post-info">
-            <p>作者：<span class="user" tippy-user>{{included['users.' + post.relationships.user.data.id].attributes.username}}</span></p>
-            <p>{{post.attributes.postCount}} 回复 / {{post.attributes.viewCount}} 浏览</p>
+        <router-link :to="{path: '/forums/topics/' + post.id}">
+          <div class="post-tag">
+            <p :class="['tag', getPostTag(post.relationships.user.data.id, post.attributes.title, post.attributes.isEssence)]"></p>
           </div>
-          <div class="post-time">
-            <p>最后一次回复：<span class="user" tippy-user>{{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}</span></p>
-            <p class="time" v-html="getTime(post.attributes.updatedAt)" :data-tippy-content="new Date(post.attributes.updatedAt).toLocaleString()"></p>
+          <div class="post-title">
+            <h2 v-html="getPostTitle(post.attributes.title)"></h2>
+            <p>{{included['posts.' + post.relationships.firstPost.data.id].attributes.content}}</p>
           </div>
-        </div>
+          <div class="post-other">
+            <div class="post-info">
+              <p>作者：<span class="user" tippy-user>{{included['users.' + post.relationships.user.data.id].attributes.username}}</span></p>
+              <p>{{post.attributes.postCount}} 回复 / {{post.attributes.viewCount}} 浏览</p>
+            </div>
+            <div class="post-time">
+              <p>最后一次回复：<span class="user" tippy-user>{{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}</span></p>
+              <p class="time" v-html="getTime(post.attributes.updatedAt)" :data-tippy-content="new Date(post.attributes.updatedAt).toLocaleString()"></p>
+            </div>
+          </div>
+        </router-link>
       </li>
       <img v-if="topPost == 0" class="empty" src="../assets/empty.png" alt="">
     </ul>
@@ -60,23 +62,25 @@
       <h2 class="part-title">主题</h2>
       <span @click="openEditor" class="post-btn btn">发表新主题</span>
       <li v-for="post in post" :key="post.id" class="post">
-        <div class="post-tag">
-          <p :class="['tag', getPostTag(post.relationships.user.data.id, post.attributes.title, post.attributes.isEssence)]"></p>
-        </div>
-        <div class="post-title">
-          <h2 v-html="getPostTitle(post.attributes.title)"></h2>
-          <p>{{included['posts.' + post.relationships.firstPost.data.id].attributes.content}}</p>
-        </div>
-        <div class="post-other">
-          <div class="post-info">
-            <p>作者：<span class="user" tippy-user>{{included['users.' + post.relationships.user.data.id].attributes.username}}</span></p>
-            <p>{{post.attributes.postCount}} 回复 / {{post.attributes.viewCount}} 浏览</p>
+        <router-link :to="{path: '/forums/topics/' + post.id}">
+          <div class="post-tag">
+            <p :class="['tag', getPostTag(post.relationships.user.data.id, post.attributes.title, post.attributes.isEssence)]"></p>
           </div>
-          <div class="post-time">
-            <p>最后一次回复：<span class="user" tippy-user>{{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}</span></p>
-            <p class="time" v-html="getTime(post.attributes.updatedAt)" :data-tippy-content="new Date(post.attributes.updatedAt).toLocaleString()"></p>
+          <div class="post-title">
+            <h2 v-html="getPostTitle(post.attributes.title)"></h2>
+            <p>{{included['posts.' + post.relationships.firstPost.data.id].attributes.content}}</p>
           </div>
-        </div>
+          <div class="post-other">
+            <div class="post-info">
+              <p>作者：<span class="user" tippy-user>{{included['users.' + post.relationships.user.data.id].attributes.username}}</span></p>
+              <p>{{post.attributes.postCount}} 回复 / {{post.attributes.viewCount}} 浏览</p>
+            </div>
+            <div class="post-time">
+              <p>最后一次回复：<span class="user" tippy-user>{{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}</span></p>
+              <p class="time" v-html="getTime(post.attributes.updatedAt)" :data-tippy-content="new Date(post.attributes.updatedAt).toLocaleString()"></p>
+            </div>
+          </div>
+        </router-link>
       </li>
       <img v-if="post == 0" class="empty" src="../assets/empty.png" alt="">
     </ul>
@@ -99,6 +103,7 @@ import Editor from './../components/Editor.vue'
 import UserCard from './../components/UserCard.vue'
 import axios from 'axios'
 import tippy from 'tippy.js';
+import { getPostTitle, getPostTag, getTime} from './../public.js'
 import 'tippy.js/dist/tippy.css'; // optional for styling
 export default {
   name: 'forum',
@@ -140,81 +145,9 @@ export default {
     ...mapMutations([
       'setData'
     ]),
-    getTime(time) {
-      let second = new Date() - new Date(time)
-      console.log(second)
-      if(second < 10000){
-        return '刚刚'
-      }else if(second < 60000){
-        return new Date(time).getSeconds() + '秒前'
-      }else if(second < 3600000){
-        return new Date(time).getMinutes() + '分钟前'
-      }else if(second < 86400000){
-        return new Date(time).getHours() + '小时前'
-      }else if(second < 2678400000){
-        return Math.floor((new Date() - new Date('2020-04-30T16:24:31+08:00')) / (24 * 3600 * 1000)) + '天前'
-      }else if(second < 31622400000){
-        return new Date(time).getMonth() + '月前'
-      }else{
-        return new Date().getFullYear() - new Date(time).getFullYear() + '年前'
-      }
-    },
-    getPostTag(id, title, star) {
-      let tag = title.slice(0, 4)
-      if(this.included['users.' + id].relationships.groups.data[0].id == 1 && ['[公告]', '[活动]', '[版规]'].includes(tag)){
-        if(tag == '[公告]'){
-          return 'tag-notice'
-        }else if(tag == '[活动]'){
-          return 'tag-activity'
-        }else if(tag == '[版规]'){
-          return 'tag-rule'
-        }
-      }else if(star){
-        return 'tag-star'
-      }else{
-        return 'tag-default'
-      }
-    },
-    getPostTitle(title) {
-      if(['[公告]', '[活动]', '[版规]'].includes(title.slice(0, 4))){
-        return title.slice(4)
-      }else{
-        let s = title;
-        let check_status = false;
-        let check_str = '';
-        let tags = [];
-        let last_valid = 0;
-        let i = 0;
-        for (i = 0; i < s.length; i++) {
-          let c = s[i];
-          if (check_status) {
-            check_str = check_str + c;
-            if (c == ']') {
-              if (!['[公告]', '[活动]', '[版规]'].includes(check_str)) {	// 这里可以判断一下 check_str 是否合法，如果
-                tags.push(check_str);
-                check_status = false;
-                last_valid = i + 1;
-              } else {
-                break;
-              }
-            } else if (c == '[') {	// 这里表示标签中不允许出现的符号
-              break;
-            }
-          } else {
-            if (c == '[') {
-              check_str = '[';
-              check_status = true;
-            }
-            else break;
-          }
-        }
-        let final = ''
-        tags.forEach(tag => {
-          final += "<span>" + tag + "</span>"
-        })
-        return final + s.substring(last_valid)
-      }
-    },
+    getTime,
+    getPostTag,
+    getPostTitle,
     openEditor() {
       this.setData({
         key: 'showEditor',
@@ -248,9 +181,12 @@ export default {
           },
           allowHTML: true,
           arrow: false,
-          theme: 'user-card'
+          theme: 'user-card',
+          delay: 100
         })
-        tippy('[data-tippy-content]')
+        tippy('[data-tippy-content]', {
+          delay: 100
+        })
       })
     }
   }
@@ -260,6 +196,8 @@ export default {
 <style scoped>
 /* 论坛-banner */
 .banner{
+  display: flex;
+  align-items: center;
   position: relative;
   height: 16em;
   box-sizing: border-box;
@@ -279,11 +217,11 @@ export default {
 .intro{
   position: relative;
   width: 1200px;
-  top: 7em;
   color: #fff;
   text-shadow: 1px 0px 10px rgba(0, 0, 0, 0.2);
   letter-spacing: 0.2em;
   margin: 0 auto;
+  margin-top: 4em;
 }
 .intro h1{
   font-weight: lighter;
@@ -373,6 +311,11 @@ export default {
   transition: all 0.3s;
   cursor: pointer;
 }
+.post a{
+  display: contents;
+  color: inherit;
+  text-decoration: none;
+}
 .post:hover{
   background: var(--item-color);
 }
@@ -391,6 +334,9 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.post-title >>>div{
+  display: inline-block;
 }
 .post-title >>>span{
   font-size: 0.8em;

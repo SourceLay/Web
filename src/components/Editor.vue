@@ -242,7 +242,7 @@ export default {
 }
 /* 编辑器主体 */
 .editor-area{
-  padding: 1em 1.5em;
+  padding: 1em 0;
   background: var(--base-color);
   width: 1200px;
   margin: 0 auto;

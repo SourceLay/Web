@@ -4,80 +4,72 @@
     <p>{{$route.params.id}}{{$bus.$data.contentWidth}}</p>
   </div>
 -->
-<div class="para-content">
+<div v-if="post" class="para-content">
   <div class="banner">
     <img src="../assets/mc.jpg" alt="">
     <div class="banner-cover"></div>
     <div class="intro">
-      <h1>帖子标题</h1>
+      <h1 class="title" v-html="getPostTitle(post.attributes.title)"></h1>
       <p>发表于 1 天前</p>
     </div>
   </div>
   <div class="forum-content">
     <ul class="posts">
+      <!-- 首帖 -->
       <li class="post">
         <img class="avatar" src="../assets/avatar.png" alt="">
         <div class="post-body">
           <div class="post-header">
             <p class="user-name">陆陆侠</p>
             <p class="post-time">一天前</p>
-            <p class="post-reply btn">回复#1</p>
+            <p class="post-floor">#1</p>
+          </div>
+          <div class="post-main">
+            <div v-html="getContent(included['posts.' + post.relationships.firstPost.data.id].attributes.content)" class="post-content bbcode">
+            </div>
+          </div>
+          <div class="post-bottom">
+            <p class="post-reply">回复#1</p>
+          </div>
+        </div>
+      </li>
+      <!-- 回复 -->
+      <li v-for="(reply, index) in post.relationships.posts.data" :key="reply.id" class="post">
+        <img class="avatar" src="../assets/avatar.png" alt="">
+        <div class="post-body">
+          <div class="post-header">
+            <p class="user-name">陆陆侠</p>
+            <p class="post-time">一天前</p>
+            <p class="post-floor">#{{index + 2}}</p>
+          </div>
+          <div class="post-main">
+            <div class="post-content">
+              {{included['posts.' + reply.id].attributes.content}}
+            </div>
+          </div>
+          <div class="post-bottom">
+            <p class="post-reply">回复#{{index + 2}}</p>
+          </div>
+        </div>
+      </li>
+      <!-- <li class="post">
+        <img class="avatar" src="../assets/avatar.png" alt="">
+        <div class="post-body">
+          <div class="post-header">
+            <p class="user-name">陆陆侠</p>
+            <p class="post-time">一天前</p>
             <p class="post-floor">#1</p>
           </div>
           <div class="post-main">
             <div class="post-content">
               <p>回帖内容</p>
             </div>
-            <div class="post-sign">
-              <p>签名档</p>
-            </div>
+          </div>
+          <div class="post-bottom">
+            <p class="post-reply">回复#1</p>
           </div>
         </div>
-      </li>
-      <li class="post">
-        <img class="avatar" src="../assets/avatar.png" alt="">
-        <div class="post-body">
-          <div class="post-header">
-            <p class="user-name">陆陆侠</p>
-            <p class="post-time">一天前</p>
-            <p class="post-reply btn">回复#2</p>
-            <p class="post-floor">#2</p>
-          </div>
-          <div class="post-main">
-            <div class="post-content">
-              <p>回帖内容</p>
-              <p>回帖内容</p>
-              <p>回帖内容</p>
-              <p>回帖内容</p>
-            </div>
-            <div class="post-sign">
-              <p>签名档</p>
-            </div>
-          </div>
-        </div>
-      </li>
-      <li class="post">
-        <img class="avatar" src="../assets/avatar.png" alt="">
-        <div class="post-body">
-          <div class="post-header">
-            <p class="user-name">陆陆侠</p>
-            <p class="post-time">一天前</p>
-            <p class="post-reply btn">回复#2</p>
-            <p class="post-floor">#2</p>
-          </div>
-          <div class="post-main">
-            <div class="post-content">
-              <p>回帖内容</p>
-              <p>回帖内容</p>
-              <p>回帖内容</p>
-              <p>回帖内容</p>
-            </div>
-            <div class="post-sign">
-              <p>签名档</p>
-            </div>
-          </div>
-        </div>
-      </li>
+      </li> -->
       <li :class="[fixedEditor ? 'fixed-editor' : '']">
         <Editor/>
       </li>
@@ -101,7 +93,10 @@
 
 <script>
 import Editor from './../components/Editor.vue'
+import axios from 'axios'
+import XBBCODE from 'xbbcode-parser'
 import { mapState, mapMutations } from 'vuex'
+import { getPostTitle, getTime } from './../public.js'
 export default {
   name: 'forum',
   data: function() {
@@ -111,7 +106,17 @@ export default {
       seekbarPercent: 0,
       seekbarY: 0,
       seekbarFloor: 1,
+      post: null,
+      included: {}
     }
+  },
+  beforeRouteEnter(to, from, next) {
+    axios.get('/api/threads/' + to.params.id + '?include=user,firstPost,posts,posts.user,category,firstPost.likedUsers,posts.likedUsers').then((response) => {
+      console.log(response.data)
+      next((vm) => {
+        vm.getData(response.data)
+      })
+    })
   },
   components: {
     Editor
@@ -125,6 +130,8 @@ export default {
     ...mapMutations([
       'setData'
     ]),
+    getPostTitle,
+    getTime,
     showEditor: function() {
       this.setData({
         key: 'fixedEditor',
@@ -141,10 +148,22 @@ export default {
     },
     jumpFloor: function() {
       this.seekbarPercent = this.seekbarFloor / this.allFloor * 100
+    },
+    getData: function(post) {
+      this.post = post.data
+      post.included.forEach((item) => {
+        this.included[item.type + '.' + item.id] = item
+      })
+      this.allFloor = this.post.attributes.postCount
+      this.seekbarPercent = 1 / this.allFloor * 100
+    },
+    getContent(content) {
+      return XBBCODE.process({
+        text: content,
+        removeMisalignedTags: false,
+        addInLineBreaks: true
+      }).html
     }
-  },
-  mounted: function() {
-    this.seekbarPercent = 1 / this.allFloor * 100
   }
 }
 </script>
@@ -153,6 +172,8 @@ export default {
 
 /* 论坛-banner */
 .banner{
+  display: flex;
+  align-items: center;
   position: relative;
   height: 16em;
   box-sizing: border-box;
@@ -172,11 +193,11 @@ export default {
 .intro{
   position: relative;
   width: 1200px;
-  top: 7em;
   color: #fff;
   text-shadow: 1px 0px 10px rgba(0, 0, 0, 0.2);
   letter-spacing: 0.2em;
   margin: 0 auto;
+  margin-top: 4em;
 }
 .intro h1{
   font-weight: lighter;
@@ -184,6 +205,13 @@ export default {
 .intro p{
   color: #ddd;
   margin-top: 0.1em;
+}
+.title >>>div{
+  font-size: 0.5em;
+}
+.title >>>span{
+  letter-spacing: 0;
+  margin-right: 0.2em;
 }
 /* 论坛-内容 */
 .forum-content{
@@ -217,8 +245,7 @@ export default {
   flex: 1;
   flex-direction: column;
   border-bottom: 2px dashed var(--line-color);
-  margin: 1em;
-  margin-left: 0;
+  margin: 1em 0;
 }
 .post:nth-last-child(2) .post-body{
   border-bottom: 0;
@@ -247,25 +274,22 @@ export default {
   font-size: 1.5em;
   opacity: 0.2;
 }
-.post-reply{
-  position: relative;
-  display: block;
-  float: right;
-  background: var(--main-color);
-  color: #fff;
-  opacity: 0;
-  transition: opacity 0.3s;
-  z-index: 1;
-}
-.post:hover .post-reply{
-  opacity: 1;
-}
 .post-main{
   color: var(--text-color);
-  margin-bottom: 1em;
+  margin: 0.5em 0;
 }
-.post-sign{
-  margin-top: 0.5em;
+.post-bottom{
+  margin-bottom: 0.5em;
+}
+.post-reply{
+  float: right;
+  font-size: 0.9em;
+  opacity: 0;
+  transition: opacity 0.3s;
+  color: var(--text-color);
+}
+.post:hover .post-reply{
+  opacity: 0.8;
 }
 
 .post-sidebar{
@@ -333,7 +357,9 @@ export default {
   transform: rotate(180deg);
   display: inline-block;
 }
-
+.editor{
+  margin-top: 1.5em;
+}
 .fixed-editor{
   position: sticky;
   bottom: 1em;
