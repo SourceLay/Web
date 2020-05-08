@@ -74,40 +74,41 @@ export function getPostTag(id, title, star) {
 //获取帖子标题
 export function getPostTitle(title) {
   if(['[公告]', '[活动]', '[版规]'].includes(title.slice(0, 4))){
-    title = title.slice(4)
-  }
-  let s = title;
-  let check_status = false;
-  let check_str = '';
-  let tags = [];
-  let last_valid = 0;
-  let i = 0;
-  for (i = 0; i < s.length; i++) {
-    let c = s[i];
-    if (check_status) {
-      check_str = check_str + c;
-      if (c == ']') {
-        if (!['[公告]', '[活动]', '[版规]'].includes(check_str)) {	// 这里可以判断一下 check_str 是否合法，如果
-          tags.push(check_str);
-          check_status = false;
-          last_valid = i + 1;
-        } else {
+    return title.slice(4)
+  }else{
+    let s = title;
+    let check_status = false;
+    let check_str = '';
+    let tags = [];
+    let last_valid = 0;
+    let i = 0;
+    for (i = 0; i < s.length; i++) {
+      let c = s[i];
+      if (check_status) {
+        check_str = check_str + c;
+        if (c == ']') {
+          if (!['[公告]', '[活动]', '[版规]'].includes(check_str)) {	// 这里可以判断一下 check_str 是否合法，如果
+            tags.push(check_str);
+            check_status = false;
+            last_valid = i + 1;
+          } else {
+            break;
+          }
+        } else if (c == '[') {	// 这里表示标签中不允许出现的符号
           break;
         }
-      } else if (c == '[') {	// 这里表示标签中不允许出现的符号
-        break;
+      } else {
+        if (c == '[') {
+          check_str = '[';
+          check_status = true;
+        }
+        else break;
       }
-    } else {
-      if (c == '[') {
-        check_str = '[';
-        check_status = true;
-      }
-      else break;
     }
+    let final = ''
+    tags.forEach(tag => {
+      final += "<span>" + tag + "</span>"
+    })
+    return '<div>' + final + '</div>' + s.substring(last_valid)
   }
-  let final = ''
-  tags.forEach(tag => {
-    final += "<span>" + tag + "</span>"
-  })
-  return '<div>' + final + '</div>' + s.substring(last_valid)
 }

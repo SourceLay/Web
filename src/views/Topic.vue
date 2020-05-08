@@ -7,7 +7,7 @@
 <div v-if="post" class="para-content">
   <div class="banner">
     <img src="../assets/mc.jpg" alt="">
-    <div class="banner-cover"></div>
+    <div :class="['banner-cover','tag', getPostTag(post.relationships.user.data.id, post.attributes.title, post.attributes.isEssence)]"></div>
     <div class="intro">
       <h1 class="title" v-html="getPostTitle(post.attributes.title)"></h1>
       <p>发表于 1 天前</p>
@@ -29,6 +29,8 @@
             </div>
           </div>
           <div class="post-bottom">
+            <i class="iconfont icon-guanzhu"></i>
+            <p class="post-likedUser" v-html="getLikedUser(included['posts.' + post.relationships.firstPost.data.id].relationships.likedUsers.data)"></p>
             <p class="post-reply">回复#1</p>
           </div>
         </div>
@@ -48,6 +50,8 @@
             </div>
           </div>
           <div class="post-bottom">
+            <i class="iconfont icon-guanzhu"></i>
+            <p class="post-likedUser" v-html="getLikedUser(included['posts.' + reply.id].relationships.likedUsers.data)"></p>
             <p class="post-reply">回复#{{index + 2}}</p>
           </div>
         </div>
@@ -96,7 +100,7 @@ import Editor from './../components/Editor.vue'
 import axios from 'axios'
 import XBBCODE from 'xbbcode-parser'
 import { mapState, mapMutations } from 'vuex'
-import { getPostTitle, getTime } from './../public.js'
+import { getPostTitle, getPostTag, getTime } from './../public.js'
 export default {
   name: 'forum',
   data: function() {
@@ -111,8 +115,7 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    axios.get('/api/threads/' + to.params.id + '?include=user,firstPost,posts,posts.user,category,firstPost.likedUsers,posts.likedUsers').then((response) => {
-      console.log(response.data)
+    axios.get('/api/threads/' + to.params.id + '?filter[isDeleted]=no&include=user,firstPost,posts,posts.user,user.groups,category,firstPost.likedUsers,posts.likedUsers').then((response) => {
       next((vm) => {
         vm.getData(response.data)
       })
@@ -131,7 +134,24 @@ export default {
       'setData'
     ]),
     getPostTitle,
+    getPostTag,
     getTime,
+    getLikedUser(users) {
+      let list = ''
+      if(users.length <= 3){
+        users.forEach((item) => {
+          list += '<span>' + this.included['users.' + item.id].attributes.username + '</span>'
+        })
+        return list += '觉得很赞'
+      }else{
+        let i = 0
+        while(i < 3){
+          list += '<span>' + this.included['users.' + users[i].id].attributes.username + '</span>'
+          i++
+        }
+        return list += '<span>等人</span>觉得很赞'
+      }
+    },
     showEditor: function() {
       this.setData({
         key: 'fixedEditor',
@@ -185,6 +205,9 @@ export default {
   object-fit: cover;
 }
 .banner-cover{
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: absolute;
   height: 100%;
   width: 100%;
@@ -212,6 +235,44 @@ export default {
 .title >>>span{
   letter-spacing: 0;
   margin-right: 0.2em;
+}
+/* 论坛-主题Tag */
+.tag::before{
+  color: #fff;
+  bottom: 0;
+  font-size: 3em;
+  font-style: italic;
+  text-align: right;
+  width: 1200px;
+  margin-top: 1em;
+  letter-spacing: 0.2em;
+}
+.tag-default::before{
+  content: '';
+}
+.tag-notice{
+  background: linear-gradient(to right, rgb(49, 121, 219) 0%,rgb(49, 121, 219, 0.8) 100%);
+}
+.tag-notice::before{
+  content: '公告';
+}
+.tag-activity{
+  background: linear-gradient(to right, rgb(78, 188, 85) 0%,rgb(78, 188, 85, 0.8) 100%);
+}
+.tag-activity::before{
+  content: '活动';
+}
+.tag-rule{
+  background: linear-gradient(to right, rgb(172, 72, 162) 0%,rgb(172, 72, 162, 0.8) 100%);
+}
+.tag-rule::before{
+  content: '版规';
+}
+.tag-star{
+  background: linear-gradient(to right, rgba(246, 162, 49, 1) 0%,rgba(246, 162, 49, 0.8) 100%);
+}
+.tag-star::before{
+  content: '精华';
 }
 /* 论坛-内容 */
 .forum-content{
@@ -252,6 +313,7 @@ export default {
 }
 .post-header{
   position: relative;
+  margin-bottom: 0.5em;
 }
 .user-name{
   display: inline-block;
@@ -279,17 +341,31 @@ export default {
   margin: 0.5em 0;
 }
 .post-bottom{
-  margin-bottom: 0.5em;
+  margin: 0.5em 0;
+  font-size: 0.9em;
+  opacity: 0.8;
+  color: var(--text-color);
+}
+.icon-guanzhu::before{
+  font-weight: bold;
+  position: relative;
+  top: 0.1em;
+  margin-right: 0.5em;
+  color: var(--main-color);
+}
+.post-likedUser{
+  display: inline-block;
+}
+.post-likedUser >>>span{
+  margin-right: 0.5em;
 }
 .post-reply{
   float: right;
-  font-size: 0.9em;
-  opacity: 0;
   transition: opacity 0.3s;
-  color: var(--text-color);
+  opacity: 0;
 }
 .post:hover .post-reply{
-  opacity: 0.8;
+  opacity: 1;
 }
 
 .post-sidebar{

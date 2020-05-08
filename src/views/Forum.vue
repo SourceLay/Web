@@ -122,9 +122,9 @@ export default {
   beforeRouteEnter(to, from, next) {
     let top = null
     let post = null
-    axios.get('/api/threads?include=user,firstPost,lastPostedUser,user.groups&filter[type]=1&filter[isSticky]=yes&filter[categoryId]=' + to.params.id).then((response) => {
+    axios.get('/api/threads?include=user,firstPost,lastPostedUser,user.groups&filter[type]=1&filter[isDeleted]=no&filter[isSticky]=yes&filter[categoryId]=' + to.params.id).then((response) => {
       top = response.data
-      axios.get('/api/threads?include=user,firstPost,lastPostedUser,user.groups&filter[type]=1&filter[isSticky]=no&filter[categoryId]=' + to.params.id).then((response) => {
+      axios.get('/api/threads?include=user,firstPost,lastPostedUser,user.groups&filter[type]=1&filter[isDeleted]=no&filter[isSticky]=no&filter[categoryId]=' + to.params.id).then((response) => {
         post = response.data
         next((vm) => {
           vm.getPost(top, post)
