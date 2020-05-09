@@ -4,19 +4,19 @@
     <p>{{$route.params.id}}{{$bus.$data.contentWidth}}</p>
   </div>
 -->
-<div v-if="post" class="para-content">
+<div v-if="data" class="para-content">
   <div class="banner">
     <img src="../assets/mc.jpg" alt="">
-    <div :class="['banner-cover','tag', getPostTag(post.relationships.user.data.id, post.attributes.title, post.attributes.isEssence)]"></div>
+    <div :class="['banner-cover','tag', getPostTag(data.relationships.user.data.id, data.attributes.title, data.attributes.isEssence)]"></div>
     <div class="intro">
-      <h1 class="title" v-html="getPostTitle(post.attributes.title)"></h1>
+      <h1 class="title" v-html="getPostTitle(data.attributes.title)"></h1>
       <p>发表于 1 天前</p>
     </div>
   </div>
   <div class="forum-content">
     <ul class="posts">
       <!-- 首帖 -->
-      <li class="post">
+      <li class="post" data-floor=1>
         <img class="avatar" src="../assets/avatar.png" alt="">
         <div class="post-body">
           <div class="post-header">
@@ -25,55 +25,39 @@
             <p class="post-floor">#1</p>
           </div>
           <div class="post-main">
-            <div v-html="getContent(included['posts.' + post.relationships.firstPost.data.id].attributes.content)" class="post-content bbcode">
+            <div v-html="getContent(included['posts.' + data.relationships.firstPost.data.id].attributes.content)" class="post-content bbcode">
             </div>
           </div>
           <div class="post-bottom">
             <i class="iconfont icon-guanzhu"></i>
-            <p class="post-likedUser" v-html="getLikedUser(included['posts.' + post.relationships.firstPost.data.id].relationships.likedUsers.data)"></p>
+            <p class="post-likedUser" v-html="getLikedUser(included['posts.' + data.relationships.firstPost.data.id].relationships.likedUsers.data)"></p>
             <p class="post-reply">回复#1</p>
           </div>
         </div>
       </li>
       <!-- 回复 -->
-      <li v-for="(reply, index) in post.relationships.posts.data" :key="reply.id" class="post">
+      <li v-for="(id, index) in reply" :key="id" :data-floor="startFloor + index" class="post">
         <img class="avatar" src="../assets/avatar.png" alt="">
         <div class="post-body">
           <div class="post-header">
             <p class="user-name">陆陆侠</p>
             <p class="post-time">一天前</p>
-            <p class="post-floor">#{{index + 2}}</p>
+            <p class="post-floor">#{{startFloor + index}}</p>
           </div>
           <div class="post-main">
             <div class="post-content">
-              {{included['posts.' + reply.id].attributes.content}}
+              {{included['posts.' + id].attributes.content}}
             </div>
           </div>
           <div class="post-bottom">
-            <i class="iconfont icon-guanzhu"></i>
-            <p class="post-likedUser" v-html="getLikedUser(included['posts.' + reply.id].relationships.likedUsers.data)"></p>
-            <p class="post-reply">回复#{{index + 2}}</p>
+            <div v-if="included['posts.' + id].relationships.likedUsers.data != ''">
+              <i class="iconfont icon-guanzhu"></i>
+              <p class="post-likedUser" v-html="getLikedUser(included['posts.' + id].relationships.likedUsers.data)"></p>
+            </div>
+            <p class="post-reply">回复#{{startFloor + index}}</p>
           </div>
         </div>
       </li>
-      <!-- <li class="post">
-        <img class="avatar" src="../assets/avatar.png" alt="">
-        <div class="post-body">
-          <div class="post-header">
-            <p class="user-name">陆陆侠</p>
-            <p class="post-time">一天前</p>
-            <p class="post-floor">#1</p>
-          </div>
-          <div class="post-main">
-            <div class="post-content">
-              <p>回帖内容</p>
-            </div>
-          </div>
-          <div class="post-bottom">
-            <p class="post-reply">回复#1</p>
-          </div>
-        </div>
-      </li> -->
       <li :class="[fixedEditor ? 'fixed-editor' : '']">
         <Editor/>
       </li>
@@ -100,24 +84,33 @@ import Editor from './../components/Editor.vue'
 import axios from 'axios'
 import XBBCODE from 'xbbcode-parser'
 import { mapState, mapMutations } from 'vuex'
+import { _throttle } from './../public'
 import { getPostTitle, getPostTag, getTime } from './../public.js'
 export default {
   name: 'forum',
   data: function() {
     return {
-      inBar: 0,
-      allFloor: 20,
-      seekbarPercent: 0,
-      seekbarY: 0,
-      seekbarFloor: 1,
-      post: null,
-      included: {}
+      inBar: 0,           //进度条激活状态
+      allFloor: 20,       //获取所有楼层数
+      seekbarPercent: 0,  //进度条百分比
+      seekbarY: 0,        //进度条Y轴
+      seekbarFloor: 1,    //进度条当前楼层
+      data: null,         //存放获取的原始数据
+      reply: [],          //存放当前显示的楼层
+      included: {},       //存放关联数据
+      startFloor: 0,      //起始楼层
+      showBanner: 0,      //是否展示顶部栏
     }
   },
   beforeRouteEnter(to, from, next) {
-    axios.get('/api/threads/' + to.params.id + '?filter[isDeleted]=no&include=user,firstPost,posts,posts.user,user.groups,category,firstPost.likedUsers,posts.likedUsers').then((response) => {
+    let startFloor = 0, page = 1
+    if(location.search.substr(0, 3) == '?n='){
+      startFloor = parseInt(location.search.substr(3) - 1)
+      page = Math.ceil(startFloor / 20)
+    }
+    axios.get('/api/threads/' + to.params.id + '?filter[isDeleted]=no&include=user,firstPost,posts,posts.user,user.groups,category,firstPost.likedUsers,posts.likedUsers&page[number]=' + page + '&page[limit]=20').then((response) => {
       next((vm) => {
-        vm.getData(response.data)
+        vm.getData(response.data, page)
       })
     })
   },
@@ -168,14 +161,21 @@ export default {
     },
     jumpFloor: function() {
       this.seekbarPercent = this.seekbarFloor / this.allFloor * 100
+      let y = document.querySelector('li[data-floor=\'' + this.seekbarFloor + '\']').offsetTop + 256
+      document.documentElement.scrollTo(0, y)
+      console.log(this.seekbarFloor + ',' + y)
     },
-    getData: function(post) {
-      this.post = post.data
+    getData: function(post, page) {
+      this.startFloor = (page - 1) * 20 + 2
+      this.data = post.data
+      post.data.relationships.posts.data.forEach((item, index) => {
+        this.reply[index] = item.id
+      })
       post.included.forEach((item) => {
         this.included[item.type + '.' + item.id] = item
       })
-      this.allFloor = this.post.attributes.postCount
-      this.seekbarPercent = 1 / this.allFloor * 100
+      this.allFloor = post.data.attributes.postCount
+      this.seekbarPercent = parseInt(1 / this.allFloor * 100)
     },
     getContent(content) {
       return XBBCODE.process({
@@ -183,7 +183,20 @@ export default {
         removeMisalignedTags: false,
         addInLineBreaks: true
       }).html
-    }
+    },
+    scroll: _throttle(function() {
+      let posts = document.querySelectorAll('.post')
+      posts.forEach((item) => {
+        if(item.getBoundingClientRect().top < 0){
+          this.seekbarFloor = parseInt(item.getAttribute('data-floor'))
+          this.seekbarPercent = this.seekbarFloor / this.allFloor * 100
+        }
+      })
+      // console.log(posts[1].getBoundingClientRect().top)
+    },50)
+  },
+  mounted() {
+    window.addEventListener('scroll', this.scroll, true)
   }
 }
 </script>
