@@ -10,7 +10,7 @@
     <div :class="['banner-cover','tag', getPostTag(data.relationships.user.data.id, data.attributes.title, data.attributes.isEssence)]"></div>
     <div class="intro">
       <h1 class="title" v-html="getPostTitle(data.attributes.title)"></h1>
-      <p>发表于 1 天前</p>
+      <p :data-tippy-content="new Date(data.attributes.createdAt).toLocaleString()">发表于<span v-html="getTime(data.attributes.createdAt)"></span></p>
     </div>
   </div>
   <div class="forum-content">
@@ -82,6 +82,8 @@
 <script>
 import Editor from './../components/Editor.vue'
 import axios from 'axios'
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css'; // optional for styling
 import XBBCODE from 'xbbcode-parser'
 import { mapState, mapMutations } from 'vuex'
 import { _throttle } from './../public'
@@ -103,14 +105,15 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    let startFloor = 0, page = 1
+    //获取API数据
+    let floor = 1, page = 1
     if(location.search.substr(0, 3) == '?n='){
-      startFloor = parseInt(location.search.substr(3) - 1)
-      page = Math.ceil(startFloor / 20)
+      floor = parseInt(location.search.substr(3) - 1)
+      page = Math.ceil(floor / 20)
     }
     axios.get('/api/threads/' + to.params.id + '?filter[isDeleted]=no&include=user,firstPost,posts,posts.user,user.groups,category,firstPost.likedUsers,posts.likedUsers&page[number]=' + page + '&page[limit]=20').then((response) => {
       next((vm) => {
-        vm.getData(response.data, page)
+        vm.getData(response.data, page, floor + 1)
       })
     })
   },
@@ -129,6 +132,7 @@ export default {
     getPostTitle,
     getPostTag,
     getTime,
+    //渲染点赞用户
     getLikedUser(users) {
       let list = ''
       if(users.length <= 3){
@@ -159,14 +163,20 @@ export default {
     closeBar: function() {
       this.inBar = 0
     },
+    //楼层跳转
     jumpFloor: function() {
-      this.seekbarPercent = this.seekbarFloor / this.allFloor * 100
-      let y = document.querySelector('li[data-floor=\'' + this.seekbarFloor + '\']').offsetTop + 256
-      document.documentElement.scrollTo(0, y)
-      console.log(this.seekbarFloor + ',' + y)
+      let floor = document.querySelector('li[data-floor=\'' + this.seekbarFloor + '\']')
+      if(floor){
+        this.seekbarPercent = this.seekbarFloor / this.allFloor * 100
+        document.documentElement.scrollTo(0, floor.offsetTop + 256)
+      }else{
+        window.location.href = window.location.pathname + '?n=' + this.seekbarFloor
+      }
     },
-    getData: function(post, page) {
+    //处理API数据并初始化
+    getData: function(post, page, floor) {
       this.startFloor = (page - 1) * 20 + 2
+      this.seekbarFloor = floor
       this.data = post.data
       post.data.relationships.posts.data.forEach((item, index) => {
         this.reply[index] = item.id
@@ -175,7 +185,15 @@ export default {
         this.included[item.type + '.' + item.id] = item
       })
       this.allFloor = post.data.attributes.postCount
-      this.seekbarPercent = parseInt(1 / this.allFloor * 100)
+      this.seekbarPercent = parseInt(floor / this.allFloor * 100)
+      this.$nextTick(() => {
+        if(floor != 1){
+          this.jumpFloor()
+        }
+        tippy('[data-tippy-content]', {
+          delay: 100
+        })
+      })
     },
     getContent(content) {
       return XBBCODE.process({
@@ -241,6 +259,7 @@ export default {
 .intro p{
   color: #ddd;
   margin-top: 0.1em;
+  display: inline-block;
 }
 .title >>>div{
   font-size: 0.5em;
