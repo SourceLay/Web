@@ -102,6 +102,9 @@ export function getPostTitle(title) {
           check_str = '[';
           check_status = true;
         }
+        else if (c == ' ') {
+          continue;
+        }
         else break;
       }
     }
