@@ -112,6 +112,6 @@ export function getPostTitle(title) {
     tags.forEach(tag => {
       final += "<span>" + tag + "</span>"
     })
-    return '<div>' + final + '</div>' + s.substring(last_valid)
+    return '<div>' + final + '</div>' + s.substring(last_valid).trim();
   }
 }
