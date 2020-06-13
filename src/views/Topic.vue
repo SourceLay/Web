@@ -5,7 +5,7 @@
   </div>
 -->
 <div v-if="data" class="para-content">
-  <div class="banner">
+  <div :class="['banner', loadPage[0] == 1 ? '' : 'hide']">
     <img src="../assets/mc.jpg" alt="">
     <div :class="['banner-cover','tag', getPostTag(data.relationships.user.data.id, data.attributes.title, data.attributes.isEssence)]"></div>
     <div class="intro">
@@ -15,8 +15,14 @@
   </div>
   <div class="forum-content">
     <ul class="posts">
+        <!-- <li v-if="loadPage[0] != 1" class="post-load load-up">
+          <p :class="[loadFlag == 'up' ? 'btn-load' : '', 'btn']">加载更多</p>
+        </li>
+        <li v-if="loadPage[1] != allPage" class="post-load load-bottom">
+          <p :class="[loadFlag == 'bottom' ? 'btn-load' : '', 'btn']">加载更多</p>
+        </li> -->
       <!-- 首帖 -->
-      <li class="post" data-floor=1>
+      <li :class="['post', loadPage[0] == 1 ? '' : 'hide']" data-floor=1>
         <img class="avatar" src="../assets/avatar.png" alt="">
         <div class="post-body">
           <div class="post-header">
@@ -40,8 +46,10 @@
         <img class="avatar" src="../assets/avatar.png" alt="">
         <div class="post-body">
           <div class="post-header">
-            <p class="user-name">陆陆侠</p>
-            <p class="post-time">一天前</p>
+            <p class="user-name">
+              {{included['users.' + included['posts.' + id].relationships.user.data.id].attributes.username}}
+            </p>
+            <p class="post-time" :data-tippy-content="new Date(included['posts.' + id].attributes.createdAt).toLocaleString()"  v-html="getTime(included['posts.' + id].attributes.createdAt)"></p>
             <p class="post-floor">#{{startFloor + index}}</p>
           </div>
           <div class="post-main">
@@ -86,14 +94,15 @@ import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css'; // optional for styling
 import XBBCODE from 'xbbcode-parser'
 import { mapState, mapMutations } from 'vuex'
-import { _throttle } from './../public'
+import { _throttle, _debounce } from './../public'
 import { getPostTitle, getPostTag, getTime } from './../public.js'
 export default {
   name: 'forum',
   data: function() {
     return {
       inBar: 0,           //进度条激活状态
-      allFloor: 20,       //获取所有楼层数
+      allFloor: null,       //获取所有楼层数
+      allPage: null,      //获取所有页数
       seekbarPercent: 0,  //进度条百分比
       seekbarY: 0,        //进度条Y轴
       seekbarFloor: 1,    //进度条当前楼层
@@ -101,19 +110,21 @@ export default {
       reply: [],          //存放当前显示的楼层
       included: {},       //存放关联数据
       startFloor: 0,      //起始楼层
+      loadPage: [1, 1],   //加载页面
       showBanner: 0,      //是否展示顶部栏
+      loadFlag: 0,        //是否处于加载更多中……
     }
   },
   beforeRouteEnter(to, from, next) {
     //获取API数据
     let floor = 1, page = 1
     if(location.search.substr(0, 3) == '?n='){
-      floor = parseInt(location.search.substr(3) - 1)
-      page = Math.ceil(floor / 20)
+      floor = parseInt(location.search.substr(3))
+      page = Math.ceil((floor - 1) / 20)
     }
     axios.get('/api/threads/' + to.params.id + '?filter[isDeleted]=no&include=user,firstPost,posts,posts.user,user.groups,category,firstPost.likedUsers,posts.likedUsers&page[number]=' + page + '&page[limit]=20').then((response) => {
       next((vm) => {
-        vm.getData(response.data, page, floor + 1)
+        vm.getData(response.data, page, floor)
       })
     })
   },
@@ -167,7 +178,7 @@ export default {
     jumpFloor: function() {
       let floor = document.querySelector('li[data-floor=\'' + this.seekbarFloor + '\']')
       if(floor){
-        this.seekbarPercent = this.seekbarFloor / this.allFloor * 100
+        this.seekbarPercent = parseInt(this.seekbarFloor / this.allFloor * 100)
         document.documentElement.scrollTo(0, floor.offsetTop + 256)
       }else{
         window.location.href = window.location.pathname + '?n=' + this.seekbarFloor
@@ -175,8 +186,8 @@ export default {
     },
     //处理API数据并初始化
     getData: function(post, page, floor) {
-      this.startFloor = (page - 1) * 20 + 2
-      this.seekbarFloor = floor
+      //处理数据
+      this.loadPage = [page, page]
       this.data = post.data
       post.data.relationships.posts.data.forEach((item, index) => {
         this.reply[index] = item.id
@@ -184,7 +195,11 @@ export default {
       post.included.forEach((item) => {
         this.included[item.type + '.' + item.id] = item
       })
+      //处理跳转
       this.allFloor = post.data.attributes.postCount
+      this.allPage = Math.ceil(this.allFloor / 20)
+      this.startFloor = (page - 1) * 20 + 2
+      this.seekbarFloor = floor
       this.seekbarPercent = parseInt(floor / this.allFloor * 100)
       this.$nextTick(() => {
         if(floor != 1){
@@ -207,14 +222,63 @@ export default {
       posts.forEach((item) => {
         if(item.getBoundingClientRect().top < 0){
           this.seekbarFloor = parseInt(item.getAttribute('data-floor'))
-          this.seekbarPercent = this.seekbarFloor / this.allFloor * 100
+          this.seekbarPercent = parseInt(this.seekbarFloor / this.allFloor * 100)
         }
       })
-      // console.log(posts[1].getBoundingClientRect().top)
-    },50)
+    },50),
+    //加载更多
+    loadMore: _debounce(function() {
+      let body = document.documentElement
+      if(body.scrollHeight - (body.clientHeight + body.scrollTop) < 800 && !this.loadFlag && this.loadPage[1] <= this.allPage){
+        console.log('load more')
+        this.loadFlag = 1
+        axios.get('/api/threads/' + this.$route.params.id + '?filter[isDeleted]=no&include=user,posts,posts.user,user.groups,posts.likedUsers&page[number]=' + (this.loadPage[1] + 1) + '&page[limit]=20').then((response) => {
+          response.data.data.relationships.posts.data.forEach((item) => {
+            this.reply.push(item.id)
+          })
+          response.data.included.forEach((item) => {
+            this.included[item.type + '.' + item.id] = item
+          })
+          this.$nextTick(() => {
+            tippy('[data-tippy-content]', {
+              delay: 100
+            })
+            this.loadPage[1]++
+            this.loadFlag = 0
+          })
+        })
+      }else if(body.scrollTop < 800 && !this.loadFlag && this.loadPage[0] != 1){
+        let oldScrollHeight = body.scrollHeight
+        let oldScrollTop = body.scrollTop
+        console.log('body.scrollHeight:' + body.scrollHeight)
+        console.log('body.clientHeight:' + body.clientHeight)
+        console.log('body.scrollTop:' + body.scrollTop)
+        this.loadFlag = 1
+        axios.get('/api/threads/' + this.$route.params.id + '?filter[isDeleted]=no&include=user,posts,posts.user,user.groups,posts.likedUsers&page[number]=' + (this.loadPage[0] - 1) + '&page[limit]=20').then((response) => {
+          response.data.data.relationships.posts.data.reverse().forEach((item) => {
+            this.reply.unshift(item.id)
+          })
+          response.data.included.forEach((item) => {
+            this.included[item.type + '.' + item.id] = item
+          })
+          this.$nextTick(() => {
+            tippy('[data-tippy-content]', {
+              delay: 100
+            })
+            let newScrollTop = body.scrollHeight - oldScrollHeight + oldScrollTop
+            console.log(oldScrollTop)
+            document.documentElement.scrollTo(0, newScrollTop)
+            this.startFloor -= 20
+            this.loadPage[0]--
+            this.loadFlag = 0
+          })
+        })
+      }
+    })
   },
   mounted() {
     window.addEventListener('scroll', this.scroll, true)
+    window.addEventListener('scroll', this.loadMore, true)
   }
 }
 </script>
@@ -399,7 +463,24 @@ export default {
 .post:hover .post-reply{
   opacity: 1;
 }
-
+/* 加载 */
+.post-load{
+  position: absolute;
+  width: 100%;
+  z-index: 2;
+}
+.post-load p{
+  background: var(--main-color);
+  margin: 0 auto;
+  color: #fff;
+}
+.load-up{
+  top: 2em;
+}
+.load-bottom{
+  bottom: 20em;
+}
+/* 进度条 */
 .post-sidebar{
   display: flex;
   flex-direction: column;
@@ -472,5 +553,8 @@ export default {
   position: sticky;
   bottom: 1em;
   z-index: 1;
+}
+.hide{
+  display: none !important;
 }
 </style>

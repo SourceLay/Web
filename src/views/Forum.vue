@@ -353,7 +353,7 @@ export default {
   width: 10em;
 }
 .post-time{
-  width: 10em;
+  width: 11em;
 }
 .time{
   display: inline-block;
