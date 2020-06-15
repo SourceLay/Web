@@ -102,6 +102,9 @@ export function getPostTitle(title) {
           check_str = '[';
           check_status = true;
         }
+        else if (c == ' ') {
+          continue;
+        }
         else break;
       }
     }
@@ -109,6 +112,6 @@ export function getPostTitle(title) {
     tags.forEach(tag => {
       final += "<span>" + tag + "</span>"
     })
-    return '<div>' + final + '</div>' + s.substring(last_valid)
+    return '<div>' + final + '</div>' + s.substring(last_valid).trim();
   }
 }
