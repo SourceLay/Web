@@ -5,9 +5,11 @@
   </div>
 -->
 <div v-if="data" class="para-content">
+  <!-- 头部 -->
   <div :class="['banner', loadPage[0] == 1 ? '' : 'hide']">
     <img src="../assets/mc.jpg" alt="">
     <div :class="['banner-cover','tag', getPostTag(data.relationships.user.data.id, data.attributes.title, data.attributes.isEssence)]"></div>
+    <!-- 帖子信息 -->
     <div class="intro">
       <h1 class="title" v-html="getPostTitle(data.attributes.title)"></h1>
       <p :data-tippy-content="new Date(data.attributes.createdAt).toLocaleString()">发表于<span v-html="getTime(data.attributes.createdAt)"></span></p>
@@ -250,9 +252,6 @@ export default {
       }else if(body.scrollTop < 800 && !this.loadFlag && this.loadPage[0] != 1){
         let oldScrollHeight = body.scrollHeight
         let oldScrollTop = body.scrollTop
-        console.log('body.scrollHeight:' + body.scrollHeight)
-        console.log('body.clientHeight:' + body.clientHeight)
-        console.log('body.scrollTop:' + body.scrollTop)
         this.loadFlag = 1
         axios.get('/api/threads/' + this.$route.params.id + '?filter[isDeleted]=no&include=user,posts,posts.user,user.groups,posts.likedUsers&page[number]=' + (this.loadPage[0] - 1) + '&page[limit]=20').then((response) => {
           response.data.data.relationships.posts.data.reverse().forEach((item) => {

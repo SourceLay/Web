@@ -1,5 +1,6 @@
 <template>
   <div :class="[$route.name == 'Topic' ? 'topic' : '']" class="editor">
+    <!-- 顶部工具栏 -->
     <div class="editor-header">
       <div @click="closeEditor" class="header-btn close">
         <i class="iconfont icon-guanbi"></i>
@@ -8,13 +9,21 @@
         <i class="iconfont icon-guding"></i>
       </div>
     </div>
+    <!-- 主要区域 -->
     <div class="editor-area">
+      <!-- 编辑 -->
       <div class="input">
-        <div @click="closePreview" v-if="preview" v-html="preview" class="preview bbcode">
+        <!-- 预览区 -->
+        <div @click="closePreview" v-if="preview" v-html="preview" class="preview bbcode"></div>
+        <!-- 提示 -->
+        <div :class="['error', isError ? 'error-open' : '']">
+          <p>{{error}}</p>
         </div>
-        <input v-model="title" placeholder="标题…" type="text">
-        <textarea v-model="content" ref="content" placeholder="正文…"></textarea>
+        <!-- 输入框 -->
+        <input v-if="!preview" v-model="title" placeholder="标题…" type="text">
+        <textarea v-if="!preview" v-model="content" ref="content" placeholder="正文…"></textarea>
       </div>
+      <!-- 底部工具 -->
       <div class="btns">
         <ul class="btns-left">
           <li v-for="(tool, index) in toolInfo" :key="tool.name" @mouseleave="closetool" class="item">
@@ -29,8 +38,9 @@
             </div>
           </li>
         </ul>
+        <!-- 按钮 -->
         <ul class="btns-right">
-          <li @click="send" class="btn btn-send">发送</li>
+          <li @click="send" :class="['btn', 'btn-send', sendLoad ? 'btn-load' : '']">发送</li>
           <li @click="showPreview" class="btn btn-preview">预览</li>
         </ul>
       </div>
@@ -108,7 +118,10 @@ export default {
           actionValue: ['music', 'video']
         },
       ],
-      preview: ''
+      preview: '',
+      sendLoad: 0,
+      isError: 0,
+      error: '',
     }
   },
   computed: {
@@ -181,26 +194,41 @@ export default {
       }
 
     },
-    send: function() {
-      if(this.$route.name == 'Forum'){
-        this.axios.post('/api/threads', {
-          data: {
-            attributes: {
-              type: 1,
-              title: this.title,
-              content: this.content
-            },
-            relationships: {
-              category: {
-                data: {
-                  id: this.$route.params.id,
-                  type: "categories",
+    send() {
+      this.sendLoad = 1
+      if(this.title && this.content){
+        if(this.$route.name == 'Forum'){
+          this.axios.post('/api/threads', {
+            data: {
+              attributes: {
+                type: 1,
+                title: this.title,
+                content: this.content
+              },
+              relationships: {
+                category: {
+                  data: {
+                    id: this.$route.params.id,
+                    type: "categories",
+                  }
                 }
               }
             }
-          }
-        })
+          }).then(response => {
+            window.location.href = '/forums/topics/' + response.data.data.id
+          }).catch(error => {
+            this.isError = 1
+            this.error = error.response.data.errors[0].detail[0]
+          })
+        }
+      }else{
+        this.isError = 1
+        this.error = '标题或正文为空！'
       }
+      setTimeout(() => {
+        this.isError = 0
+        this.sendLoad = 0
+      }, 2000);
     }
   }
 }
@@ -434,5 +462,22 @@ export default {
 }
 .fixed{
   transition: opacity 0.3s, transform 0.3s;
+}
+.error{
+  position: absolute;
+  right: 0;
+  bottom: 1em;
+  background: #e3527d;
+  color: #fff;
+  width: auto;
+  padding: 0.5em;
+  border-radius: 0.2em 0 0 0.2em;
+  opacity: 0;
+  transform: translate(5em, 0);
+  transition: all 0.3s;
+}
+.error-open{
+  opacity: 1;
+  transform: translate(0, 0);
 }
 </style>
