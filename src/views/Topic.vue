@@ -17,28 +17,28 @@
   </div>
   <div class="forum-content">
     <ul class="posts">
-        <!-- <li v-if="loadPage[0] != 1" class="post-load load-up">
-          <p :class="[loadFlag == 'up' ? 'btn-load' : '', 'btn']">加载更多</p>
-        </li>
-        <li v-if="loadPage[1] != allPage" class="post-load load-bottom">
-          <p :class="[loadFlag == 'bottom' ? 'btn-load' : '', 'btn']">加载更多</p>
-        </li> -->
       <!-- 首帖 -->
       <li :class="['post', loadPage[0] == 1 ? '' : 'hide']" data-floor=1>
         <img class="avatar" src="../assets/avatar.png" alt="">
         <div class="post-body">
+          <!-- 用户信息 -->
           <div class="post-header">
             <p class="user-name">陆陆侠</p>
             <p class="post-time">一天前</p>
             <p class="post-floor">#1</p>
           </div>
+          <!-- 内容 -->
           <div class="post-main">
             <div v-html="getContent(included['posts.' + data.relationships.firstPost.data.id].attributes.content)" class="post-content bbcode">
             </div>
           </div>
           <div class="post-bottom">
-            <i class="iconfont icon-guanzhu"></i>
-            <p class="post-likedUser" v-html="getLikedUser(included['posts.' + data.relationships.firstPost.data.id].relationships.likedUsers.data)"></p>
+            <!-- 点赞 -->
+            <div v-if="included['posts.' + data.relationships.firstPost.data.id].relationships.likedUsers.data != ''">
+              <i class="iconfont icon-guanzhu"></i>
+              <p class="post-likedUser" v-html="getLikedUser(included['posts.' + data.relationships.firstPost.data.id].relationships.likedUsers.data)"></p>
+            </div>
+            <!-- 功能 -->
             <p class="post-reply">回复#1</p>
           </div>
         </div>
@@ -47,6 +47,7 @@
       <li v-for="(id, index) in reply" :key="id" :data-floor="startFloor + index" class="post">
         <img class="avatar" src="../assets/avatar.png" alt="">
         <div class="post-body">
+          <!-- 用户信息 -->
           <div class="post-header">
             <p class="user-name">
               {{included['users.' + included['posts.' + id].relationships.user.data.id].attributes.username}}
@@ -54,16 +55,19 @@
             <p class="post-time" :data-tippy-content="new Date(included['posts.' + id].attributes.createdAt).toLocaleString()"  v-html="getTime(included['posts.' + id].attributes.createdAt)"></p>
             <p class="post-floor">#{{startFloor + index}}</p>
           </div>
+          <!-- 内容 -->
           <div class="post-main">
             <div class="post-content">
               {{included['posts.' + id].attributes.content}}
             </div>
           </div>
           <div class="post-bottom">
+            <!-- 点赞 -->
             <div v-if="included['posts.' + id].relationships.likedUsers.data != ''">
               <i class="iconfont icon-guanzhu"></i>
               <p class="post-likedUser" v-html="getLikedUser(included['posts.' + id].relationships.likedUsers.data)"></p>
             </div>
+            <!-- 功能 -->
             <p class="post-reply">回复#{{startFloor + index}}</p>
           </div>
         </div>
@@ -72,6 +76,7 @@
         <Editor/>
       </li>
     </ul>
+    <!-- 侧边进度条 -->
     <div class="post-sidebar">
       <div class="post-sidebar-content">
         <p @click="showEditor" class="btn btn-reply">添加回复</p>
@@ -461,23 +466,6 @@ export default {
 }
 .post:hover .post-reply{
   opacity: 1;
-}
-/* 加载 */
-.post-load{
-  position: absolute;
-  width: 100%;
-  z-index: 2;
-}
-.post-load p{
-  background: var(--main-color);
-  margin: 0 auto;
-  color: #fff;
-}
-.load-up{
-  top: 2em;
-}
-.load-bottom{
-  bottom: 20em;
 }
 /* 进度条 */
 .post-sidebar{
