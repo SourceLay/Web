@@ -4,8 +4,8 @@
       <img class="avatar" src="../assets/avatar.png" alt="">
       <img class="bg" src="../assets/mc.jpg" alt="">
       <div class="user-info">
-        <p class="user-name">陆陆侠</p>
-        <p class="user-intro">啊哈，我说贝蒂莉亚……</p>
+        <p class="user-name">{{popUser.username}}</p>
+        <p class="user-intro">{{popUser.signature}}</p>
       </div>
     </div>
   </div>
@@ -16,7 +16,7 @@ import { mapState } from 'vuex'
 export default {
   computed: {
     ...mapState([
-      'username'
+      'popUser'
     ])
   }
 }

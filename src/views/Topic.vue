@@ -99,7 +99,7 @@ import Editor from './../components/Editor.vue'
 import axios from 'axios'
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css'; // optional for styling
-import XBBCODE from 'xbbcode-parser'
+import XBBCODE from '.././xbbcode'
 import { mapState, mapMutations } from 'vuex'
 import { _throttle, _debounce } from './../public'
 import { getPostTitle, getPostTag, getTime } from './../public.js'

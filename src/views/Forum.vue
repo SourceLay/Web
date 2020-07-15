@@ -46,11 +46,21 @@
           </div>
           <div class="post-other">
             <div class="post-info">
-              <p>作者：<span class="user" tippy-user>{{included['users.' + post.relationships.user.data.id].attributes.username}}</span></p>
+              <p>
+                作者：
+                <span class="user" :data-id="post.relationships.user.data.id" tippy-user>
+                  {{included['users.' + post.relationships.user.data.id].attributes.username}}
+                </span>
+              </p>
               <p>{{post.attributes.postCount}} 回复 / {{post.attributes.viewCount}} 浏览</p>
             </div>
             <div class="post-time">
-              <p>最后一次回复：<span class="user" tippy-user>{{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}</span></p>
+              <p>
+                最后一次回复：
+                <span class="user" :data-id="post.relationships.lastPostedUser.data.id" tippy-user>
+                  {{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}
+                </span>
+              </p>
               <p class="time" v-html="getTime(post.attributes.updatedAt)" :data-tippy-content="new Date(post.attributes.updatedAt).toLocaleString()"></p>
             </div>
           </div>
@@ -72,11 +82,21 @@
           </div>
           <div class="post-other">
             <div class="post-info">
-              <p>作者：<span class="user" tippy-user>{{included['users.' + post.relationships.user.data.id].attributes.username}}</span></p>
+              <p>
+                作者：
+                <span class="user" :data-id="post.relationships.user.data.id" tippy-user>
+                  {{included['users.' + post.relationships.user.data.id].attributes.username}}
+                </span>
+              </p>
               <p>{{post.attributes.postCount}} 回复 / {{post.attributes.viewCount}} 浏览</p>
             </div>
             <div class="post-time">
-              <p>最后一次回复：<span class="user" tippy-user>{{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}</span></p>
+              <p>
+                最后一次回复：
+                <span class="user" :data-id="post.relationships.lastPostedUser.data.id" tippy-user>
+                  {{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}
+                </span>
+              </p>
               <p class="time" v-html="getTime(post.attributes.updatedAt)" :data-tippy-content="new Date(post.attributes.updatedAt).toLocaleString()"></p>
             </div>
           </div>
@@ -171,10 +191,11 @@ export default {
         let vue = this
         tippy('[tippy-user]', {
           onShow(instance) {
-            // vue.setData({
-            //   key: 'username',
-            //   value: '12345'
-            // })
+            console.log(instance)
+            vue.setData({
+              key: 'popUser',
+              value: vue.included['users.' + instance.reference.dataset.id].attributes
+            })
             vue.$nextTick(() => {
               instance.setContent(vue.$refs.userCard.$el.innerHTML)
             })
@@ -272,7 +293,7 @@ export default {
 }
 /* 论坛-帖子 */
 .posts{
-  background: var(--bg-color);
+  background: #f8f8f8;
   padding: 1em;
   margin: 1em 0;
   border-radius: 0.2em;
@@ -323,14 +344,14 @@ export default {
   display: inline-block;
 }
 .post-title{
-  width: 65em;
+  width: 62em;
 }
 .post-title h2{
   font-weight: normal;
   font-size: 1.4em;
 }
 .post-title p{
-  opacity: 0.6;
+  opacity: 0.7;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -353,7 +374,7 @@ export default {
   width: 10em;
 }
 .post-time{
-  width: 11em;
+  width: 12em;
 }
 .time{
   display: inline-block;

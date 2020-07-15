@@ -1,5 +1,7 @@
 <template>
   <div :class="[$route.name == 'Topic' ? 'topic' : '']" class="editor">
+    <!-- 加载图片 -->
+    <input @change="changeImage()" ref="load_pic" type="file" multiple accept="image/jpg,image/jpeg,image/png,image/gif" style="display: none">
     <!-- 顶部工具栏 -->
     <div class="editor-header">
       <div @click="closeEditor" class="header-btn close">
@@ -29,11 +31,11 @@
           <li v-for="(tool, index) in toolInfo" :key="tool.name" @mouseleave="closetool" class="item">
             <i @click="add(tool.action)" @mouseover="opentool(index)" :class="['icon-' + tool.name, 'iconfont']"></i>
             <div v-if="toolIndex == index" class="tool">
-              <ul v-if="tool.optionType != 'color'" :class="['tool-' + tool.optionType, 'tool-content']">
-                <li @click="add(tool.action, tool.actionValue[index])" v-for="(option, index) in tool.option" :key="index">{{option}}</li>
-              </ul>
               <ul v-if="tool.optionType == 'color'" :class="['tool-' + tool.optionType, 'tool-content']">
                 <li @click="add(tool.action, tool.actionValue[index])" v-for="(option, index) in tool.option" :key="index" :class="[option]"></li>
+              </ul>
+              <ul v-else :class="['tool-' + tool.optionType, 'tool-content']">
+                <li @click="add(tool.action, tool.actionValue[index])" v-for="(option, index) in tool.option" :key="index">{{option}}</li>
               </ul>
             </div>
           </li>
@@ -50,7 +52,7 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
-import XBBCODE from 'xbbcode-parser'
+import XBBCODE from '.././xbbcode'
 export default {
   name: 'editor',
   data: function() {
@@ -96,7 +98,8 @@ export default {
           name: 'tupian',
           optionType: 'list',
           action: 'img',
-          option: ['网络图片', '本地上传']
+          option: ['网络图片', '本地上传'],
+          actionValue: ['net', 'local']
         },
         {
           name: 'lianjie',
@@ -169,6 +172,11 @@ export default {
         bbcodeL = '[' + action + ']'
       }else if(typeof actionValue != 'undefined'){
         console.log('选择了带属性项目' + action + '属性为' + actionValue)
+        if(action == 'img' && actionValue == 'local'){
+          this.$refs.load_pic.files = null
+          this.$refs.load_pic.click()
+          return
+        }
         bbcodeL = '[' + action + '=' + actionValue + ']'
       }else{
         return
@@ -229,6 +237,24 @@ export default {
         this.isError = 0
         this.sendLoad = 0
       }, 2000);
+    },
+    changeImage() {
+      let files = this.$refs.load_pic.files
+      let content = this.$refs.content
+      files.forEach(e => {
+        let data = new FormData()
+        this.content = this.content.slice(0, content.selectionStart) + '[img=' + e.name +']上传中[/img]\n' + this.content.slice(content.selectionStart)
+        data.append('type', 1)
+        data.append('order', 2)
+        data.append('file', e)
+        this.axios.post('/api/attachments', data).then(response => {
+          let data = response.data.data.attributes
+          this.content = this.content.replace('[img=' + e.name +']上传中[/img]', '[img=' + e.name +']' + data.url + '[/img]')
+        }).catch(error => {
+          this.isError = 1
+          this.error = error.response.data.errors[0].detail[0]
+        })
+      })
     }
   }
 }
@@ -356,18 +382,16 @@ export default {
   position: relative;
   width: max-content;
   left: calc(-50% + 1em);
-  background: var(--dark-color);
+  background: var(--bg-color);
   border-radius: 0.2em;
   overflow: hidden;
 }
-.tool-list{
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-}
+
 .tool-list li{
   list-style: none;
   text-shadow: 1px 0px 10px rgba(0, 0, 0, 0.2);
   padding: 0 1em;
-  color: var(--base-color);
+  color: var(--text-color);
 }
 .tool-list li:hover{
   opacity: 0.8;
@@ -377,8 +401,8 @@ export default {
   list-style: none;
   text-shadow: 1px 0px 10px rgba(0, 0, 0, 0.2);
   padding: 0 0.8em;
-  color: var(--base-color);
-  background: var(--dark-color);
+  color: var(--text-color);
+  background: var(--bg-color);
 }
 .tool-color{
   display: flex;
@@ -442,7 +466,7 @@ export default {
 .icon-lianjie{
   font-size: 1.5em !important;
 }
-
+/* 主题页模式 */
 .topic{
   position: relative;
   box-shadow: none;
