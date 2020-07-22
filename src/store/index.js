@@ -24,6 +24,9 @@ export default new Vuex.Store({
   mutations: {
     setData(state, payload) {
       state[payload.key] = payload.value
+    },
+    test(){
+      console.log(this.abc)
     }
   },
   actions: {

@@ -8,11 +8,14 @@
   <!-- 头部 -->
   <div :class="['banner', loadPage[0] == 1 ? '' : 'hide']">
     <img src="../assets/mc.jpg" alt="">
-    <div :class="['banner-cover','tag', getPostTag(data.relationships.user.data.id, data.attributes.title, data.attributes.isEssence)]"></div>
+    <div v-once :class="['banner-cover','tag', getPostTag(data.relationships.user.data.id, data.attributes.title, data.attributes.isEssence)]"></div>
     <!-- 帖子信息 -->
     <div class="intro">
-      <h1 class="title" v-html="getPostTitle(data.attributes.title)"></h1>
-      <p :data-tippy-content="new Date(data.attributes.createdAt).toLocaleString()">发表于<span v-html="getTime(data.attributes.createdAt)"></span></p>
+      <h1 v-once class="title" v-html="getPostTitle(data.attributes.title)"></h1>
+      <p :data-tippy-content="new Date(data.attributes.createdAt).toLocaleString()">
+        发表于
+        <span v-once v-html="getTime(data.attributes.createdAt)"></span>
+      </p>
     </div>
   </div>
   <div class="forum-content">
@@ -23,20 +26,24 @@
         <div class="post-body">
           <!-- 用户信息 -->
           <div class="post-header">
-            <p class="user-name">陆陆侠</p>
-            <p class="post-time">一天前</p>
+            <p class="user-name">
+              {{included['users.' + data.relationships.user.data.id].attributes.username}}
+            </p>
+            <p class="post-time" :data-tippy-content="new Date(included['posts.' + data.relationships.firstPost.data.id].attributes.createdAt).toLocaleString()">
+              {{firstPost.time}}
+            </p>
             <p class="post-floor">#1</p>
           </div>
           <!-- 内容 -->
           <div class="post-main">
-            <div v-html="getContent(included['posts.' + data.relationships.firstPost.data.id].attributes.content)" class="post-content bbcode">
+            <div v-html="firstPost.content" class="post-content bbcode">
             </div>
           </div>
           <div class="post-bottom">
             <!-- 点赞 -->
             <div v-if="included['posts.' + data.relationships.firstPost.data.id].relationships.likedUsers.data != ''">
               <i class="iconfont icon-guanzhu"></i>
-              <p class="post-likedUser" v-html="getLikedUser(included['posts.' + data.relationships.firstPost.data.id].relationships.likedUsers.data)"></p>
+              <p class="post-likedUser" v-html="firstPost.likedUser"></p>
             </div>
             <!-- 功能 -->
             <p class="post-reply">回复#1</p>
@@ -44,7 +51,7 @@
         </div>
       </li>
       <!-- 回复 -->
-      <li v-for="(id, index) in reply" :key="id" :data-floor="startFloor + index" class="post">
+      <li v-for="(id, index) in replyList" :key="id" :data-floor="startFloor + index" class="post">
         <img class="avatar" src="../assets/avatar.png" alt="">
         <div class="post-body">
           <!-- 用户信息 -->
@@ -52,28 +59,54 @@
             <p class="user-name">
               {{included['users.' + included['posts.' + id].relationships.user.data.id].attributes.username}}
             </p>
-            <p class="post-time" :data-tippy-content="new Date(included['posts.' + id].attributes.createdAt).toLocaleString()"  v-html="getTime(included['posts.' + id].attributes.createdAt)"></p>
+            <p class="post-time" :data-tippy-content="new Date(included['posts.' + id].attributes.createdAt).toLocaleString()">
+              {{formatData['posts.' + id].time}}
+            </p>
             <p class="post-floor">#{{startFloor + index}}</p>
           </div>
           <!-- 内容 -->
           <div class="post-main">
-            <div class="post-content">
-              {{included['posts.' + id].attributes.content}}
+            <div v-html="formatData['posts.' + id].content" class="post-content bbcode">
             </div>
           </div>
           <div class="post-bottom">
             <!-- 点赞 -->
             <div v-if="included['posts.' + id].relationships.likedUsers.data != ''">
               <i class="iconfont icon-guanzhu"></i>
-              <p class="post-likedUser" v-html="getLikedUser(included['posts.' + id].relationships.likedUsers.data)"></p>
+              <p class="post-likedUser" v-html="formatData['posts.' + id].likedUser"></p>
             </div>
             <!-- 功能 -->
             <p class="post-reply">回复#{{startFloor + index}}</p>
           </div>
         </div>
       </li>
+      <!-- 自我回复 -->
+      <li v-for="(id, index) in selfReplyList" :key="id" :data-floor="selfReplyFloor[index]" class="post">
+        <img class="avatar" src="../assets/avatar.png" alt="">
+        <div class="post-body">
+          <!-- 用户信息 -->
+          <div class="post-header">
+            <p class="user-name">
+              {{included['users.' + included['posts.' + id].relationships.user.data.id].attributes.username}}
+            </p>
+            <p class="post-time" :data-tippy-content="new Date(included['posts.' + id].attributes.createdAt).toLocaleString()">
+              {{formatData['posts.' + id].time}}
+            </p>
+            <p class="post-floor">#{{selfReplyFloor[index]}}</p>
+          </div>
+          <!-- 内容 -->
+          <div class="post-main">
+            <div v-html="formatData['posts.' + id].content" class="post-content bbcode">
+            </div>
+          </div>
+          <div class="post-bottom">
+            <!-- 功能 -->
+            <p class="post-reply">回复#{{selfReplyFloor[index]}}</p>
+          </div>
+        </div>
+      </li>
       <li :class="[fixedEditor ? 'fixed-editor' : '']">
-        <Editor/>
+        <Editor @sendReply="sendReply" />
       </li>
     </ul>
     <!-- 侧边进度条 -->
@@ -114,12 +147,16 @@ export default {
       seekbarY: 0,        //进度条Y轴
       seekbarFloor: 1,    //进度条当前楼层
       data: null,         //存放获取的原始数据
+      firstPost: {},    //存放楼主数据
       reply: [],          //存放当前显示的楼层
+      selfReply: [],      //存放自我回复楼层id
+      selfReplyFloor: [], //存放自我回复楼层数
       included: {},       //存放关联数据
       startFloor: 0,      //起始楼层
       loadPage: [1, 1],   //加载页面
       showBanner: 0,      //是否展示顶部栏
       loadFlag: 0,        //是否处于加载更多中……
+      formatData: {}
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -141,7 +178,30 @@ export default {
   computed: {
     ...mapState([
       'fixedEditor'
-    ])
+    ]),
+    replyList: function() {
+      this.reply.forEach(id => {
+        if(!this.formatData['posts.' + id]){
+          this.formatData['posts.' + id] = {
+            time : this.getTime(this.included['posts.' + id].attributes.createdAt),
+            content : this.getContent(this.included['posts.' + id].attributes.content),
+            likedUser : this.getLikedUser(this.included['posts.' + id].relationships.likedUsers.data)
+          }
+        }
+      })
+      return this.reply
+    },
+    selfReplyList: function() {
+      this.selfReply.forEach(id => {
+        if(!this.formatData['posts.' + id]){
+          this.formatData['posts.' + id] = {
+            time : this.getTime(this.included['posts.' + id].attributes.createdAt),
+            content : this.getContent(this.included['posts.' + id].attributes.content),
+          }
+        }
+      })
+      return this.selfReply
+    }
   },
   methods: {
     ...mapMutations([
@@ -202,6 +262,12 @@ export default {
       post.included.forEach((item) => {
         this.included[item.type + '.' + item.id] = item
       })
+      this.firstPost = {
+        content : this.getContent(this.included['posts.' + this.data.relationships.firstPost.data.id].attributes.content),
+        likedUser : this.getLikedUser(this.included['posts.' + this.data.relationships.firstPost.data.id].relationships.likedUsers.data),
+        time : this.getTime(this.included['posts.' + this.data.relationships.firstPost.data.id].attributes.createdAt)
+      }
+
       //处理跳转
       this.allFloor = post.data.attributes.postCount
       this.allPage = Math.ceil(this.allFloor / 20)
@@ -236,8 +302,10 @@ export default {
     //加载更多
     loadMore: _debounce(function() {
       let body = document.documentElement
-      if(body.scrollHeight - (body.clientHeight + body.scrollTop) < 800 && !this.loadFlag && this.loadPage[1] <= this.allPage){
-        console.log('load more')
+      if(body.scrollHeight - (body.clientHeight + body.scrollTop) < 800 && !this.loadFlag && this.loadPage[1] < this.allPage){
+        //清空自己的回复
+        this.selfReply = []
+        this.selfReplyFloor = []
         this.loadFlag = 1
         axios.get('/api/threads/' + this.$route.params.id + '?filter[isDeleted]=no&include=user,posts,posts.user,user.groups,posts.likedUsers&page[number]=' + (this.loadPage[1] + 1) + '&page[limit]=20').then((response) => {
           response.data.data.relationships.posts.data.forEach((item) => {
@@ -270,7 +338,6 @@ export default {
               delay: 100
             })
             let newScrollTop = body.scrollHeight - oldScrollHeight + oldScrollTop
-            console.log(oldScrollTop)
             document.documentElement.scrollTo(0, newScrollTop)
             this.startFloor -= 20
             this.loadPage[0]--
@@ -278,7 +345,12 @@ export default {
           })
         })
       }
-    })
+    }),
+    sendReply(data) {
+      this.included['posts.' + data.data.id] = data.data
+      this.selfReply.push(data.data.id)
+      this.selfReplyFloor.push(data.included[1].attributes.postCount + 1)
+    }
   },
   mounted() {
     window.addEventListener('scroll', this.scroll, true)

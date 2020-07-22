@@ -95,7 +95,6 @@ var XBBCODE = (function() {
   tags = {
       "size": {
           openTag: function(params,content) {
-            console.log(params)
               params = params || '';
               var mySize = params.substr(1) || 'm';
               return '<span class="size-' + mySize + '">';

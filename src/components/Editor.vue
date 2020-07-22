@@ -204,8 +204,11 @@ export default {
     },
     send() {
       this.sendLoad = 1
-      if(this.title && this.content){
-        if(this.$route.name == 'Forum'){
+      if(this.$route.name == 'Forum'){
+        if(!this.title || !this.content){
+          this.isError = 1
+          this.error = '标题或正文为空！'
+        }else{
           this.axios.post('/api/threads', {
             data: {
               attributes: {
@@ -229,9 +232,33 @@ export default {
             this.error = error.response.data.errors[0].detail[0]
           })
         }
-      }else{
-        this.isError = 1
-        this.error = '标题或正文为空！'
+      }else if(this.$route.name == 'Topic'){
+        if(!this.content){
+          this.isError = 1
+          this.error = '正文为空！'
+        }else{
+          this.axios.post('/api/posts', {
+            data: {
+              attributes: {
+                content: this.content
+              },
+              relationships: {
+                thread: {
+                  data: {
+                    id: this.$route.params.id,
+                    type: "threads",
+                  }
+                }
+              }
+            }
+          }).then(response => {
+            this.content = null
+            this.$emit('sendReply', response.data)
+          }).catch(error => {
+            this.isError = 1
+            this.error = error.response.data.errors[0].detail[0]
+          })
+        }
       }
       setTimeout(() => {
         this.isError = 0

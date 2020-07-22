@@ -1,8 +1,8 @@
 <template>
   <div class="test">
     <UserCard style="display: none" ref="userCard" />
-    <p data-tippy-content>test</p>
-    <p v-html="getPostTitle('[公告][新闻]123123')"></p>
+    <p v-html="test"></p>
+    <p>{{abc}}</p>
   </div>
 </template>
 
@@ -16,12 +16,23 @@ export default {
   components: {
     UserCard
   },
+  data() {
+    return {
+      abc: 123
+    }
+  },
   methods: {
     ...mapMutations([
-      'setData'
+      'setData', 'test'
     ]),
     getPostTitle,
-    getPostTag
+    getPostTag,
+  },
+  computed: {
+    test: function() {
+      console.log(this)
+      return 233
+    }
   },
   mounted() {
     let vue = this
