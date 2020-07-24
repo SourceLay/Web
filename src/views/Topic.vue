@@ -135,7 +135,7 @@ import 'tippy.js/dist/tippy.css'; // optional for styling
 import XBBCODE from '.././xbbcode'
 import { mapState, mapMutations } from 'vuex'
 import { _throttle, _debounce } from './../public'
-import { getPostTitle, getPostTag, getTime } from './../public.js'
+import { getPostTitle, getPostTag, getTime, dzq } from './../public.js'
 export default {
   name: 'forum',
   data: function() {
@@ -166,7 +166,28 @@ export default {
       floor = parseInt(location.search.substr(3))
       page = Math.ceil((floor - 1) / 20)
     }
-    axios.get('/api/threads/' + to.params.id + '?filter[isDeleted]=no&include=user,firstPost,posts,posts.user,user.groups,category,firstPost.likedUsers,posts.likedUsers&page[number]=' + page + '&page[limit]=20').then((response) => {
+    axios.get(
+      dzq({
+        name: 'threads/' + to.params.id,
+        include: [
+          'user',
+          'firstPost',
+          'category',
+          'posts',
+          'posts.user',
+          'posts.likedUsers',
+          'user.groups',
+          'firstPost.likedUsers',
+        ],
+        filter: {
+          isDeleted: 'no',
+        },
+        page: {
+          number: 1,
+          limit: 20
+        }
+      })
+    ).then((response) => {
       next((vm) => {
         vm.getData(response.data, page, floor)
       })
@@ -307,7 +328,19 @@ export default {
         this.selfReply = []
         this.selfReplyFloor = []
         this.loadFlag = 1
-        axios.get('/api/threads/' + this.$route.params.id + '?filter[isDeleted]=no&include=user,posts,posts.user,user.groups,posts.likedUsers&page[number]=' + (this.loadPage[1] + 1) + '&page[limit]=20').then((response) => {
+        axios.get(
+          dzq({
+            name: 'threads/' + this.$route.params.id,
+            include: ['user', 'posts', 'posts.user', 'user.groups', 'posts.likedUsers'],
+            filter: {
+              isDeleted: 'no'
+            },
+            page: {
+              number: this.loadPage[1] + 1,
+              limit: 20
+            }
+          })
+        ).then((response) => {
           response.data.data.relationships.posts.data.forEach((item) => {
             this.reply.push(item.id)
           })
@@ -326,7 +359,19 @@ export default {
         let oldScrollHeight = body.scrollHeight
         let oldScrollTop = body.scrollTop
         this.loadFlag = 1
-        axios.get('/api/threads/' + this.$route.params.id + '?filter[isDeleted]=no&include=user,posts,posts.user,user.groups,posts.likedUsers&page[number]=' + (this.loadPage[0] - 1) + '&page[limit]=20').then((response) => {
+        axios.get(
+          dzq({
+            name: 'threads/' + this.$route.params.id,
+            include: ['user', 'posts', 'posts.user', 'user.groups', 'posts.likedUsers'],
+            filter: {
+              isDeleted: 'no'
+            },
+            page: {
+              number: this.loadPage[0] - 1,
+              limit: 20
+            }
+          })
+        ).then((response) => {
           response.data.data.relationships.posts.data.reverse().forEach((item) => {
             this.reply.unshift(item.id)
           })

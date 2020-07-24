@@ -1,3 +1,5 @@
+import { Object } from "core-js";
+
 // 防抖
 export function _debounce(fn, delay) {
   delay = delay || 200;
@@ -116,4 +118,27 @@ export function getPostTitle(title) {
     })
     return '<div>' + final + '</div>' + s.substring(last_valid).trim();
   }
+}
+export function dzq(e) {
+  let url = ''
+  let parts = []
+  Object.keys(e).forEach((item, index) => {
+    if(index == 0){
+      url = '/api/' + e[item] + '?'
+    }else if(e[item] instanceof Array){
+      parts.push(item + '=' + e[item].join(','))
+    }else{
+      if(e[item] instanceof Object){
+        let objectPart = []
+        Object.keys(e[item]).forEach(key => {
+          objectPart.push(item + '[' + key + ']=' + e[item][key])
+        })
+        parts.push(objectPart.join('&'))
+      }else{
+        parts.push(e[item])
+      }
+    }
+  })
+  url += parts.join('&')
+  return url
 }

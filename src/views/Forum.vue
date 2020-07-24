@@ -20,10 +20,9 @@
   <div class="forum-content">
     <ul class="tags">
       <li class="menu-item-choose">全部</li>
-      <li>生存</li>
-      <li>建筑</li>
-      <li>模组</li>
-      <li class="sort">排序方式：最新</li>
+      <li>精华</li>
+      <li>已关注</li>
+      <!-- <li class="sort">排序方式：最新</li> -->
       <li class="stat">
         <span class="stat-key">今日</span>
         <span class="stat-value">0</span>
@@ -123,7 +122,7 @@ import Editor from './../components/Editor.vue'
 import UserCard from './../components/UserCard.vue'
 import axios from 'axios'
 import tippy from 'tippy.js';
-import { getPostTitle, getPostTag, getTime} from './../public.js'
+import { getPostTitle, getPostTag, getTime, dzq} from './../public.js'
 import 'tippy.js/dist/tippy.css'; // optional for styling
 export default {
   name: 'forum',
@@ -142,9 +141,31 @@ export default {
   beforeRouteEnter(to, from, next) {
     let top = null
     let post = null
-    axios.get('/api/threads?include=user,firstPost,lastPostedUser,user.groups&filter[type]=1&filter[isDeleted]=no&filter[isSticky]=yes&filter[categoryId]=' + to.params.id).then((response) => {
+    axios.get(
+      dzq({
+        name: 'threads',
+        include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
+        filter: {
+          type: 1,
+          isDeleted: 'no',
+          isSticky: 'yes',
+          categoryId: to.params.id
+        }
+      })
+    ).then((response) => {
       top = response.data
-      axios.get('/api/threads?include=user,firstPost,lastPostedUser,user.groups&filter[type]=1&filter[isDeleted]=no&filter[isSticky]=no&filter[categoryId]=' + to.params.id).then((response) => {
+      axios.get(
+        dzq({
+          name: 'threads',
+          include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
+          filter: {
+            type: 1,
+            isDeleted: 'no',
+            isSticky: 'no',
+            categoryId: to.params.id
+          }
+        })
+      ).then((response) => {
         post = response.data
         next((vm) => {
           vm.getPost(top, post)

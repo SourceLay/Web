@@ -3,6 +3,7 @@
     <UserCard style="display: none" ref="userCard" />
     <p v-html="test"></p>
     <p>{{abc}}</p>
+    <p>{{tester}}</p>
   </div>
 </template>
 
@@ -18,7 +19,8 @@ export default {
   },
   data() {
     return {
-      abc: 123
+      abc: 123,
+      tester: 'url'
     }
   },
   methods: {
@@ -27,6 +29,29 @@ export default {
     ]),
     getPostTitle,
     getPostTag,
+    dzq(e) {
+      let url = ''
+      let parts = []
+      Object.keys(e).forEach((item, index) => {
+        if(index == 0){
+          url = '/api/' + e[item] + '?'
+        }
+        if(e[item] instanceof Array){
+          parts.push(item + '=' + e[item].join(','))
+        }else{
+          if(e[item] instanceof Object){
+            let objectPart = []
+            Object.keys(e[item]).forEach(key => {
+              objectPart.push(item + '[' + key + ']=' + e[item][key])
+            })
+            parts.push(objectPart.join('&'))
+          }
+        }
+      })
+      url += parts.join('&')
+      console.log(parts)
+      return url
+    }
   },
   computed: {
     test: function() {
@@ -35,6 +60,14 @@ export default {
     }
   },
   mounted() {
+    this.tester = this.dzq({
+                    name: 'threads',
+                    include: ['user', 'firstPost'],
+                    filter: {
+                      type: 1,
+                      isDeleted: 'no'
+                    }
+                  })
     let vue = this
     tippy('[data-tippy-content]', {
       onShow(instance) {
