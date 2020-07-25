@@ -39,7 +39,6 @@ export function _throttle(fn, interval) {
 }
 //获取时间
 export function getTime(time) {
-  console.log('time')
   let second = new Date() - new Date(time)
   if(second < 1000 * 10){
     return '刚刚'
@@ -76,7 +75,6 @@ export function getPostTag(id, title, star) {
 }
 //获取帖子标题
 export function getPostTitle(title) {
-  console.log('123')
   if(['[公告]', '[活动]', '[版规]'].includes(title.slice(0, 4))){
     return title.slice(4)
   }else{
@@ -135,7 +133,7 @@ export function dzq(e) {
         })
         parts.push(objectPart.join('&'))
       }else{
-        parts.push(e[item])
+        parts.push(item + '=' + e[item])
       }
     }
   })
