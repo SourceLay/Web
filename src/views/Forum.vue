@@ -105,11 +105,7 @@
     </ul>
     <ul class="pages">
       <li class="pages-btn">上一页</li>
-      <li class="pages-active">1</li>
-      <li>2</li>
-      <li>3</li>
-      <li>…</li>
-      <li>9</li>
+      <li v-for="p in pageList" :key="p" :class="page == p ? 'pages-active' : ''">{{p}}</li>
       <li class="pages-btn">下一页</li>
     </ul>
   </div>
@@ -135,12 +131,19 @@ export default {
       test: '666',
       topPost: null,
       post: null,
+      page: 1,
+      pageList: [],
       included: {},
     }
   },
   beforeRouteEnter(to, from, next) {
     let top = null
     let post = null
+    let page = 1
+    if(location.search.substr(0, 3) == '?p='){
+      page = parseInt(location.search.substr(3))
+    }
+    //获取置顶
     axios.get(
       dzq({
         name: 'threads',
@@ -154,6 +157,7 @@ export default {
       })
     ).then((response) => {
       top = response.data
+      //获取帖子
       axios.get(
         dzq({
           name: 'threads',
@@ -163,12 +167,17 @@ export default {
             isDeleted: 'no',
             isSticky: 'no',
             categoryId: to.params.id
-          }
+          },
+          page: {
+            number: page,
+            limit: 5
+          },
+          sort: '-updatedAt'
         })
       ).then((response) => {
         post = response.data
         next((vm) => {
-          vm.getPost(top, post)
+          vm.getPost(top, post, page)
         })
       })
     })
@@ -195,9 +204,23 @@ export default {
         value: 1
       })
     },
-    getPost(top, post) {
+    getPost(top, post, page) {
       this.topPost = top.data
       this.post = post.data
+      this.page = page
+
+      let allPage = post.meta.pageCount
+
+      if(allPage <= 10){
+        this.pageList = Array.from(new Array(allPage), (x,i) => i + 1)
+      }else if(page < 4){
+        this.pageList = Array.from(new Array(page + 1), (x,i) => i + 2)
+      }else if((allPage - page) < 3){
+        this.pageList = Array.from(new Array(allPage - page + 2), (x,i) => i + (page - 2))
+      }else{
+        this.pageList = Array.from(new Array(5), (x,i) => i + page - 2)
+      }
+
       if(typeof top.included != 'undefined'){
         top.included.forEach((item) => {
           this.included[item.type + '.' + item.id] = item
