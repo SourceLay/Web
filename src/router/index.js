@@ -25,14 +25,14 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/Test.vue')
   },
   {
-    path: '/forums/:id/:page?',
-    name: 'Forum',
-    component: Forum
-  },
-  {
     path: '/forums/topics/:id',
     name: 'Topic',
     component: Topic
+  },
+  {
+    path: '/forums/:id/:page?',
+    name: 'Forum',
+    component: Forum
   }
 ]
 
