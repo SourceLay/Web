@@ -104,9 +104,29 @@
       <img v-if="post == 0" class="empty" src="../assets/empty.png" alt="">
     </ul>
     <ul class="pages">
-      <li class="pages-btn">上一页</li>
-      <li v-for="p in pageList" :key="p" :class="page == p ? 'pages-active' : ''">{{p}}</li>
-      <li class="pages-btn">下一页</li>
+      <li :style="{pointerEvents: page == 1 ? 'none' : ''}" class="pages-btn">
+        <router-link :to="{params: {page : Number(page) - 1}}">上一页</router-link>
+      </li>
+
+      <li :class="page == 1 ? 'pages-active' : ''">
+        <router-link :to="{params: {page : 1}}">1</router-link>
+      </li>
+      
+      <li v-if="pageList != '' && pageList[0] != 2">…</li>
+      
+      <li v-for="p in pageList" :key="p" :class="page == p ? 'pages-active' : ''">
+        <router-link :to="{params: {page : p}}">{{p}}</router-link>
+      </li>
+
+      <li v-if="pageList != '' && pageList[pageList.length - 1] != allPage -1">…</li>
+
+      <li v-if="allPage != 1" :class="page == allPage ? 'pages-active' : ''">
+        <router-link :to="{params: {page : allPage}}">{{allPage}}</router-link>
+      </li>
+
+      <li :style="{pointerEvents: page == allPage ? 'none' : ''}" class="pages-btn">
+        <router-link :to="{params: {page : Number(page) + 1}}">下一页</router-link>
+      </li>
     </ul>
   </div>
 </div>
@@ -132,6 +152,7 @@ export default {
       topPost: null,
       post: null,
       page: 1,
+      allPage: 0,
       pageList: [],
       included: {},
     }
@@ -140,8 +161,8 @@ export default {
     let top = null
     let post = null
     let page = 1
-    if(location.search.substr(0, 3) == '?p='){
-      page = parseInt(location.search.substr(3))
+    if(to.params.page){
+      page = to.params.page
     }
     //获取置顶
     axios.get(
@@ -170,7 +191,7 @@ export default {
           },
           page: {
             number: page,
-            limit: 5
+            limit: 20
           },
           sort: '-updatedAt'
         })
@@ -184,7 +205,33 @@ export default {
   },
   beforeRouteUpdate(to, from, next) {
     console.log('同页面跳转')
-    next()
+    let top = null
+    let post = null
+    let page = 1
+    if(to.params.page){
+      page = to.params.page
+    }
+    axios.get(
+      dzq({
+        name: 'threads',
+        include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
+        filter: {
+          type: 1,
+          isDeleted: 'no',
+          isSticky: 'no',
+          categoryId: to.params.id
+        },
+        page: {
+          number: page,
+          limit: 20
+        },
+        sort: '-updatedAt'
+      })
+    ).then((response) => {
+      post = response.data
+      this.getPost(top, post, page)
+      next()
+    })
   },
   computed: {
     ...mapState([
@@ -205,23 +252,30 @@ export default {
       })
     },
     getPost(top, post, page) {
-      this.topPost = top.data
+      if(top){
+        this.topPost = top.data
+      }
       this.post = post.data
       this.page = page
+      page = Number(page)
 
-      let allPage = post.meta.pageCount
-
-      if(allPage <= 10){
-        this.pageList = Array.from(new Array(allPage), (x,i) => i + 1)
+      this.allPage = post.meta.pageCount
+      if(this.allPage == 0){
+        this.allPage = 1
+      }
+      if(this.allPage == 1){
+        this.pageList = []
+      }else if(this.allPage <= 10){
+        this.pageList = Array.from(new Array(this.allPage - 2), (x,i) => i + 2)
       }else if(page < 4){
         this.pageList = Array.from(new Array(page + 1), (x,i) => i + 2)
-      }else if((allPage - page) < 3){
-        this.pageList = Array.from(new Array(allPage - page + 2), (x,i) => i + (page - 2))
+      }else if((this.allPage - page) < 3){
+        this.pageList = Array.from(new Array(this.allPage - page + 2), (x,i) => i + (page - 2))
       }else{
         this.pageList = Array.from(new Array(5), (x,i) => i + page - 2)
       }
 
-      if(typeof top.included != 'undefined'){
+      if(top && typeof top.included != 'undefined'){
         top.included.forEach((item) => {
           this.included[item.type + '.' + item.id] = item
         })
@@ -475,8 +529,13 @@ export default {
 .pages li{
   display: inline-block;
   list-style: none;
-  padding: 0.2em 0.6em;
   margin: 0 0.2em;
+}
+.pages a{
+  display: block;
+  padding: 0.2em 0.6em;
+  color: inherit;
+  text-decoration: none;
 }
 .pages-btn{
   background: var(--item-color);
@@ -484,6 +543,9 @@ export default {
   border-radius: 1em;
   letter-spacing: 0.1em;
   text-shadow: 1px 0px 10px rgba(0, 0, 0, 0.4);
+}
+.pages-btn a{
+  padding: 0;
 }
 .pages-active{
   background: var(--bg-color);
