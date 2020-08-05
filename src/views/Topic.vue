@@ -46,7 +46,12 @@
               <p class="post-likedUser" v-html="firstPost.likedUser"></p>
             </div>
             <!-- 功能 -->
-            <p class="post-reply">回复#1</p>
+            <ul class="post-func">
+              <li v-if="included['posts.' + data.relationships.firstPost.data.id].attributes.canHide">删除</li>
+              <li v-if="included['posts.' + data.relationships.firstPost.data.id].attributes.canEdit">编辑</li>
+              <li v-if="included['posts.' + data.relationships.firstPost.data.id].attributes.canLike">点赞</li>
+              <li>回复#1</li>
+            </ul>
           </div>
         </div>
       </li>
@@ -76,7 +81,12 @@
               <p class="post-likedUser" v-html="formatData['posts.' + id].likedUser"></p>
             </div>
             <!-- 功能 -->
-            <p class="post-reply">回复#{{startFloor + index}}</p>
+            <ul class="post-func">
+              <li v-if="included['posts.' + id].attributes.canHide">删除</li>
+              <li v-if="included['posts.' + id].attributes.canEdit">编辑</li>
+              <li v-if="included['posts.' + id].attributes.canLike">点赞</li>
+              <li>回复#{{startFloor + index}}</li>
+            </ul>
           </div>
         </div>
       </li>
@@ -115,11 +125,11 @@
         <p @click="showEditor" class="btn btn-reply">添加回复</p>
         <div class="post-seekbar">
           <p :style="{opacity: inBar, transform: 'translate(0, ' + seekbarY + 'px)'}" class="bar-tip">{{seekbarFloor}}</p>
-          <p><i class="iconfont icon-shang"></i>主楼</p>
+          <p class="post-seekbar-btn" @click="jumpTo(1)"><i class="iconfont icon-shang"></i>主楼</p>
           <div @click="jumpFloor" @mousemove="showBar" @mouseleave="closeBar" class="bar">
             <div :style="{height: seekbarPercent + '%'}" class="now-bar"></div>
           </div>
-          <p><i class="iconfont icon-shang icon-xia"></i>最新楼层</p>
+          <p class="post-seekbar-btn" @click="jumpTo(allFloor)"><i class="iconfont icon-shang icon-xia"></i>最新楼层</p>
         </div>
       </div>
     </div>
@@ -183,7 +193,7 @@ export default {
           isDeleted: 'no',
         },
         page: {
-          number: 1,
+          number: page,
           limit: 20
         }
       })
@@ -271,6 +281,10 @@ export default {
       }else{
         window.location.href = window.location.pathname + '?n=' + this.seekbarFloor
       }
+    },
+    jumpTo(id){
+      this.seekbarFloor = id
+      this.jumpFloor()
     },
     //处理API数据并初始化
     getData: function(post, page, floor) {
@@ -576,12 +590,16 @@ export default {
 .post-likedUser >>>span{
   margin-right: 0.5em;
 }
-.post-reply{
+.post-func{
   float: right;
   transition: opacity 0.3s;
   opacity: 0;
 }
-.post:hover .post-reply{
+.post-func li{
+  display: inline-block;
+  margin-left: 0.5em
+}
+.post:hover .post-func{
   opacity: 1;
 }
 /* 进度条 */
@@ -616,6 +634,9 @@ export default {
 }
 .post-seekbar:hover .bar, .post-seekbar:hover .now-bar{
   width: 0.8em;
+}
+.post-seekbar-btn{
+  cursor: pointer;
 }
 .bar:hover .bar-tip{
   opacity: 1;
