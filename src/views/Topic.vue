@@ -1,20 +1,15 @@
 <template>
-<!--
-  <div>
-    <p>{{$route.params.id}}{{$bus.$data.contentWidth}}</p>
-  </div>
--->
-<div v-if="data" class="para-content">
+<div v-if="topic" class="para-content">
   <!-- 头部 -->
   <div :class="['banner', loadPage[0] == 1 ? '' : 'hide']">
     <img src="../assets/mc.jpg" alt="">
-    <div v-once :class="['banner-cover','tag', getPostTag(data.relationships.user.data.id, data.attributes.title, data.attributes.isEssence)]"></div>
+    <div v-once :class="['banner-cover','tag', getPostTag(topic.relationships.user.data.id, topic.attributes.title, topic.attributes.isEssence)]"></div>
     <!-- 帖子信息 -->
     <div class="intro">
-      <h1 v-once class="title" v-html="getPostTitle(data.attributes.title)"></h1>
-      <p :data-tippy-content="new Date(data.attributes.createdAt).toLocaleString()">
+      <h1 v-once class="title" v-html="getPostTitle(topic.attributes.title)"></h1>
+      <p :data-tippy-content="new Date(topic.attributes.createdAt).toLocaleString()">
         发表于
-        <span v-once v-html="getTime(data.attributes.createdAt)"></span>
+        <span v-once v-html="getTime(topic.attributes.createdAt)"></span>
       </p>
     </div>
   </div>
@@ -27,9 +22,9 @@
           <!-- 用户信息 -->
           <div class="post-header">
             <p class="user-name">
-              {{included['users.' + data.relationships.user.data.id].attributes.username}}
+              {{included['users.' + topic.relationships.user.data.id].attributes.username}}
             </p>
-            <p class="post-time" :data-tippy-content="new Date(included['posts.' + data.relationships.firstPost.data.id].attributes.createdAt).toLocaleString()">
+            <p class="post-time" :data-tippy-content="new Date(included['posts.' + topic.relationships.firstPost.data.id].attributes.createdAt).toLocaleString()">
               {{firstPost.time}}
             </p>
             <p class="post-floor">#1</p>
@@ -41,15 +36,15 @@
           </div>
           <div class="post-bottom">
             <!-- 点赞 -->
-            <div v-if="included['posts.' + data.relationships.firstPost.data.id].relationships.likedUsers.data != ''">
+            <div v-if="included['posts.' + topic.relationships.firstPost.data.id].relationships.likedUsers.data != ''">
               <i class="iconfont icon-guanzhu"></i>
               <p class="post-likedUser" v-html="firstPost.likedUser"></p>
             </div>
             <!-- 功能 -->
             <ul class="post-func">
-              <li v-if="included['posts.' + data.relationships.firstPost.data.id].attributes.canHide">删除</li>
-              <li v-if="included['posts.' + data.relationships.firstPost.data.id].attributes.canEdit">编辑</li>
-              <li v-if="included['posts.' + data.relationships.firstPost.data.id].attributes.canLike">点赞</li>
+              <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canHide">删除</li>
+              <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canEdit">编辑</li>
+              <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canLike">点赞</li>
               <li>回复#1</li>
             </ul>
           </div>
@@ -111,7 +106,12 @@
           </div>
           <div class="post-bottom">
             <!-- 功能 -->
-            <p class="post-reply">回复#{{selfReplyFloor[index]}}</p>
+            <ul class="post-func">
+              <li v-if="included['posts.' + id].attributes.canHide">删除</li>
+              <li v-if="included['posts.' + id].attributes.canEdit">编辑</li>
+              <li v-if="included['posts.' + id].attributes.canLike">点赞</li>
+              <li>回复#{{selfReplyFloor[index]}}</li>
+            </ul>
           </div>
         </div>
       </li>
@@ -150,15 +150,19 @@ export default {
   name: 'forum',
   data: function() {
     return {
+      topic: null,        //存放主题数据
+      showPost: [],       //当前展示的帖子ID
+      jumpUrl: {},
+
       inBar: 0,           //进度条激活状态
       allFloor: null,       //获取所有楼层数
       allPage: null,      //获取所有页数
       seekbarPercent: 0,  //进度条百分比
       seekbarY: 0,        //进度条Y轴
       seekbarFloor: 1,    //进度条当前楼层
-      data: null,         //存放获取的原始数据
+
       firstPost: {},    //存放楼主数据
-      reply: [],          //存放当前显示的楼层
+
       selfReply: [],      //存放自我回复楼层id
       selfReplyFloor: [], //存放自我回复楼层数
       included: {},       //存放关联数据
@@ -170,36 +174,46 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    //获取API数据
+    //获取楼层数据
     let floor = 1, page = 1
     if(location.search.substr(0, 3) == '?n='){
       floor = parseInt(location.search.substr(3))
       page = Math.ceil((floor - 1) / 20)
     }
+    //获取主题信息
     axios.get(
       dzq({
         name: 'threads/' + to.params.id,
         include: [
-          'user',
           'firstPost',
           'category',
-          'posts',
-          'posts.user',
-          'posts.likedUsers',
           'user.groups',
           'firstPost.likedUsers',
-        ],
-        filter: {
-          isDeleted: 'no',
-        },
-        page: {
-          number: page,
-          limit: 20
-        }
+        ]
       })
-    ).then((response) => {
-      next((vm) => {
-        vm.getData(response.data, page, floor)
+    ).then((topic) => {
+      //获取回复
+      axios.get(
+        dzq({
+          name: 'posts',
+          filter: {
+            isDeleted: 'no',
+            thread: to.params.id
+          },
+          include: [
+            'user',
+            'user.groups',
+            'likedUsers'
+          ],
+          page: {
+            number: page,
+            limit: 20
+          }
+        })
+      ).then((post) => {
+        next((vm) => {
+          vm.getData(topic.data, post.data, page, floor)
+        })
       })
     })
   },
@@ -211,7 +225,7 @@ export default {
       'fixedEditor'
     ]),
     replyList: function() {
-      this.reply.forEach(id => {
+      this.showPost.forEach(id => {
         if(!this.formatData['posts.' + id]){
           this.formatData['posts.' + id] = {
             time : this.getTime(this.included['posts.' + id].attributes.createdAt),
@@ -220,7 +234,7 @@ export default {
           }
         }
       })
-      return this.reply
+      return this.showPost
     },
     selfReplyList: function() {
       this.selfReply.forEach(id => {
@@ -287,24 +301,35 @@ export default {
       this.jumpFloor()
     },
     //处理API数据并初始化
-    getData: function(post, page, floor) {
+    getData: function(topic, post, page, floor) {
       //处理数据
       this.loadPage = [page, page]
-      this.data = post.data
-      post.data.relationships.posts.data.forEach((item, index) => {
-        this.reply[index] = item.id
-      })
-      post.included.forEach((item) => {
+      this.topic = topic.data
+
+      this.jumpUrl = post.links
+      //存放关联数据
+      topic.included.forEach((item) => {
         this.included[item.type + '.' + item.id] = item
       })
+      //存放回复数据
+      if(post.data != ''){
+        post.included.forEach((item) => {
+          this.included[item.type + '.' + item.id] = item
+        })
+        post.data.forEach((item, index) => {
+          this.showPost[index] = item.id
+          this.included[item.type + '.' + item.id] = item
+        })
+      }
+      
       this.firstPost = {
-        content : this.getContent(this.included['posts.' + this.data.relationships.firstPost.data.id].attributes.content),
-        likedUser : this.getLikedUser(this.included['posts.' + this.data.relationships.firstPost.data.id].relationships.likedUsers.data),
-        time : this.getTime(this.included['posts.' + this.data.relationships.firstPost.data.id].attributes.createdAt)
+        content : this.getContent(this.included['posts.' + this.topic.relationships.firstPost.data.id].attributes.content),
+        likedUser : this.getLikedUser(this.included['posts.' + this.topic.relationships.firstPost.data.id].relationships.likedUsers.data),
+        time : this.getTime(this.included['posts.' + this.topic.relationships.firstPost.data.id].attributes.createdAt)
       }
 
       //处理跳转
-      this.allFloor = post.data.attributes.postCount
+      this.allFloor = post.meta.postCount + 1
       this.allPage = Math.ceil(this.allFloor / 20)
       this.startFloor = (page - 1) * 20 + 2
       this.seekbarFloor = floor
@@ -343,24 +368,14 @@ export default {
         this.selfReplyFloor = []
         this.loadFlag = 1
         axios.get(
-          dzq({
-            name: 'threads/' + this.$route.params.id,
-            include: ['user', 'posts', 'posts.user', 'user.groups', 'posts.likedUsers'],
-            filter: {
-              isDeleted: 'no'
-            },
-            page: {
-              number: this.loadPage[1] + 1,
-              limit: 20
-            }
-          })
+          //临时截去前半段
+          this.jumpUrl.next.slice(16)
         ).then((response) => {
-          response.data.data.relationships.posts.data.forEach((item) => {
-            this.reply.push(item.id)
-          })
-          response.data.included.forEach((item) => {
+          response.data.data.forEach((item) => {
+            this.showPost.push(item.id)
             this.included[item.type + '.' + item.id] = item
           })
+          this.jumpUrl = response.data.links
           this.$nextTick(() => {
             tippy('[data-tippy-content]', {
               delay: 100
@@ -374,24 +389,14 @@ export default {
         let oldScrollTop = body.scrollTop
         this.loadFlag = 1
         axios.get(
-          dzq({
-            name: 'threads/' + this.$route.params.id,
-            include: ['user', 'posts', 'posts.user', 'user.groups', 'posts.likedUsers'],
-            filter: {
-              isDeleted: 'no'
-            },
-            page: {
-              number: this.loadPage[0] - 1,
-              limit: 20
-            }
-          })
+          //临时截去前半段
+          this.jumpUrl.prev.slice(16)
         ).then((response) => {
-          response.data.data.relationships.posts.data.reverse().forEach((item) => {
-            this.reply.unshift(item.id)
-          })
-          response.data.included.forEach((item) => {
+          response.data.data.reverse().forEach((item) => {
+            this.showPost.unshift(item.id)
             this.included[item.type + '.' + item.id] = item
           })
+          this.jumpUrl = response.data.links
           this.$nextTick(() => {
             tippy('[data-tippy-content]', {
               delay: 100
@@ -408,7 +413,7 @@ export default {
     sendReply(data) {
       this.included['posts.' + data.data.id] = data.data
       this.selfReply.push(data.data.id)
-      this.selfReplyFloor.push(data.included[1].attributes.postCount + 1)
+      this.selfReplyFloor.push(data.included[1].attributes.postCount)
     }
   },
   mounted() {
