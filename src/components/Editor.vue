@@ -23,7 +23,7 @@
         </div>
         <!-- 输入框 -->
         <input v-if="!preview" v-model="title" placeholder="标题…" type="text">
-        <textarea v-if="!preview" v-model="content" ref="content" placeholder="正文…"></textarea>
+        <textarea v-if="!preview" v-model="content" ref="content" :placeholder="[replyData ? '回复#' + replyData.floor : '正文…']"></textarea>
       </div>
       <!-- 底部工具 -->
       <div class="btns">
@@ -55,6 +55,9 @@ import { mapState, mapMutations } from 'vuex'
 import XBBCODE from '.././xbbcode'
 export default {
   name: 'editor',
+  props: [
+    'replyData'
+  ],
   data: function() {
     return {
       inTopic: 0,
@@ -237,11 +240,14 @@ export default {
           this.isError = 1
           this.error = '正文为空！'
         }else{
+          let attr = {}
+          attr.content = this.content
+          if(this.replyData){
+            attr.replyId = this.replyData.id
+          }
           this.axios.post('/api/posts', {
             data: {
-              attributes: {
-                content: this.content
-              },
+              attributes: attr,
               relationships: {
                 thread: {
                   data: {

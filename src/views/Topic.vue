@@ -45,7 +45,7 @@
               <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canHide">删除</li>
               <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canEdit">编辑</li>
               <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canLike">点赞</li>
-              <li>回复#1</li>
+              <li @click="setReply(1, topic.relationships.firstPost.data.id)">回复#1</li>
             </ul>
           </div>
         </div>
@@ -80,7 +80,7 @@
               <li v-if="included['posts.' + id].attributes.canHide">删除</li>
               <li v-if="included['posts.' + id].attributes.canEdit">编辑</li>
               <li v-if="included['posts.' + id].attributes.canLike">点赞</li>
-              <li>回复#{{startFloor + index}}</li>
+              <li @click="setReply(startFloor + index, id)">回复#{{startFloor + index}}</li>
             </ul>
           </div>
         </div>
@@ -110,13 +110,13 @@
               <li v-if="included['posts.' + id].attributes.canHide">删除</li>
               <li v-if="included['posts.' + id].attributes.canEdit">编辑</li>
               <li v-if="included['posts.' + id].attributes.canLike">点赞</li>
-              <li>回复#{{selfReplyFloor[index]}}</li>
+              <li @click="setReply(selfReplyFloor[index], id)">回复#{{selfReplyFloor[index]}}</li>
             </ul>
           </div>
         </div>
       </li>
       <li :class="[fixedEditor ? 'fixed-editor' : '']">
-        <Editor @sendReply="sendReply" />
+        <Editor :replyData="replyData" @sendReply="sendReply" />
       </li>
     </ul>
     <!-- 侧边进度条 -->
@@ -153,6 +153,7 @@ export default {
       topic: null,        //存放主题数据
       showPost: [],       //当前展示的帖子ID
       jumpUrl: {},
+      replyData: null,    //预备回复信息
 
       inBar: 0,           //进度条激活状态
       allFloor: null,       //获取所有楼层数
@@ -273,6 +274,7 @@ export default {
       }
     },
     showEditor: function() {
+      this.replyData = null
       this.setData({
         key: 'fixedEditor',
         value: 1
@@ -410,10 +412,25 @@ export default {
         })
       }
     }),
+    setReply(floor, id) {
+      this.setData({
+        key: 'fixedEditor',
+        value: 1
+      })
+      this.replyData = {
+        floor: floor,
+        id: id
+      }
+    },
     sendReply(data) {
       this.included['posts.' + data.data.id] = data.data
       this.selfReply.push(data.data.id)
       this.selfReplyFloor.push(data.included[1].attributes.postCount)
+      this.setData({
+        key: 'fixedEditor',
+        value: 0
+      })
+      this.replyData = null
     }
   },
   mounted() {
@@ -683,6 +700,16 @@ export default {
   position: sticky;
   bottom: 1em;
   z-index: 1;
+}
+.fixed-editor::after{
+  content: "";
+  position: absolute;
+  display: block;
+  background: #fff;
+  width: calc(100% + 2em);
+  height: 100%;
+  left: -1em;
+  bottom: -2em;
 }
 .hide{
   display: none !important;
