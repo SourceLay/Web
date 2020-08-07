@@ -426,6 +426,7 @@ export default {
       this.included['posts.' + data.data.id] = data.data
       this.selfReply.push(data.data.id)
       this.selfReplyFloor.push(data.included[1].attributes.postCount)
+      this.allFloor = data.included[1].attributes.postCount
       this.setData({
         key: 'fixedEditor',
         value: 0

@@ -84,7 +84,7 @@
               <!-- 这里可以套娃展开，但是实际上没必要 -->
               <img src="../assets/mc.jpeg" alt="">
               <p class="board-name">{{board.name}}<span class="board-today">(15)</span></p>
-              <p class="board-slogan">{{board.description}}</p>
+              <p class="board-slogan">{{board.slogan}}</p>
             </router-link>
           </li>
         </ul>
