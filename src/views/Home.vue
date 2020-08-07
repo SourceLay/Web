@@ -80,7 +80,7 @@
     <div class="block-content">
         <ul class="boards">
           <li v-for="(board, index) in info.children" :key="index" class="board">
-            <router-link :to="{path: '/forums/' + board}">
+            <router-link :to="{path: '/forums/' + board.id}">
               <!-- 这里可以套娃展开，但是实际上没必要 -->
               <img src="../assets/mc.jpeg" alt="">
               <p class="board-name">{{board.name}}<span class="board-today">(15)</span></p>
