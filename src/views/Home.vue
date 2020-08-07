@@ -79,11 +79,12 @@
     </h2>
     <div class="block-content">
         <ul class="boards">
-          <li v-for="(board, index) in info.board" :key="index" class="board">
-            <router-link :to="{path: '/forums/' + board}">
+          <li v-for="(board, index) in info.children" :key="index" class="board">
+            <router-link :to="{path: '/forums/' + board.id}">
+              <!-- 这里可以套娃展开，但是实际上没必要 -->
               <img src="../assets/mc.jpeg" alt="">
-              <p class="board-name">{{forumInfo[board - 1].attributes.name}}<span class="board-today">(15)</span></p>
-              <p class="board-slogan">{{forumInfo[board - 1].attributes.description}}</p>
+              <p class="board-name">{{board.name}}<span class="board-today">(15)</span></p>
+              <p class="board-slogan">{{board.description}}</p>
             </router-link>
           </li>
         </ul>
@@ -172,27 +173,6 @@ export default {
           'share.png'
         ]
       ],
-      //板块信息
-      boardInfo: [
-        {
-          icon: 'xingqiu',
-          name: '派瑞行星',
-          slogan: '一起体验创造的乐趣！',
-          board: [1, 2, 3, 4, 5]
-        },
-        {
-          icon: 'youxi',
-          name: '游海拾慧',
-          slogan: '永远都是孩子！',
-          board: [6, 7, 8, 9]
-        },
-        {
-          icon: 'icon-chilun',
-          name: '社区基石',
-          slogan: '轴承之力！',
-          board: [10, 11, 12, 13]
-        }
-      ],
       //主题菜单
       postInfo: [
         '最新主题', '最新回复', '热门主题'
@@ -201,8 +181,9 @@ export default {
   },
   computed: {
     ...mapState([
-      'forumInfo'
-    ])
+      'boardInfo'
+    ]),
+
   },
   methods: {
     showIndexBanner(index) {
