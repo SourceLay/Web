@@ -1,6 +1,7 @@
 class CategoriesTranslator {
     constructor (categories) {
         this.data = {};
+        this.original = [];
 
         for (let a_categories of categories.data) {
             if (a_categories.type == "categories") {
@@ -19,6 +20,8 @@ class CategoriesTranslator {
     }
 
     add (a_categories) {
+        this.original[a_categories.id] = a_categories;
+
         let path = a_categories.attributes.name.split(".");
         let id = a_categories.id;
     
@@ -57,6 +60,7 @@ class CategoriesTranslator {
             if (flag === 0) {
                 let new_dir = {name:foot, board:[]};
                 dir.children.push(new_dir);
+                new_dir.parent = dir;
                 dir = new_dir;
             }
             
@@ -72,6 +76,8 @@ class CategoriesTranslator {
             dir.fullname = a_categories.attributes.name;
             dir.slogan = a_categories.attributes.description;
             
+            this.original[a_categories.id].translated = dir;
+
             // 备用信息
             // dir.description = a_categories.attributes.description;
             // dir.sort = a_categories.attributes.sort;

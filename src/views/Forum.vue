@@ -13,8 +13,8 @@
     <img src="../assets/mc.jpg" alt="">
     <div class="banner-cover"></div>
     <div class="intro">
-      <h1>{{forumInfo[$route.params.id - 1].attributes.name}}</h1>
-      <p>{{forumInfo[$route.params.id - 1].attributes.description}}</p>
+      <h1 v-html="this.getBoardName()"></h1>
+      <p>{{ boardDescription }}</p>
     </div>
   </div>
   <div class="forum-content">
@@ -151,6 +151,7 @@ export default {
       test: '666',
       topPost: null,
       post: null,
+      id: 0,      // 板块 ID
       page: 1,
       allPage: 0,
       pageList: [],
@@ -198,7 +199,8 @@ export default {
       ).then((response) => {
         post = response.data
         next((vm) => {
-          vm.getPost(top, post, page)
+          vm.getPost(top, post, page);
+          vm.id = to.params.id;
         })
       })
     })
@@ -211,6 +213,7 @@ export default {
     if(to.params.page){
       page = to.params.page
     }
+    this.id = to.params.id;
     axios.get(
       dzq({
         name: 'threads',
@@ -235,8 +238,12 @@ export default {
   },
   computed: {
     ...mapState([
-      'showEditor', 'forumInfo'
-    ])
+      'showEditor', 'boardInfo'
+    ]),
+    
+    boardDescription: function () {
+      return this.boardInfo.original[this.id]?.translated.slogan;
+    },
   },
   methods: {
     ...mapMutations([
@@ -307,6 +314,24 @@ export default {
           delay: 100
         })
       })
+    },
+    getBoardName: function () {
+      let ret = "";
+
+      let board = this.boardInfo.original[this.id]?.translated;
+      if (board == undefined) return;
+
+      let pboard = board.parent;      
+
+      while (pboard != undefined) {
+        if (pboard.id != undefined) 
+          ret = "<span><a href=/forums/"+pboard.id+">" + pboard.name + "</a></span>" + ret;
+        pboard = pboard.parent;
+      }
+      
+      ret += board.name;
+
+      return ret;
     }
   }
 }
