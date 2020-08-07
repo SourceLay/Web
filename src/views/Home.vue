@@ -71,7 +71,7 @@
     </div>
   </div>
   <!-- 首页-论坛板块 -->
-  <div v-for="(info, index) in boardInfo" :key="index" class="block">
+  <div v-for="(info, index) in boardInfo.data.children" :key="index" class="block">
     <h2>
       <svg :class="['icon', 'icon-' + info.icon]" aria-hidden="true">
         <use :xlink:href="'#icon-' + info.icon"></use>

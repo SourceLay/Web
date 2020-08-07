@@ -15,7 +15,7 @@ export default new Vuex.Store({
     showEditor: 0,
     fixedEditor: 0,
     colorTheme: 'light',
-    forumInfo: null,
+    boardInfo: null,
     popUser: {
       username: '',
       signature: ''
@@ -32,5 +32,11 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
+  },
+  getters: {
+    getBoardInfo: state => {
+      console.log(state);
+      return state.boardInfo;
+    }
   }
 })
