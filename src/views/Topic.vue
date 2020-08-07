@@ -36,7 +36,7 @@
           </div>
           <div class="post-bottom">
             <!-- 点赞 -->
-            <div v-if="included['posts.' + topic.relationships.firstPost.data.id].relationships.likedUsers.data != ''">
+            <div v-if="included['posts.' + topic.relationships.firstPost.data.id].relationships.likedUsers != undefined && included['posts.' + topic.relationships.firstPost.data.id].relationships.likedUsers.data != ''">
               <i class="iconfont icon-guanzhu"></i>
               <p class="post-likedUser" v-html="firstPost.likedUser"></p>
             </div>
@@ -71,7 +71,7 @@
           </div>
           <div class="post-bottom">
             <!-- 点赞 -->
-            <div v-if="included['posts.' + id].relationships.likedUsers.data != ''">
+            <div v-if="included['posts.' + id].relationships.likedUsers != undefined && included['posts.' + id].relationships.likedUsers.data != ''">
               <i class="iconfont icon-guanzhu"></i>
               <p class="post-likedUser" v-html="formatData['posts.' + id].likedUser"></p>
             </div>
@@ -198,7 +198,7 @@ export default {
         dzq({
           name: 'posts',
           filter: {
-            isDeleted: 'no',
+            // isDeleted: 'no',
             thread: to.params.id
           },
           include: [
@@ -231,7 +231,7 @@ export default {
           this.formatData['posts.' + id] = {
             time : this.getTime(this.included['posts.' + id].attributes.createdAt),
             content : this.getContent(this.included['posts.' + id].attributes.content),
-            likedUser : this.getLikedUser(this.included['posts.' + id].relationships.likedUsers.data)
+            likedUser : this.getLikedUser(this.included['posts.' + id].relationships.likedUsers?.data)
           }
         }
       })
@@ -258,6 +258,8 @@ export default {
     getTime,
     //渲染点赞用户
     getLikedUser(users) {
+      if (users == undefined) return;
+
       let list = ''
       if(users.length <= 3){
         users.forEach((item) => {
@@ -326,7 +328,7 @@ export default {
       
       this.firstPost = {
         content : this.getContent(this.included['posts.' + this.topic.relationships.firstPost.data.id].attributes.content),
-        likedUser : this.getLikedUser(this.included['posts.' + this.topic.relationships.firstPost.data.id].relationships.likedUsers.data),
+        likedUser : this.getLikedUser(this.included['posts.' + this.topic.relationships.firstPost.data.id].relationships.likedUsers?.data),
         time : this.getTime(this.included['posts.' + this.topic.relationships.firstPost.data.id].attributes.createdAt)
       }
 
@@ -346,6 +348,7 @@ export default {
       })
     },
     getContent(content) {
+      if (content == undefined || content == null || content == '') return;
       return XBBCODE.process({
         text: content,
         removeMisalignedTags: false,
