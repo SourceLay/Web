@@ -7,6 +7,7 @@ import store from '../store/index'
 import axios from 'axios'
 import nprogress from 'nprogress'
 import 'nprogress/nprogress.css' 
+import CategoriesTranslator from '../helpers/categoriesTranslator'
 
 Vue.use(VueRouter)
 
@@ -60,6 +61,7 @@ router.beforeEach(function(to, from, next) {
         value: 'guest'
       })
     }
+
     //获取论坛信息
     axios.get('/api/forum').then((response) => {
       console.log('获取论坛信息')
@@ -74,15 +76,27 @@ router.beforeEach(function(to, from, next) {
           })
         })
       }
+
       //获取板块信息
       axios.get('/api/categories').then((response) => {
         console.log("获取板块信息")
+
+        // 普通版块信息
         store.commit('setData', {
           key: 'forumInfo',
           value: response.data.data
         })
+
+        // 结构化板块信息
+        let boardInfo = new CategoriesTranslator(response.data);
+        store.commit('setData', {
+          key: 'boardInfo',
+          value: boardInfo.data.children
+        })
+
         next()
       })
+      
     })
   }else{
     next()
