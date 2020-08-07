@@ -20,10 +20,9 @@
   <div class="forum-content">
     <ul class="tags">
       <li class="menu-item-choose">全部</li>
-      <li>生存</li>
-      <li>建筑</li>
-      <li>模组</li>
-      <li class="sort">排序方式：最新</li>
+      <li>精华</li>
+      <li>已关注</li>
+      <!-- <li class="sort">排序方式：最新</li> -->
       <li class="stat">
         <span class="stat-key">今日</span>
         <span class="stat-value">0</span>
@@ -46,11 +45,21 @@
           </div>
           <div class="post-other">
             <div class="post-info">
-              <p>作者：<span class="user" tippy-user>{{included['users.' + post.relationships.user.data.id].attributes.username}}</span></p>
+              <p>
+                作者：
+                <span class="user" :data-id="post.relationships.user.data.id" tippy-user>
+                  {{included['users.' + post.relationships.user.data.id].attributes.username}}
+                </span>
+              </p>
               <p>{{post.attributes.postCount}} 回复 / {{post.attributes.viewCount}} 浏览</p>
             </div>
             <div class="post-time">
-              <p>最后一次回复：<span class="user" tippy-user>{{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}</span></p>
+              <p>
+                最后一次回复：
+                <span class="user" :data-id="post.relationships.lastPostedUser.data.id" tippy-user>
+                  {{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}
+                </span>
+              </p>
               <p class="time" v-html="getTime(post.attributes.updatedAt)" :data-tippy-content="new Date(post.attributes.updatedAt).toLocaleString()"></p>
             </div>
           </div>
@@ -72,11 +81,21 @@
           </div>
           <div class="post-other">
             <div class="post-info">
-              <p>作者：<span class="user" tippy-user>{{included['users.' + post.relationships.user.data.id].attributes.username}}</span></p>
+              <p>
+                作者：
+                <span class="user" :data-id="post.relationships.user.data.id" tippy-user>
+                  {{included['users.' + post.relationships.user.data.id].attributes.username}}
+                </span>
+              </p>
               <p>{{post.attributes.postCount}} 回复 / {{post.attributes.viewCount}} 浏览</p>
             </div>
             <div class="post-time">
-              <p>最后一次回复：<span class="user" tippy-user>{{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}</span></p>
+              <p>
+                最后一次回复：
+                <span class="user" :data-id="post.relationships.lastPostedUser.data.id" tippy-user>
+                  {{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}
+                </span>
+              </p>
               <p class="time" v-html="getTime(post.attributes.updatedAt)" :data-tippy-content="new Date(post.attributes.updatedAt).toLocaleString()"></p>
             </div>
           </div>
@@ -85,13 +104,29 @@
       <img v-if="post == 0" class="empty" src="../assets/empty.png" alt="">
     </ul>
     <ul class="pages">
-      <li class="pages-btn">上一页</li>
-      <li class="pages-active">1</li>
-      <li>2</li>
-      <li>3</li>
-      <li>…</li>
-      <li>9</li>
-      <li class="pages-btn">下一页</li>
+      <li :style="{pointerEvents: page == 1 ? 'none' : ''}" class="pages-btn">
+        <router-link :to="{params: {page : Number(page) - 1}}">上一页</router-link>
+      </li>
+
+      <li :class="page == 1 ? 'pages-active' : ''">
+        <router-link :to="{params: {page : 1}}">1</router-link>
+      </li>
+      
+      <li v-if="pageList != '' && pageList[0] != 2">…</li>
+      
+      <li v-for="p in pageList" :key="p" :class="page == p ? 'pages-active' : ''">
+        <router-link :to="{params: {page : p}}">{{p}}</router-link>
+      </li>
+
+      <li v-if="pageList != '' && pageList[pageList.length - 1] != allPage -1">…</li>
+
+      <li v-if="allPage != 1" :class="page == allPage ? 'pages-active' : ''">
+        <router-link :to="{params: {page : allPage}}">{{allPage}}</router-link>
+      </li>
+
+      <li :style="{pointerEvents: page == allPage ? 'none' : ''}" class="pages-btn">
+        <router-link :to="{params: {page : Number(page) + 1}}">下一页</router-link>
+      </li>
     </ul>
   </div>
 </div>
@@ -103,7 +138,7 @@ import Editor from './../components/Editor.vue'
 import UserCard from './../components/UserCard.vue'
 import axios from 'axios'
 import tippy from 'tippy.js';
-import { getPostTitle, getPostTag, getTime} from './../public.js'
+import { getPostTitle, getPostTag, getTime, dzq} from './../public.js'
 import 'tippy.js/dist/tippy.css'; // optional for styling
 export default {
   name: 'forum',
@@ -116,25 +151,87 @@ export default {
       test: '666',
       topPost: null,
       post: null,
+      page: 1,
+      allPage: 0,
+      pageList: [],
       included: {},
     }
   },
   beforeRouteEnter(to, from, next) {
     let top = null
     let post = null
-    axios.get('/api/threads?include=user,firstPost,lastPostedUser,user.groups&filter[type]=1&filter[isDeleted]=no&filter[isSticky]=yes&filter[categoryId]=' + to.params.id).then((response) => {
+    let page = 1
+    if(to.params.page){
+      page = to.params.page
+    }
+    //获取置顶
+    axios.get(
+      dzq({
+        name: 'threads',
+        include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
+        filter: {
+          type: 1,
+          isDeleted: 'no',
+          isSticky: 'yes',
+          categoryId: to.params.id
+        }
+      })
+    ).then((response) => {
       top = response.data
-      axios.get('/api/threads?include=user,firstPost,lastPostedUser,user.groups&filter[type]=1&filter[isDeleted]=no&filter[isSticky]=no&filter[categoryId]=' + to.params.id).then((response) => {
+      //获取帖子
+      axios.get(
+        dzq({
+          name: 'threads',
+          include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
+          filter: {
+            type: 1,
+            isDeleted: 'no',
+            isSticky: 'no',
+            categoryId: to.params.id
+          },
+          page: {
+            number: page,
+            limit: 20
+          },
+          sort: '-updatedAt'
+        })
+      ).then((response) => {
         post = response.data
         next((vm) => {
-          vm.getPost(top, post)
+          vm.getPost(top, post, page)
         })
       })
     })
   },
   beforeRouteUpdate(to, from, next) {
     console.log('同页面跳转')
-    next()
+    let top = null
+    let post = null
+    let page = 1
+    if(to.params.page){
+      page = to.params.page
+    }
+    axios.get(
+      dzq({
+        name: 'threads',
+        include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
+        filter: {
+          type: 1,
+          isDeleted: 'no',
+          isSticky: 'no',
+          categoryId: to.params.id
+        },
+        page: {
+          number: page,
+          limit: 20
+        },
+        sort: '-updatedAt'
+      })
+    ).then((response) => {
+      post = response.data
+      this.getPost(top, post, page)
+      next()
+    })
   },
   computed: {
     ...mapState([
@@ -154,10 +251,31 @@ export default {
         value: 1
       })
     },
-    getPost(top, post) {
-      this.topPost = top.data
+    getPost(top, post, page) {
+      if(top){
+        this.topPost = top.data
+      }
       this.post = post.data
-      if(typeof top.included != 'undefined'){
+      this.page = page
+      page = Number(page)
+
+      this.allPage = post.meta.pageCount
+      if(this.allPage == 0){
+        this.allPage = 1
+      }
+      if(this.allPage == 1){
+        this.pageList = []
+      }else if(this.allPage <= 10){
+        this.pageList = Array.from(new Array(this.allPage - 2), (x,i) => i + 2)
+      }else if(page < 4){
+        this.pageList = Array.from(new Array(page + 1), (x,i) => i + 2)
+      }else if((this.allPage - page) < 3){
+        this.pageList = Array.from(new Array(this.allPage - page + 2), (x,i) => i + (page - 2))
+      }else{
+        this.pageList = Array.from(new Array(5), (x,i) => i + page - 2)
+      }
+
+      if(top && typeof top.included != 'undefined'){
         top.included.forEach((item) => {
           this.included[item.type + '.' + item.id] = item
         })
@@ -171,10 +289,11 @@ export default {
         let vue = this
         tippy('[tippy-user]', {
           onShow(instance) {
-            // vue.setData({
-            //   key: 'username',
-            //   value: '12345'
-            // })
+            console.log(instance)
+            vue.setData({
+              key: 'popUser',
+              value: vue.included['users.' + instance.reference.dataset.id].attributes
+            })
             vue.$nextTick(() => {
               instance.setContent(vue.$refs.userCard.$el.innerHTML)
             })
@@ -272,7 +391,7 @@ export default {
 }
 /* 论坛-帖子 */
 .posts{
-  background: var(--bg-color);
+  background: #f8f8f8;
   padding: 1em;
   margin: 1em 0;
   border-radius: 0.2em;
@@ -323,14 +442,14 @@ export default {
   display: inline-block;
 }
 .post-title{
-  width: 65em;
+  width: 62em;
 }
 .post-title h2{
   font-weight: normal;
   font-size: 1.4em;
 }
 .post-title p{
-  opacity: 0.6;
+  opacity: 0.7;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -353,7 +472,7 @@ export default {
   width: 10em;
 }
 .post-time{
-  width: 10em;
+  width: 12em;
 }
 .time{
   display: inline-block;
@@ -410,8 +529,13 @@ export default {
 .pages li{
   display: inline-block;
   list-style: none;
-  padding: 0.2em 0.6em;
   margin: 0 0.2em;
+}
+.pages a{
+  display: block;
+  padding: 0.2em 0.6em;
+  color: inherit;
+  text-decoration: none;
 }
 .pages-btn{
   background: var(--item-color);
@@ -419,6 +543,9 @@ export default {
   border-radius: 1em;
   letter-spacing: 0.1em;
   text-shadow: 1px 0px 10px rgba(0, 0, 0, 0.4);
+}
+.pages-btn a{
+  padding: 0;
 }
 .pages-active{
   background: var(--bg-color);

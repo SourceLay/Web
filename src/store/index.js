@@ -15,11 +15,18 @@ export default new Vuex.Store({
     showEditor: 0,
     fixedEditor: 0,
     colorTheme: 'light',
-    forumInfo: null
+    forumInfo: null,
+    popUser: {
+      username: '',
+      signature: ''
+    }
   },
   mutations: {
     setData(state, payload) {
       state[payload.key] = payload.value
+    },
+    test(){
+      console.log(this.abc)
     }
   },
   actions: {

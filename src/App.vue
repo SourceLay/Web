@@ -3,9 +3,9 @@
     <Sidebar/>
     <div class="content">
       <TopHeader/>
-      <transition name="fade">
+      <!-- <transition name="fade"> -->
         <router-view/>
-      </transition>
+      <!-- </transition> -->
     </div>
   </div>
 </template>
@@ -60,9 +60,9 @@ html, body{
   width: 100%;
   height: 100%;
 }
-html{
+/* html{
   scroll-behavior: smooth;
-}
+} */
 body::-webkit-scrollbar {
   width: 6px;
   background-color: #eee;

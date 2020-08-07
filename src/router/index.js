@@ -26,14 +26,14 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/Test.vue')
   },
   {
-    path: '/forums/:id',
-    name: 'Forum',
-    component: Forum
-  },
-  {
     path: '/forums/topics/:id',
     name: 'Topic',
     component: Topic
+  },
+  {
+    path: '/forums/:id/:page?',
+    name: 'Forum',
+    component: Forum
   }
 ]
 
@@ -44,7 +44,7 @@ const router = new VueRouter({
 })
 
 //路由守卫
-router.beforeEach(function(to, from, next) {
+router.beforeEach((to, from, next) => {
   nprogress.start()
   //初始化信息
   if(from.name == null){
@@ -65,18 +65,21 @@ router.beforeEach(function(to, from, next) {
     //获取论坛信息
     axios.get('/api/forum').then((response) => {
       console.log('获取论坛信息')
-      localStorage.setItem('site_info', JSON.stringify(response.data.data.attributes))
+      let siteInfo = response.data.data.attributes
+      localStorage.setItem('site_info', JSON.stringify(siteInfo))
+      return siteInfo
+    }).then((siteInfo) => {
       //获取登录用户信息
       if(store.state.status == 'login'){
         console.log("获取登录信息")
-        axios.get('/api/users/' + response.data.data.attributes.user.groups[0].pivot.user_id).then((response) => {
+        axios.get('/api/users/' + siteInfo.user.groups[0].pivot.user_id).then((response) => {
           store.commit('setData', {
             key: 'userInfo',
             value: response.data.data.attributes
           })
         })
       }
-
+    }).then(() => {
       //获取板块信息
       axios.get('/api/categories').then((response) => {
         console.log("获取板块信息")

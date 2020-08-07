@@ -1,3 +1,5 @@
+import { Object } from "core-js";
+
 // 防抖
 export function _debounce(fn, delay) {
   delay = delay || 200;
@@ -38,14 +40,14 @@ export function _throttle(fn, interval) {
 //获取时间
 export function getTime(time) {
   let second = new Date() - new Date(time)
-  if(second < 10000){
+  if(second < 1000 * 10){
     return '刚刚'
-  }else if(second < 60000){
+  }else if(second < (1000 * 60)){
     return new Date(time).getSeconds() + '秒前'
-  }else if(second < 3600000){
-    return new Date(time).getMinutes() + '分钟前'
-  }else if(second < 86400000){
-    return new Date(time).getHours() + '小时前'
+  }else if(second < (1000 * 60 * 60)){
+    return Math.floor(second / (1000 * 60))  + '分钟前'
+  }else if(second < (1000 * 60 * 60 * 24)){
+    return Math.floor(second / (1000 * 60 * 60)) + '小时前'
   }else if(second < 2678400000){
     return Math.floor(second / (24 * 3600 * 1000)) + '天前'
   }else if(second < 31622400000){
@@ -114,4 +116,27 @@ export function getPostTitle(title) {
     })
     return '<div>' + final + '</div>' + s.substring(last_valid).trim();
   }
+}
+export function dzq(e) {
+  let url = ''
+  let parts = []
+  Object.keys(e).forEach((item, index) => {
+    if(index == 0){
+      url = '/api/' + e[item] + '?'
+    }else if(e[item] instanceof Array){
+      parts.push(item + '=' + e[item].join(','))
+    }else{
+      if(e[item] instanceof Object){
+        let objectPart = []
+        Object.keys(e[item]).forEach(key => {
+          objectPart.push(item + '[' + key + ']=' + e[item][key])
+        })
+        parts.push(objectPart.join('&'))
+      }else{
+        parts.push(item + '=' + e[item])
+      }
+    }
+  })
+  url += parts.join('&')
+  return url
 }
