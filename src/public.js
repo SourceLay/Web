@@ -43,7 +43,7 @@ export function getTime(time) {
   if(second < 1000 * 10){
     return '刚刚'
   }else if(second < (1000 * 60)){
-    return new Date(time).getSeconds() + '秒前'
+    return Math.floor(second / 1000) + '秒前'
   }else if(second < (1000 * 60 * 60)){
     return Math.floor(second / (1000 * 60))  + '分钟前'
   }else if(second < (1000 * 60 * 60 * 24)){
