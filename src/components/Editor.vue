@@ -259,7 +259,7 @@ export default {
             }
           }).then(response => {
             this.content = null
-            this.$emit('sendReply', response.data)
+            this.$emit('sendPost', response.data)
           }).catch(error => {
             this.isError = 1
             this.error = error.response.data.errors[0].detail[0]

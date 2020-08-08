@@ -51,7 +51,7 @@
         </div>
       </li>
       <!-- 回复 -->
-      <li v-for="(id, index) in replyList" :key="id" :data-floor="startFloor + index" class="post">
+      <li v-for="(id, index) in postList" :key="id" :data-floor="startFloor + index" class="post">
         <img class="avatar" src="../assets/avatar.png" alt="">
         <div class="post-body">
           <!-- 用户信息 -->
@@ -66,6 +66,16 @@
           </div>
           <!-- 内容 -->
           <div class="post-main">
+            <!-- 引用回复 -->
+            <div v-if="formatReplyData && included['posts.' + id].attributes.replyPostId" class="post-reply">
+              <span>
+                {{formatData['reply.' + included['posts.' + id].attributes.replyPostId].user}}：
+              </span>
+              <span>
+                {{formatData['reply.' + included['posts.' + id].attributes.replyPostId].content}}
+              </span>
+            </div>
+            <!-- 正文 -->
             <div v-html="formatData['posts.' + id].content" class="post-content bbcode">
             </div>
           </div>
@@ -86,7 +96,7 @@
         </div>
       </li>
       <!-- 自我回复 -->
-      <li v-for="(id, index) in selfReplyList" :key="id" :data-floor="selfReplyFloor[index]" class="post">
+      <li v-for="(id, index) in selfPostList" :key="id" :data-floor="selfPostFloor[index]" class="post">
         <img class="avatar" src="../assets/avatar.png" alt="">
         <div class="post-body">
           <!-- 用户信息 -->
@@ -97,10 +107,22 @@
             <p class="post-time" :data-tippy-content="new Date(included['posts.' + id].attributes.createdAt).toLocaleString()">
               {{formatData['posts.' + id].time}}
             </p>
-            <p class="post-floor">#{{selfReplyFloor[index]}}</p>
+            <p class="post-floor">#{{selfPostFloor[index]}}</p>
           </div>
           <!-- 内容 -->
           <div class="post-main">
+            <!-- 引用回复 -->
+            <div v-if="formatReplyData && included['posts.' + id].attributes.replyPostId" class="post-reply">
+              <div v-if="formatData['reply.' + included['posts.' + id].attributes.replyPostId]">
+                <span>
+                  {{formatData['reply.' + included['posts.' + id].attributes.replyPostId].user}}：
+                </span>
+                <span>
+                  {{formatData['reply.' + included['posts.' + id].attributes.replyPostId].content}}
+                </span>
+              </div>
+            </div>
+            <!-- 内容 -->
             <div v-html="formatData['posts.' + id].content" class="post-content bbcode">
             </div>
           </div>
@@ -110,19 +132,19 @@
               <li v-if="included['posts.' + id].attributes.canHide">删除</li>
               <li v-if="included['posts.' + id].attributes.canEdit">编辑</li>
               <li v-if="included['posts.' + id].attributes.canLike">点赞</li>
-              <li @click="setReply(selfReplyFloor[index], id)">回复#{{selfReplyFloor[index]}}</li>
+              <li @click="setReply(selfPostFloor[index], id)">回复#{{selfPostFloor[index]}}</li>
             </ul>
           </div>
         </div>
       </li>
       <li :class="[fixedEditor ? 'fixed-editor' : '']">
-        <Editor :replyData="replyData" @sendReply="sendReply" />
+        <Editor :replyData="replyData" @sendPost="sendPost" />
       </li>
     </ul>
     <!-- 侧边进度条 -->
     <div class="post-sidebar">
       <div class="post-sidebar-content">
-        <p @click="showEditor" class="btn btn-reply">添加回复</p>
+        <p @click="showEditor" class="btn btn-post">添加回复</p>
         <div class="post-seekbar">
           <p :style="{opacity: inBar, transform: 'translate(0, ' + seekbarY + 'px)'}" class="bar-tip">{{seekbarFloor}}</p>
           <p class="post-seekbar-btn" @click="jumpTo(1)"><i class="iconfont icon-shang"></i>主楼</p>
@@ -154,6 +176,7 @@ export default {
       showPost: [],       //当前展示的帖子ID
       jumpUrl: {},
       replyData: null,    //预备回复信息
+      replyId: [],      //存放引用回复信息
 
       inBar: 0,           //进度条激活状态
       allFloor: null,       //获取所有楼层数
@@ -164,8 +187,8 @@ export default {
 
       firstPost: {},    //存放楼主数据
 
-      selfReply: [],      //存放自我回复楼层id
-      selfReplyFloor: [], //存放自我回复楼层数
+      selfPost: [],      //存放自我回复楼层id
+      selfPostFloor: [], //存放自我回复楼层数
       included: {},       //存放关联数据
       startFloor: 0,      //起始楼层
       loadPage: [1, 1],   //加载页面
@@ -225,7 +248,7 @@ export default {
     ...mapState([
       'fixedEditor'
     ]),
-    replyList: function() {
+    postList: function() {
       this.showPost.forEach(id => {
         if(!this.formatData['posts.' + id]){
           this.formatData['posts.' + id] = {
@@ -237,8 +260,8 @@ export default {
       })
       return this.showPost
     },
-    selfReplyList: function() {
-      this.selfReply.forEach(id => {
+    selfPostList: function() {
+      this.selfPost.forEach(id => {
         if(!this.formatData['posts.' + id]){
           this.formatData['posts.' + id] = {
             time : this.getTime(this.included['posts.' + id].attributes.createdAt),
@@ -246,7 +269,15 @@ export default {
           }
         }
       })
-      return this.selfReply
+      return this.selfPost
+    },
+    formatReplyData: function() {
+      this.replyId.forEach(reply => {
+        if(!this.formatData['reply.' + reply.id]){
+          this.formatData['reply.' + reply.id] = this.getReplyData(reply.id, reply.user)
+        }
+      })
+      return 1
     }
   },
   methods: {
@@ -321,6 +352,13 @@ export default {
           this.included[item.type + '.' + item.id] = item
         })
         post.data.forEach((item, index) => {
+          if(item.attributes.replyPostId){
+            this.replyId.push({
+              id: item.attributes.replyPostId,
+              user: item.attributes.replyUserId,
+              index: index
+            })
+          }
           this.showPost[index] = item.id
           this.included[item.type + '.' + item.id] = item
         })
@@ -369,14 +407,20 @@ export default {
       let body = document.documentElement
       if(body.scrollHeight - (body.clientHeight + body.scrollTop) < 800 && !this.loadFlag && this.loadPage[1] < this.allPage){
         //清空自己的回复
-        this.selfReply = []
-        this.selfReplyFloor = []
+        this.selfPost = []
+        this.selfPostFloor = []
         this.loadFlag = 1
         axios.get(
           //临时截去前半段
           this.jumpUrl.next.slice(16)
         ).then((response) => {
           response.data.data.forEach((item) => {
+            if(item.attributes.replyPostId){
+              this.replyId.push({
+                id: item.attributes.replyPostId,
+                user: item.attributes.replyUserId,
+              })
+            }
             this.showPost.push(item.id)
             this.included[item.type + '.' + item.id] = item
           })
@@ -398,6 +442,12 @@ export default {
           this.jumpUrl.prev.slice(16)
         ).then((response) => {
           response.data.data.reverse().forEach((item) => {
+            if(item.attributes.replyPostId){
+              this.replyId.push({
+                id: item.attributes.replyPostId,
+                user: item.attributes.replyUserId,
+              })
+            }
             this.showPost.unshift(item.id)
             this.included[item.type + '.' + item.id] = item
           })
@@ -425,17 +475,55 @@ export default {
         id: id
       }
     },
-    sendReply(data) {
+    sendPost(data) {
       this.included['posts.' + data.data.id] = data.data
-      this.selfReply.push(data.data.id)
-      this.selfReplyFloor.push(data.included[1].attributes.postCount)
+      if(data.data.attributes.replyPostId){
+        this.replyId.push({
+          id: data.data.attributes.replyPostId,
+          user: data.data.attributes.replyUserId
+        })
+      }
+      this.selfPost.push(data.data.id)
+      this.selfPostFloor.push(data.included[1].attributes.postCount)
       this.allFloor = data.included[1].attributes.postCount
       this.setData({
         key: 'fixedEditor',
         value: 0
       })
       this.replyData = null
-    }
+    },
+    getReplyData(id, user) {
+      //加载数据中已有该贴
+      let data = {
+        user: '加载中'
+      }
+      if(this.included['posts.' + id]){
+        data.user = this.included['users.' + user].attributes.username
+        data.content = XBBCODE.process({
+          text: this.included['posts.' + id].attributes.content,
+          removeMisalignedTags: false,
+          addInLineBreaks: true,
+          clean: true
+        }).clean
+      }else{
+        //加载数据中无该贴
+        axios.get(
+          dzq({
+            name: 'posts/' + id
+          })
+        ).then((res) => {
+          data.user = res.data.included[0].attributes.username
+          data.content = XBBCODE.process({
+            text: res.data.data.attributes.content,
+            removeMisalignedTags: false,
+            addInLineBreaks: true,
+            clean: true
+          }).clean
+          this.$forceUpdate()
+        })
+      }
+      return data
+    },
   },
   mounted() {
     window.addEventListener('scroll', this.scroll, true)
@@ -597,6 +685,12 @@ export default {
   color: var(--text-color);
   margin: 0.5em 0;
 }
+.post-reply{
+  background: var(--bg-color);
+  padding: 0.5em;
+  border-radius: 0.2em;
+  margin-bottom: 0.5em;
+}
 .post-bottom{
   margin: 0.5em 0;
   font-size: 0.9em;
@@ -640,7 +734,7 @@ export default {
   position: sticky;
   top: 6em;
 }
-.btn-reply{
+.btn-post{
   background: var(--main-color);
   color: #fff;
   padding: 0.5em 1.5em;

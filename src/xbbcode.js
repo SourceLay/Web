@@ -671,10 +671,19 @@ var XBBCODE = (function() {
 
       return openTag + processedContent + closeTag;
   };
+  var cleanFunct = function(matchStr, bbcodeLevel, tagName, tagParams, tagContents) {
+      return tagContents
+  }
 
   function parse(config) {
       var output = config.text;
       output = output.replace(bbRegExp, replaceFunct);
+      return output;
+  }
+  function cleanParse(config) {
+      console.log('clean')
+      var output = config.text;
+      output = output.replace(bbRegExp, cleanFunct);
       return output;
   }
 
@@ -782,6 +791,9 @@ var XBBCODE = (function() {
       }
       if (config.addInLineBreaks) {
           ret.html = '<div style="white-space:pre-wrap;">' + ret.html + '</div>';
+      }
+      if (config.clean) {
+          ret.clean = cleanParse(config);
       }
 
   if (!config.escapeHtml) {
