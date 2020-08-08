@@ -231,7 +231,7 @@ export default {
           this.formatData['posts.' + id] = {
             time : this.getTime(this.included['posts.' + id].attributes.createdAt),
             content : this.getContent(this.included['posts.' + id].attributes.content),
-            likedUser : this.getLikedUser(this.included['posts.' + id].relationships.likedUsers?.data)
+            likedUser : this.getLikedUser(this.included['posts.' + id].relationships?.likedUsers?.data)
           }
         }
       })
