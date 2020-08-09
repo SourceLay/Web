@@ -48,12 +48,12 @@ export function getTime(time) {
     return Math.floor(second / (1000 * 60))  + '分钟前'
   }else if(second < (1000 * 60 * 60 * 24)){
     return Math.floor(second / (1000 * 60 * 60)) + '小时前'
-  }else if(second < 2678400000){
+  }else if(second < 1000 * 60 * 60 * 24 * 30){
     return Math.floor(second / (24 * 3600 * 1000)) + '天前'
-  }else if(second < 31622400000){
-    return new Date(time).getMonth() + '月前'
+  }else if(second < 1000 * 60 * 60 * 24 * 30 * 365){
+    return new Math.floor(second / (1000 * 60 * 60 * 24 * 30))+ '月前'
   }else{
-    return new Date().getFullYear() - new Date(time).getFullYear() + '年前'
+    return new Math.floor(second / (1000 * 60 * 60 * 24 * 30 * 365)) + '年前'
   }
 }
 //获取帖子是否为特殊Tag
