@@ -51,9 +51,9 @@ export function getTime(time) {
   }else if(second < 1000 * 60 * 60 * 24 * 30){
     return Math.floor(second / (24 * 3600 * 1000)) + '天前'
   }else if(second < 1000 * 60 * 60 * 24 * 30 * 365){
-    return new Math.floor(second / (1000 * 60 * 60 * 24 * 30))+ '月前'
+    return Math.floor(second / (1000 * 60 * 60 * 24 * 30))+ '月前'
   }else{
-    return new Math.floor(second / (1000 * 60 * 60 * 24 * 30 * 365)) + '年前'
+    return Math.floor(second / (1000 * 60 * 60 * 24 * 30 * 365)) + '年前'
   }
 }
 //获取帖子是否为特殊Tag
