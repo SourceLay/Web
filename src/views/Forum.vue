@@ -32,6 +32,21 @@
         <span class="stat-value">0</span>
       </li>
     </ul>
+
+    <ul class="posts">
+      <li v-for="(info, index) in boardInfo.original[$route.params.id].translated.children" :key="index" class="post">
+        <router-link :to="{path: '/forums/' + info.id}">
+          <div class="sub-board">
+            <div class="sub-board-info"><img src="../assets/mc.jpeg" alt="" class="sub-board-info-icon"></div>
+            <div class="sub-board-info sub-board-info-middle">
+              <h2 class="sub-board-info-name">{{info.name}} <span class="sub-board-info-today">(15)</span></h2>
+              <p class="sub-board-info-slogan">{{info.slogan}}</p>
+            </div>
+          </div>
+        </router-link>
+      </li>
+    </ul>
+
     <ul class="posts">
       <h2 class="part-title">置顶主题</h2>
       <li v-for="post in topPost" :key="post.id" class="post">
@@ -67,6 +82,7 @@
       </li>
       <img v-if="topPost == 0" class="empty" src="../assets/empty.png" alt="">
     </ul>
+
     <ul class="posts">
       <h2 class="part-title">主题</h2>
       <span @click="openEditor" class="post-btn btn">发表新主题</span>
@@ -577,4 +593,37 @@ export default {
   color: var(--text-color);
   border-radius: 1em;
 }
+.sub-board {
+  padding-left: 1em;
+}
+.sub-board-info {
+  display: table-cell;
+}
+.sub-board-info-icon {
+  width: 4em;
+  height: 4em;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 0.1em solid #fff;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+.sub-board-info-middle {
+  width: 62em;
+}
+.sub-board-info-name {
+  font-weight: normal;
+  font-size: 1.4em;
+}
+.sub-board-info-slogan {
+  opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sub-board-info-today {
+  font-size: 0.8em;
+  margin-right: 0.2em;
+}
+
+
 </style>
