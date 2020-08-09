@@ -198,12 +198,6 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    //获取楼层数据
-    let floor = 1, page = 1
-    if(location.search.substr(0, 3) == '?n='){
-      floor = parseInt(location.search.substr(3))
-      page = Math.ceil((floor - 1) / 20)
-    }
     //获取主题信息
     axios.get(
       dzq({
@@ -216,6 +210,16 @@ export default {
         ]
       })
     ).then((topic) => {
+      //获取楼层数据
+      let floor = 1, page = 1
+      if(location.search.substr(0, 3) == '?n='){
+        floor = parseInt(location.search.substr(3))
+        page = Math.ceil((floor - 1) / 20)
+      }
+      if(floor >= topic.data.data.attributes.postCount || floor < 0 || !floor){
+        floor = 1
+        page = 1
+      }
       //获取回复
       axios.get(
         dzq({
