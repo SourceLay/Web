@@ -82,7 +82,7 @@
           <li v-for="(board, index) in info.children" :key="index" class="board">
             <router-link :to="{path: '/forums/' + board.id}">
               <img src="../assets/mc.jpeg" alt="">
-              <p class="board-name">{{board.name}}<span class="board-today">(15)</span></p>
+              <p class="board-name">{{board.name}}<span class="board-today">({{board.activitiesDaily.threads}} / {{board.activitiesDaily.posts}})</span></p>
               <p class="board-slogan">{{board.slogan}}</p>
             </router-link>
           </li>

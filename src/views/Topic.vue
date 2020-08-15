@@ -67,7 +67,7 @@
           <!-- 内容 -->
           <div class="post-main">
             <!-- 引用回复 -->
-            <div v-if="formatReplyData && included['posts.' + id].attributes.replyPostId" class="post-reply">
+            <div @click="jumpTo(formatData['reply.' + included['posts.' + id].attributes.replyPostId].floor)" v-if="formatReplyData && included['posts.' + id].attributes.replyPostId" class="post-reply">
               <span>
                 {{formatData['reply.' + included['posts.' + id].attributes.replyPostId].user}}：
               </span>
@@ -198,12 +198,6 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    //获取楼层数据
-    let floor = 1, page = 1
-    if(location.search.substr(0, 3) == '?n='){
-      floor = parseInt(location.search.substr(3))
-      page = Math.ceil((floor - 1) / 20)
-    }
     //获取主题信息
     axios.get(
       dzq({
@@ -216,6 +210,16 @@ export default {
         ]
       })
     ).then((topic) => {
+      //获取楼层数据
+      let floor = 1, page = 1
+      if(location.search.substr(0, 3) == '?n='){
+        floor = parseInt(location.search.substr(3))
+        page = Math.ceil((floor - 1) / 20)
+      }
+      if(floor >= topic.data.data.attributes.postCount || floor < 0 || !floor){
+        floor = 1
+        page = 1
+      }
       //获取回复
       axios.get(
         dzq({
@@ -355,8 +359,7 @@ export default {
           if(item.attributes.replyPostId){
             this.replyId.push({
               id: item.attributes.replyPostId,
-              user: item.attributes.replyUserId,
-              index: index
+              user: item.attributes.replyUserId
             })
           }
           this.showPost[index] = item.id
@@ -505,6 +508,19 @@ export default {
           addInLineBreaks: true,
           clean: true
         }).clean
+        //如回复贴为楼主，则楼层为1
+        if(id == this.topic.relationships.firstPost.data.id){
+          data.floor = 1
+        }else{
+          //遍历获取楼层号
+          let floor
+          for(floor in this.showPost){
+            if(this.showPost[floor] == id){
+              break
+            }
+          }
+          data.floor = Number(floor) + 2
+        }
       }else{
         //加载数据中无该贴
         axios.get(
@@ -513,6 +529,7 @@ export default {
           })
         ).then((res) => {
           data.user = res.data.included[0].attributes.username
+          data.floor = res.data.data.attributes.floor
           data.content = XBBCODE.process({
             text: res.data.data.attributes.content,
             removeMisalignedTags: false,
@@ -686,6 +703,7 @@ export default {
   margin: 0.5em 0;
 }
 .post-reply{
+  cursor: pointer;
   background: var(--bg-color);
   padding: 0.5em;
   border-radius: 0.2em;
