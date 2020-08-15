@@ -15,7 +15,8 @@
         </ul>
       </div>
       <div @mouseenter="openBox" class="avatar">
-        <img src="../assets/avatar.png" alt="">
+        <img v-if="userInfo == undefined || userInfo.avatarUrl == '' || userInfo.avatarUrl == null" src="../assets/avatar.png" alt="">
+        <img v-if="userInfo != undefined && userInfo.avatarUrl != '' && userInfo.avatarUrl != null" :src="userInfo.avatarUrl" alt="">
       </div>
       <!-- 登录框 -->
       <transition name="up">
@@ -135,6 +136,9 @@ export default {
       })
       this.loginForm.username = ''
       this.loginForm.password = ''
+    },
+    getAvatar: function() {
+      return this.userInfo?.avatar ?? '../assets/avatar.png';
     }
   }
 }
