@@ -17,7 +17,10 @@
     <ul class="posts">
       <!-- 首帖 -->
       <li :class="['post', loadPage[0] == 1 ? '' : 'hide']" data-floor=1>
-        <img class="avatar" src="../assets/avatar.png" alt="">
+        <!-- TODO 改成更优雅的版本 -->
+        <img class="avatar" v-if="included['users.' + topic.relationships.user.data.id].attributes.avatarUrl == ''" src="../assets/avatar.png" alt=""/>
+        <img class="avatar" v-if="included['users.' + topic.relationships.user.data.id].attributes.avatarUrl != ''" 
+                            :src="included['users.' + topic.relationships.user.data.id].attributes.avatarUrl" alt=""/>
         <div class="post-body">
           <!-- 用户信息 -->
           <div class="post-header">
@@ -52,7 +55,10 @@
       </li>
       <!-- 回复 -->
       <li v-for="(id, index) in postList" :key="id" :data-floor="startFloor + index" class="post">
-        <img class="avatar" src="../assets/avatar.png" alt="">
+        <!-- TODO 改成更优雅的版本 -->
+        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl == ''" src="../assets/avatar.png" alt=""/>
+        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl != ''"
+                            :src="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl" alt=""/>
         <div class="post-body">
           <!-- 用户信息 -->
           <div class="post-header">
@@ -97,7 +103,10 @@
       </li>
       <!-- 自我回复 -->
       <li v-for="(id, index) in selfPostList" :key="id" :data-floor="selfPostFloor[index]" class="post">
-        <img class="avatar" src="../assets/avatar.png" alt="">
+        <!-- TODO 改成更优雅的版本 -->
+        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl == ''" src="../assets/avatar.png" alt=""/>
+        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl != ''"
+                            :src="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl" alt=""/>
         <div class="post-body">
           <!-- 用户信息 -->
           <div class="post-header">
@@ -168,6 +177,8 @@ import XBBCODE from '.././xbbcode'
 import { mapState, mapMutations } from 'vuex'
 import { _throttle, _debounce } from './../public'
 import { getPostTitle, getPostTag, getTime, dzq } from './../public.js'
+import IncludedHelper from '../helpers/includedHelper'
+
 export default {
   name: 'forum',
   data: function() {
@@ -414,8 +425,8 @@ export default {
         this.selfPostFloor = []
         this.loadFlag = 1
         axios.get(
-          //临时截去前半段
-          this.jumpUrl.next.slice(16)
+          //TODO 临时截去域名部分
+          this.jumpUrl.next.replace(/^https?:\/\/[^/]+/, "")
         ).then((response) => {
           response.data.data.forEach((item) => {
             if(item.attributes.replyPostId){
@@ -441,8 +452,8 @@ export default {
         let oldScrollTop = body.scrollTop
         this.loadFlag = 1
         axios.get(
-          //临时截去前半段
-          this.jumpUrl.prev.slice(16)
+          //TODO 临时截去域名部分
+          this.jumpUrl.prev.replace(/^https?:\/\/[^/]+/, "")
         ).then((response) => {
           response.data.data.reverse().forEach((item) => {
             if(item.attributes.replyPostId){
@@ -487,8 +498,13 @@ export default {
         })
       }
       this.selfPost.push(data.data.id)
-      this.selfPostFloor.push(data.included[1].attributes.postCount)
-      this.allFloor = data.included[1].attributes.postCount
+
+      let includedInfo = new IncludedHelper(data.included);
+      let threadInfo = includedInfo.get('threads.' + data.data.relationships.thread.data.id);
+
+      this.selfPostFloor.push(data.data.attributes.floor)
+      this.allFloor = threadInfo.attributes.postCount
+
       this.setData({
         key: 'fixedEditor',
         value: 0
@@ -528,7 +544,9 @@ export default {
             name: 'posts/' + id
           })
         ).then((res) => {
-          data.user = res.data.included[0].attributes.username
+          let includedInfo = new IncludedHelper(res.data.included);
+          let userInfo = includedInfo.get('users.' + res.data.data.relationships.user.data.id);
+          data.user = userInfo.attributes.username
           data.floor = res.data.data.attributes.floor
           data.content = XBBCODE.process({
             text: res.data.data.attributes.content,
