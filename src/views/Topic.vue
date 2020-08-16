@@ -17,7 +17,10 @@
     <ul class="posts">
       <!-- 首帖 -->
       <li :class="['post', loadPage[0] == 1 ? '' : 'hide']" data-floor=1>
-        <img class="avatar" src="../assets/avatar.png" alt="">
+        <!-- TODO 改成更优雅的版本 -->
+        <img class="avatar" v-if="included['users.' + topic.relationships.user.data.id].attributes.avatarUrl == ''" src="../assets/avatar.png" alt=""/>
+        <img class="avatar" v-if="included['users.' + topic.relationships.user.data.id].attributes.avatarUrl != ''" 
+                            :src="included['users.' + topic.relationships.user.data.id].attributes.avatarUrl" alt=""/>
         <div class="post-body">
           <!-- 用户信息 -->
           <div class="post-header">
@@ -52,7 +55,10 @@
       </li>
       <!-- 回复 -->
       <li v-for="(id, index) in postList" :key="id" :data-floor="startFloor + index" class="post">
-        <img class="avatar" src="../assets/avatar.png" alt="">
+        <!-- TODO 改成更优雅的版本 -->
+        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl == ''" src="../assets/avatar.png" alt=""/>
+        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl != ''"
+                            :src="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl" alt=""/>
         <div class="post-body">
           <!-- 用户信息 -->
           <div class="post-header">
@@ -97,7 +103,10 @@
       </li>
       <!-- 自我回复 -->
       <li v-for="(id, index) in selfPostList" :key="id" :data-floor="selfPostFloor[index]" class="post">
-        <img class="avatar" src="../assets/avatar.png" alt="">
+        <!-- TODO 改成更优雅的版本 -->
+        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl == ''" src="../assets/avatar.png" alt=""/>
+        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl != ''"
+                            :src="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl" alt=""/>
         <div class="post-body">
           <!-- 用户信息 -->
           <div class="post-header">

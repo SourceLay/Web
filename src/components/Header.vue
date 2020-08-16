@@ -15,6 +15,7 @@
         </ul>
       </div>
       <div @mouseenter="openBox" class="avatar">
+        <!-- TODO 改成更优雅的版本 -->
         <img v-if="userInfo == undefined || userInfo.avatarUrl == '' || userInfo.avatarUrl == null" src="../assets/avatar.png" alt=""/>
         <img v-if="userInfo != undefined && userInfo.avatarUrl != '' && userInfo.avatarUrl != null" :src="userInfo.avatarUrl" alt=""/>
       </div>
