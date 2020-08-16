@@ -15,8 +15,8 @@
         </ul>
       </div>
       <div @mouseenter="openBox" class="avatar">
-        <img v-if="userInfo == undefined || userInfo.avatarUrl == '' || userInfo.avatarUrl == null" src="../assets/avatar.png" alt="">
-        <img v-if="userInfo != undefined && userInfo.avatarUrl != '' && userInfo.avatarUrl != null" :src="userInfo.avatarUrl" alt="">
+        <img v-if="userInfo == undefined || userInfo.avatarUrl == '' || userInfo.avatarUrl == null" src="../assets/avatar.png" alt=""/>
+        <img v-if="userInfo != undefined && userInfo.avatarUrl != '' && userInfo.avatarUrl != null" :src="userInfo.avatarUrl" alt=""/>
       </div>
       <!-- 登录框 -->
       <transition name="up">
@@ -63,6 +63,8 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
+import IncludedHelper from '../helpers/includedHelper'
+
 export default {
   name: 'header',
   data: function() {
@@ -102,18 +104,26 @@ export default {
           }
         }
       }).then((response) => {
+
         console.log(response.data)
         localStorage.setItem('access_token', response.data.data.attributes.access_token)
         localStorage.setItem('refresh_token', response.data.data.attributes.refresh_token)
+
+        let includedInfo = new IncludedHelper(response.data.included);
+        let tmpUserInfo = includedInfo.get('users.' + response.data.data.id);
+
         this.setData({
           key: 'userInfo',
-          value: response.data.included[0].attributes
+          value: tmpUserInfo.attributes
         })
+
         this.setData({
           key: 'status',
           value: 'login'
         })
+
         this.loginLoad = 0
+
       }).catch((error) => {
         console.log(error)
         this.loginError = 1

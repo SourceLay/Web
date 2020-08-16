@@ -19,7 +19,11 @@ export default new Vuex.Store({
     popUser: {
       username: '',
       signature: ''
-    }
+    },
+    userInfo: {
+      avatarUrl: '',
+      username: '',
+    },
   },
   mutations: {
     setData(state, payload) {
