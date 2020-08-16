@@ -414,8 +414,8 @@ export default {
         this.selfPostFloor = []
         this.loadFlag = 1
         axios.get(
-          //临时截去前半段
-          this.jumpUrl.next.slice(16)
+          //TODO 临时截去域名部分
+          this.jumpUrl.next.replace(/^https?:\/\/[^/]+/, "")
         ).then((response) => {
           response.data.data.forEach((item) => {
             if(item.attributes.replyPostId){
@@ -441,8 +441,8 @@ export default {
         let oldScrollTop = body.scrollTop
         this.loadFlag = 1
         axios.get(
-          //临时截去前半段
-          this.jumpUrl.prev.slice(16)
+          //TODO 临时截去域名部分
+          this.jumpUrl.prev.replace(/^https?:\/\/[^/]+/, "")
         ).then((response) => {
           response.data.data.reverse().forEach((item) => {
             if(item.attributes.replyPostId){
