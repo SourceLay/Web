@@ -535,7 +535,9 @@ export default {
             name: 'posts/' + id
           })
         ).then((res) => {
-          data.user = res.data.included[0].attributes.username
+          let includedInfo = new IncludedHelper(res.data.included);
+          let userInfo = includedInfo.get('users.' + res.data.data.relationships.user.data.id);
+          data.user = userInfo.attributes.username
           data.floor = res.data.data.attributes.floor
           data.content = XBBCODE.process({
             text: res.data.data.attributes.content,
