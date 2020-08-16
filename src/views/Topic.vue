@@ -168,6 +168,8 @@ import XBBCODE from '.././xbbcode'
 import { mapState, mapMutations } from 'vuex'
 import { _throttle, _debounce } from './../public'
 import { getPostTitle, getPostTag, getTime, dzq } from './../public.js'
+import IncludedHelper from '../helpers/includedHelper'
+
 export default {
   name: 'forum',
   data: function() {
@@ -487,8 +489,13 @@ export default {
         })
       }
       this.selfPost.push(data.data.id)
-      this.selfPostFloor.push(data.included[1].attributes.postCount)
-      this.allFloor = data.included[1].attributes.postCount
+
+      let includedInfo = new IncludedHelper(data.included);
+      let threadInfo = includedInfo.get('threads.' + data.data.relationships.thread.data.id);
+
+      this.selfPostFloor.push(data.data.attributes.floor)
+      this.allFloor = threadInfo.attributes.postCount
+
       this.setData({
         key: 'fixedEditor',
         value: 0
