@@ -523,7 +523,19 @@ var XBBCODE = (function() {
               return "</li>";
           },
           restrictParentsTo: ["list","ul","ol"]
-      }
+      },
+      "latex": {
+          openTag: function(params,content) {
+              let tex2html = require('./helpers/tex2html').default;
+              // console.log(tex2html);
+              let latexHtml = tex2html(content);
+              console.log(latexHtml);
+              return "<div>" + latexHtml.html;
+          },
+          closeTag: function(params,content) {
+              return "</div>";
+          }
+      },
   };
 
   // create tag list and lookup fields
