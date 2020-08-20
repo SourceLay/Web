@@ -34,8 +34,7 @@ const AllPackages = require('mathjax-full/js/input/tex/AllPackages.js').AllPacka
 
 function tex2svg(texContent,
     inline = true, em = 16, ex = 8, width = 80*16,
-    packages = AllPackages, /*css = true,*/
-    fontURL = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.0.0/es5/output/chtml/fonts/woff-v2") {
+    packages = AllPackages, /*css = true,*/) {
 
     //
     //  Create DOM adaptor and register it for HTML documents
@@ -47,7 +46,7 @@ function tex2svg(texContent,
     //  Create input and output jax and a document using them on the content from the HTML file
     //
     const tex = new TeX({packages: packages});
-    const svg = new SVG({fontCache: (argv.fontCache ? 'local' : 'none')});
+    const svg = new SVG({fontCache: 'local'});
     const html = mathjax.document('', {InputJax: tex, OutputJax: svg});
 
     //

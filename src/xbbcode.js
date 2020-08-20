@@ -524,13 +524,14 @@ var XBBCODE = (function() {
           },
           restrictParentsTo: ["list","ul","ol"]
       },
+      
       "latex": {
           openTag: function(params,content) {
-              let tex2html = require('./helpers/tex2html').default;
-              // console.log(tex2html);
-              let latexHtml = tex2html(content);
-              console.log(latexHtml);
-              return "<div>" + latexHtml.html;
+              let render = require('./helpers/tex2svg').default;
+              // let result = {"html": ""};
+              let result = render(content);
+              return "<div style=\"display: inline-block;\">" + result.html +
+               "</div>" + "<div style=\"display: none;\">";
           },
           closeTag: function(params,content) {
               return "</div>";
