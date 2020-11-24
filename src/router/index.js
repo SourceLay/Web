@@ -80,6 +80,34 @@ router.beforeEach((to, from, next) => {
           })
         })
       }
+    }).catch(() => {
+
+      // 登陆信息过期后的处理方案
+      delete  axios.defaults.headers.common.Authorization;
+      store.commit('setData', {
+        key: 'status',
+        value: 'guest'
+      })
+
+      axios.get('/api/forum').then((response) => {
+        console.log('获取论坛信息')
+        let siteInfo = response.data.data.attributes
+        localStorage.setItem('site_info', JSON.stringify(siteInfo))
+        return siteInfo
+      }).then((siteInfo) => {
+        //获取登录用户信息
+        if(store.state.status == 'login'){
+          console.log("获取登录信息")
+          // 假设该用户隶属于最少一个用户组
+          axios.get('/api/users/' + siteInfo.user.groups[0].pivot.user_id).then((response) => {
+            store.commit('setData', {
+              key: 'userInfo',
+              value: response.data.data.attributes
+            })
+          })
+        }
+      })
+
     }).then(() => {
       //获取板块信息
       axios.get('/api/categories').then((response) => {
