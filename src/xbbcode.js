@@ -535,7 +535,8 @@ var XBBCODE = (function() {
           },
           closeTag: function(params,content) {
               return "</div>";
-          }
+          },
+          noParse: true
       },
   };
 
