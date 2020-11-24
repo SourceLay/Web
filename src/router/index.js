@@ -83,7 +83,8 @@ router.beforeEach((to, from, next) => {
     }).catch(() => {
 
       // 登陆信息过期后的处理方案
-      delete  axios.defaults.headers.common.Authorization;
+      if (axios.defaults.headers.common.Authorization)
+        delete  axios.defaults.headers.common.Authorization;
       store.commit('setData', {
         key: 'status',
         value: 'guest'
