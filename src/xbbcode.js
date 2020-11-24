@@ -523,7 +523,20 @@ var XBBCODE = (function() {
               return "</li>";
           },
           restrictParentsTo: ["list","ul","ol"]
-      }
+      },
+      
+      "latex": {
+          openTag: function(params,content) {
+              let render = require('./helpers/tex2svg').default;
+              // let result = {"html": ""};
+              let result = render(content);
+              return "<div style=\"display: inline-block;\">" + result.html +
+               "</div>" + "<div style=\"display: none;\">";
+          },
+          closeTag: function(params,content) {
+              return "</div>";
+          }
+      },
   };
 
   // create tag list and lookup fields
