@@ -1,83 +1,83 @@
 <template>
-<div class="para-content">
-  <!-- 首页-banner -->
-  <div class="index-banner">
-    <ul class="banner">
-      <li v-for="(banner, index) in indexBanner" :key="index" :style="{'background': banner[5]}" :class="[indexBannerActive == index ? 'banner-active' : '']">
-        <div class="banner-content">
-          <p>{{banner[0]}}</p>
-          <h1>{{banner[1]}}</h1>
-          <a :href="banner[3]">{{banner[2]}}</a>
-          <img :src="require('../assets/' + banner[4])" alt="">
-        </div>
-      </li>
-    </ul>
-    <div class="banner-dots">
-      <ul class="banner-dot">
-        <li v-for="(banner, index) in indexBanner" :key="index" :class="[indexBannerActive == index ? 'banner-current' : '']" @mouseover="showIndexBanner(index)"></li>
+  <div class="para-content">
+    <!-- 首页-banner -->
+    <div class="index-banner">
+      <ul class="banner">
+        <li v-for="(banner, index) in indexBanner" :key="index" :style="{'background': banner[5]}" :class="[indexBannerActive == index ? 'banner-active' : '']">
+          <div class="banner-content">
+            <p>{{banner[0]}}</p>
+            <h1>{{banner[1]}}</h1>
+            <a :href="banner[3]">{{banner[2]}}</a>
+            <img :src="require('../assets/' + banner[4])" alt="">
+          </div>
+        </li>
       </ul>
-    </div>
-  </div>
-  <!-- 首页-轮播和热点 -->
-  <div class="block">
-    <h2>
-      <svg class="icon icon-hot" aria-hidden="true">
-        <use xlink:href="#icon-hot"></use>
-      </svg>社区动态<span class="title-tip">派瑞派对社区正式运营活动开启！</span>
-    </h2>
-    <div class="block-content">
-      <!-- 轮播 -->
-      <div @mouseover="sliderBar(1)" @mouseleave="sliderBar(0)" class="slidershow">
-        <ul :style="{'transform': [sliderBarActive ? 'none' : 'translate(100%, 0)']}" class="slider-bar">
-          <li @mouseover="showSlider(index)" :style="{'opacity' : [slidershowActive == index ? '1' : '0.5']}" v-for="(slider, index) in sliderContent" :key="index">
-            <img :src="require('../assets/' + slider[2])" alt="">
-          </li>
-        </ul>
-        <ul :style="{'transform':'translateX(-' + 100 * slidershowActive + '%)'}" class="sliders">
-          <li v-for="(slider, index) in sliderContent" :key="index" class="slider">
-            <img :src="require('../assets/' + slider[2])" alt="">
-            <div class="slider-info">
-              <p>{{slider[0]}}</p>
-              <p>{{slider[1]}}</p>
-            </div>
-          </li>
-        </ul>
-      </div>
-      <!-- 热点 -->
-      <div class="posts">
-        <ul class="posts-option">
-          <li @mouseover="showPost(index)" v-for="(item, index) in postInfo" :key="index" :class="[postInfoActive == index ? 'option-active' : '']">{{item}}</li>
-        </ul>
-        <ul class="post">
-          <li>
-            <span class="post-num">1</span>
-            <span>[我的世界] 为什么这个村民在哭？</span>
-            <span class="post-writer">陆陆侠</span>
-          </li>
-          <li>
-            <span class="post-num">2</span>
-            <span>[板块名] 主题名</span>
-            <span class="post-writer">发帖人</span>
-          </li>
-          <li><span class="post-num">3</span>[板块名] 主题名</li>
-          <li><span class="post-num">4</span>[板块名] 主题名</li>
-          <li><span class="post-num">5</span>[板块名] 主题名</li>
-          <li><span class="post-num">6</span>[板块名] 主题名</li>
-          <li><span class="post-num">7</span>[板块名] 主题名</li>
-          <li><span class="post-num">8</span>[板块名] 主题名</li>
-          <li><span class="post-num">9</span>[板块名] 主题名</li>
+      <div class="banner-dots">
+        <ul class="banner-dot">
+          <li v-for="(banner, index) in indexBanner" :key="index" :class="[indexBannerActive == index ? 'banner-current' : '']" @mouseover="showIndexBanner(index)"></li>
         </ul>
       </div>
     </div>
-  </div>
-  <!-- 首页-论坛板块 -->
-  <div v-for="(info, index) in boardInfo.data.children" :key="index" class="block">
-    <h2>
-      <svg :class="['icon', 'icon-' + info.icon]" aria-hidden="true">
-        <use :xlink:href="'#icon-' + info.icon"></use>
-      </svg>{{info.name}}<span class="title-tip">{{info.slogan}}</span>
-    </h2>
-    <div class="block-content">
+    <!-- 首页-轮播和热点 -->
+    <div class="block">
+      <h2>
+        <svg class="icon icon-hot" aria-hidden="true">
+          <use xlink:href="#icon-hot"></use>
+        </svg>社区动态<span class="title-tip">派瑞派对社区正式运营活动开启！</span>
+      </h2>
+      <div class="block-content">
+        <!-- 轮播 -->
+        <div @mouseover="sliderBar(1)" @mouseleave="sliderBar(0)" class="slidershow">
+          <ul :style="{'transform': [sliderBarActive ? 'none' : 'translate(100%, 0)']}" class="slider-bar">
+            <li @mouseover="showSlider(index)" :style="{'opacity' : [slidershowActive == index ? '1' : '0.5']}" v-for="(slider, index) in sliderContent" :key="index">
+              <img :src="require('../assets/' + slider[2])" alt="">
+            </li>
+          </ul>
+          <ul :style="{'transform':'translateX(-' + 100 * slidershowActive + '%)'}" class="sliders">
+            <li v-for="(slider, index) in sliderContent" :key="index" class="slider">
+              <img :src="require('../assets/' + slider[2])" alt="">
+              <div class="slider-info">
+                <p>{{slider[0]}}</p>
+                <p>{{slider[1]}}</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <!-- 热点 -->
+        <div class="posts">
+          <ul class="posts-option">
+            <li @mouseover="showPost(index)" v-for="(item, index) in postInfo" :key="index" :class="[postInfoActive == index ? 'option-active' : '']">{{item}}</li>
+          </ul>
+          <ul class="post">
+            <li>
+              <span class="post-num">1</span>
+              <span>[我的世界] 为什么这个村民在哭？</span>
+              <span class="post-writer">陆陆侠</span>
+            </li>
+            <li>
+              <span class="post-num">2</span>
+              <span>[板块名] 主题名</span>
+              <span class="post-writer">发帖人</span>
+            </li>
+            <li><span class="post-num">3</span>[板块名] 主题名</li>
+            <li><span class="post-num">4</span>[板块名] 主题名</li>
+            <li><span class="post-num">5</span>[板块名] 主题名</li>
+            <li><span class="post-num">6</span>[板块名] 主题名</li>
+            <li><span class="post-num">7</span>[板块名] 主题名</li>
+            <li><span class="post-num">8</span>[板块名] 主题名</li>
+            <li><span class="post-num">9</span>[板块名] 主题名</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- 首页-论坛板块 -->
+    <div v-for="(info, index) in boardInfo.data.children" :key="index" class="block">
+      <h2>
+        <svg :class="['icon', 'icon-' + info.icon]" aria-hidden="true">
+          <use :xlink:href="'#icon-' + info.icon"></use>
+        </svg>{{info.name}}<span class="title-tip">{{info.slogan}}</span>
+      </h2>
+      <div class="block-content">
         <ul class="boards">
           <li v-for="(board, index) in info.children" :key="index" class="board">
             <router-link :to="{path: '/forums/' + board.id}">
@@ -88,9 +88,9 @@
             </router-link>
           </li>
         </ul>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>

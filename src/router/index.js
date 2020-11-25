@@ -6,7 +6,7 @@ import Topic from '../views/Topic.vue'
 import store from '../store/index'
 import axios from 'axios'
 import nprogress from 'nprogress'
-import 'nprogress/nprogress.css' 
+import 'nprogress/nprogress.css'
 import CategoriesTranslator from '../helpers/categoriesTranslator'
 
 Vue.use(VueRouter)
@@ -24,6 +24,11 @@ const routes = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/Test.vue')
+  },
+  {
+    path: '/cloudDisk',
+    name: 'CloudDisk',
+    component: () => import('../views/CloudDisk')
   },
   {
     path: '/forums/topics/:id',
@@ -123,7 +128,7 @@ router.beforeEach((to, from, next) => {
 
         next()
       })
-      
+
     })
   }else{
     next()

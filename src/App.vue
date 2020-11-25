@@ -6,6 +6,7 @@
       <!-- <transition name="fade"> -->
         <router-view/>
       <!-- </transition> -->
+      <Foot/>
     </div>
   </div>
 </template>
@@ -14,8 +15,10 @@
 import Sidebar from './components/Sidebar.vue'
 import TopHeader from './components/Header.vue'
 import { _throttle } from './public'
+import Foot from "@/components/Foot";
 export default {
   components: {
+    Foot,
     Sidebar,
     TopHeader
   },
@@ -117,7 +120,7 @@ body::-webkit-scrollbar-thumb {
 }
 .btn-load::before{
   content: "";
-  background: url(/img/loading.26fed9aa.svg);
+  background: url('/img/loading.26fed9aa.svg');
   display: block;
   height: 1.25em;
   width: 1.25em;

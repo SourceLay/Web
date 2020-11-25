@@ -22,6 +22,9 @@
         <router-link to="/think">
           <li :class="[$route.name == 'Think' ? 'menu-item-choose noise' : '', 'menu-item']">灵感</li>
         </router-link>
+        <router-link to="/cloudDisk">
+          <li :class="[$route.name == 'CloudDisk' ? 'menu-item-choose noise' : '', 'menu-item']">网盘</li>
+        </router-link>
       </ul>
       <ul class="menu-dblist">
         <router-link to="/forums/minecraft" :class="[$route.params.id == 'minecraft' ? 'menu-item-choose noise' : '', 'menu-dbitem']">
@@ -63,7 +66,7 @@ export default {
 }
 .header{
   position: relative;
-  width: 4em; 
+  width: 4em;
   height: 100vh;
   float: left;
   background: var(--bg-color);
