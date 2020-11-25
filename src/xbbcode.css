@@ -68,11 +68,13 @@
 }
 
 .xbbcode-code-block {
-  padding-left: 0.5em;
-  padding-right: 0.5em;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  padding: 1em;
+  background-color: #F5F2F0;
 }
 
 .xbbcode-code-inline {
-  padding-left: 1em;
-  padding-right: 1em;
+  margin-left: 1em;
+  margin-right: 1em;
 }
