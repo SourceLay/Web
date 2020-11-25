@@ -66,3 +66,13 @@
 .purple:hover{
   color: #ac48a2 !important;
 }
+
+.xbbcode-code-block {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+.xbbcode-code-inline {
+  padding-left: 1em;
+  padding-right: 1em;
+}

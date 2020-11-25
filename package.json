@@ -12,6 +12,7 @@
     "core-js": "^3.6.4",
     "mathjax-full": "^3.0.5",
     "nprogress": "^0.2.0",
+    "prismjs": "^1.22.0",
     "register-service-worker": "^1.7.1",
     "tippy.js": "^6.2.5",
     "vue": "^2.6.11",
