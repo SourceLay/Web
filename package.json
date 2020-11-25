@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@wenyan/highlight": "^0.1.2",
     "axios": "^0.19.2",
     "core-js": "^3.6.4",
     "mathjax-full": "^3.0.5",

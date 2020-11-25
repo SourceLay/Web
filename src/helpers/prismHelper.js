@@ -73,6 +73,8 @@ import 'prismjs/components/prism-wasm'
 import 'prismjs/components/prism-wiki'
 import 'prismjs/components/prism-yaml'
 
+import '@wenyan/highlight/prism'
+
 // import 'prismjs/plugins/line-numbers/prism-line-numbers.css'
 // import 'prismjs/plugins/line-numbers/prism-line-numbers'
 
