@@ -526,18 +526,17 @@ var XBBCODE = (function() {
       },
       
       "latex": {
-          openTag: function(params,content) {
-              let render = require('./helpers/tex2svg').default;
-              // let result = {"html": ""};
-              let result = render(content);
-              return "<div style=\"display: inline-block;\">" + result.html +
-               "</div>" + "<div style=\"display: none;\">";
-          },
-          closeTag: function(params,content) {
-              return "</div>";
-          },
-          noParse: true
-      },
+        openTag: function(params,content) {
+          let render = require('./helpers/tex2svg').default;
+          let result = render(content);
+          return "<div style=\"display: inline-block;\">" + result.html;
+        },
+        closeTag: function(params,content) {
+          return "</div>";
+        },
+        noParse: true,
+        displayContent: false
+    },
   };
 
   // create tag list and lookup fields

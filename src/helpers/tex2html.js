@@ -37,6 +37,9 @@ function tex2html(texContent,
     packages = AllPackages, /*css = true,*/
     fontURL = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.0.0/es5/output/chtml/fonts/woff-v2") {
 
+    texContent = texContent.replace("&lt;", "<"); // escape HTML tag brackets
+    texContent = texContent.replace("&gt;", ">"); // escape HTML tag brackets
+
     //
     //  Create DOM adaptor and register it for HTML documents
     //
