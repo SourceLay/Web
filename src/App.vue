@@ -147,7 +147,7 @@ body::-webkit-scrollbar-thumb {
 }
 .para-content{
   margin-left: 5em;
-  width: 60%;
+  width: calc(100% - 5em);
   background: var(--base-color);
   box-sizing: border-box;
 }
