@@ -215,12 +215,71 @@ var XBBCODE = (function() {
 
       "code": {
           openTag: function(params,content) {
-              return '<span class="xbbcode-code">';
-          },
-          closeTag: function(params,content) {
-              return '</span>';
-          },
-          noParse: true
+              if (params) {
+                  params = params.substr(1);
+              } else {
+                  params = "text";
+              }
+              let args = params.split(',');
+
+              let language = "text";
+              let inline = false;
+              let languageFlag = true;
+              for (let arg of args) {
+                  if (arg.toLowerCase() == 'inline') {
+                      inline = true;
+                      continue;
+                  }
+                  if (languageFlag) {
+                      language = arg;
+                      languageFlag = false;
+                  }
+              }
+
+              ////////
+
+              let render = require('./helpers/prismHelper').default;
+              let ret = render(language, content);
+              let pre = "";
+
+              if (!inline) {
+                pre = '<div class="xbbcode-code xbbcode-code-block"><pre><code>'
+              } else {
+                pre = '<code class="xbbcode-code xbbcode-code-inline">'
+              }
+
+              return pre + ret;
+
+            },
+            closeTag: function(params,content) {
+                if (params) {
+                    params = params.substr(1);
+                } else {
+                    params = "text";
+                }
+                let args = params.split(',');
+  
+                let inline = false;
+                for (let arg of args) {
+                    if (arg.toLowerCase() == 'inline') {
+                        inline = true;
+                        break;
+                    }
+                }
+
+                ////////
+
+                let suf = ""
+                if (!inline) {
+                    suf = "</code></pre></div>"
+                } else {
+                    suf = "</code>"
+                }
+
+                return suf;
+            },
+          noParse: true,
+          displayContent: false
       },
       "email": {
           openTag: function(params,content) {
@@ -526,18 +585,17 @@ var XBBCODE = (function() {
       },
       
       "latex": {
-          openTag: function(params,content) {
-              let render = require('./helpers/tex2svg').default;
-              // let result = {"html": ""};
-              let result = render(content);
-              return "<div style=\"display: inline-block;\">" + result.html +
-               "</div>" + "<div style=\"display: none;\">";
-          },
-          closeTag: function(params,content) {
-              return "</div>";
-          },
-          noParse: true
-      },
+        openTag: function(params,content) {
+          let render = require('./helpers/tex2svg').default;
+          let result = render(content);
+          return "<div style=\"display: inline-block;\">" + result.html;
+        },
+        closeTag: function(params,content) {
+          return "</div>";
+        },
+        noParse: true,
+        displayContent: false
+    },
   };
 
   // create tag list and lookup fields

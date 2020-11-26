@@ -36,6 +36,9 @@ function tex2svg(texContent,
     inline = true, em = 16, ex = 8, width = 80*16,
     packages = AllPackages, /*css = true,*/) {
 
+    texContent = texContent.replace("&lt;", "<"); // escape HTML tag brackets
+    texContent = texContent.replace("&gt;", ">"); // escape HTML tag brackets
+    
     //
     //  Create DOM adaptor and register it for HTML documents
     //
