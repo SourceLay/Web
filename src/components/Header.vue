@@ -1,8 +1,10 @@
 <template>
   <div @mouseleave="closeBox" :class="[headerAbove ? 'header-above' : '', $route.name == 'Home' ? '' : 'fourm-header', 'header']">
     <div class="content">
+      <div>
+        <img src="../assets/SourceLayLOGO3.png" style="top: 0.3em;height: 6em;margin-left: -3em;">
+      </div>
       <div class="search">
-        <i class="iconfont icon-sousuo"></i>
         <input placeholder="搜索" type="text">
       </div>
       <div class="menu">

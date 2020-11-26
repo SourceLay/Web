@@ -2,21 +2,7 @@
   <div class="para-content">
     <!-- 首页-banner -->
     <div class="index-banner">
-      <ul class="banner">
-        <li v-for="(banner, index) in indexBanner" :key="index" :style="{'background': banner[5]}" :class="[indexBannerActive == index ? 'banner-active' : '']">
-          <div class="banner-content">
-            <p>{{banner[0]}}</p>
-            <h1>{{banner[1]}}</h1>
-            <a :href="banner[3]">{{banner[2]}}</a>
-            <img :src="require('../assets/' + banner[4])" alt="">
-          </div>
-        </li>
-      </ul>
-      <div class="banner-dots">
-        <ul class="banner-dot">
-          <li v-for="(banner, index) in indexBanner" :key="index" :class="[indexBannerActive == index ? 'banner-current' : '']" @mouseover="showIndexBanner(index)"></li>
-        </ul>
-      </div>
+      &nbsp;
     </div>
     <!-- 首页-轮播和热点 -->
     <div class="block">
@@ -222,7 +208,8 @@ export default {
 </script>
 <style scoped>
 .index-banner{
-  margin-top: 4em;
+  text-align: center;
+  margin-top: -1em;
   position: relative;
 }
 .banner{
@@ -302,6 +289,7 @@ export default {
 }
 /* 首页-区块 */
 .block{
+  top: 4em;
   width: 1200px;
   margin-bottom: 1em;
   margin: 0 auto;

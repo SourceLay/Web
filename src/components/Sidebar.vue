@@ -2,7 +2,7 @@
   <div class="sidebar">
     <div class="header">
       <div class="header-item">
-        <ul>
+        <ul style="top: 2em;">
           <li><i class="iconfont icon-guanzhu"></i></li>
           <li><i class="iconfont icon-tixing"></i></li>
         </ul>

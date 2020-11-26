@@ -146,7 +146,8 @@ body::-webkit-scrollbar-thumb {
   width: 100%;
 }
 .para-content{
-  width: 100%;
+  margin-left: 5em;
+  width: 60%;
   background: var(--base-color);
   box-sizing: border-box;
 }
