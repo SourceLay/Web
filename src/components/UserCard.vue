@@ -2,8 +2,8 @@
   <div>
     <div class="user-card">
       <!-- TODO 改成更优雅的版本 -->
-      <img class="avatar" v-if="popUser.avatarUrl == ''" src="../assets/avatar.png" alt=""/>
-      <img class="avatar" v-if="popUser.avatarUrl != ''"
+      <img class="avatar" v-if="popUser.avatarUrl === ''" src="../assets/avatar.png" alt=""/>
+      <img class="avatar" v-if="popUser.avatarUrl !== ''"
                           :src="popUser.avatarUrl" alt=""/>
       <!-- TODO 背景-->
       <img class="bg" src="../assets/mc.jpg" alt="">

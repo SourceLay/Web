@@ -1,7 +1,7 @@
 <template>
 <div v-if="topic" class="para-content">
   <!-- 头部 -->
-  <div :class="['banner', loadPage[0] == 1 ? '' : 'hide']">
+  <div :class="['banner', loadPage[0] === 1 ? '' : 'hide']">
     <img src="../assets/mc.jpg" alt="">
     <div v-once :class="['banner-cover','tag', getPostTag(topic.relationships.user.data.id, topic.attributes.title, topic.attributes.isEssence)]"></div>
     <!-- 帖子信息 -->
@@ -16,10 +16,10 @@
   <div class="forum-content">
     <ul class="posts">
       <!-- 首帖 -->
-      <li :class="['post', loadPage[0] == 1 ? '' : 'hide']" data-floor=1>
+      <li :class="['post', loadPage[0] === 1 ? '' : 'hide']" data-floor=1>
         <!-- TODO 改成更优雅的版本 -->
-        <img class="avatar" v-if="included['users.' + topic.relationships.user.data.id].attributes.avatarUrl == ''" src="../assets/avatar.png" alt=""/>
-        <img class="avatar" v-if="included['users.' + topic.relationships.user.data.id].attributes.avatarUrl != ''" 
+        <img class="avatar" v-if="included['users.' + topic.relationships.user.data.id].attributes.avatarUrl === ''" src="../assets/avatar.png" alt=""/>
+        <img class="avatar" v-if="included['users.' + topic.relationships.user.data.id].attributes.avatarUrl !== ''"
                             :src="included['users.' + topic.relationships.user.data.id].attributes.avatarUrl" alt=""/>
         <div class="post-body">
           <!-- 用户信息 -->
@@ -39,7 +39,7 @@
           </div>
           <div class="post-bottom">
             <!-- 点赞 -->
-            <div v-if="included['posts.' + topic.relationships.firstPost.data.id].relationships.likedUsers != undefined && included['posts.' + topic.relationships.firstPost.data.id].relationships.likedUsers.data != ''">
+            <div v-if="included['posts.' + topic.relationships.firstPost.data.id].relationships.likedUsers !== undefined && included['posts.' + topic.relationships.firstPost.data.id].relationships.likedUsers.data !== ''">
               <i class="iconfont icon-guanzhu"></i>
               <p class="post-likedUser" v-html="firstPost.likedUser"></p>
             </div>
@@ -56,8 +56,8 @@
       <!-- 回复 -->
       <li v-for="(id, index) in postList" :key="id" :data-floor="startFloor + index" class="post">
         <!-- TODO 改成更优雅的版本 -->
-        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl == ''" src="../assets/avatar.png" alt=""/>
-        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl != ''"
+        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl === ''" src="../assets/avatar.png" alt=""/>
+        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl !== ''"
                             :src="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl" alt=""/>
         <div class="post-body">
           <!-- 用户信息 -->
@@ -87,7 +87,7 @@
           </div>
           <div class="post-bottom">
             <!-- 点赞 -->
-            <div v-if="included['posts.' + id].relationships.likedUsers != undefined && included['posts.' + id].relationships.likedUsers.data != ''">
+            <div v-if="included['posts.' + id].relationships.likedUsers !== undefined && included['posts.' + id].relationships.likedUsers.data !== ''">
               <i class="iconfont icon-guanzhu"></i>
               <p class="post-likedUser" v-html="formatData['posts.' + id].likedUser"></p>
             </div>
@@ -104,8 +104,8 @@
       <!-- 自我回复 -->
       <li v-for="(id, index) in selfPostList" :key="id" :data-floor="selfPostFloor[index]" class="post">
         <!-- TODO 改成更优雅的版本 -->
-        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl == ''" src="../assets/avatar.png" alt=""/>
-        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl != ''"
+        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl === ''" src="../assets/avatar.png" alt=""/>
+        <img class="avatar" v-if="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl !== ''"
                             :src="included['users.' + included['posts.' + id].relationships.user.data.id].attributes.avatarUrl" alt=""/>
         <div class="post-body">
           <!-- 用户信息 -->
@@ -175,8 +175,8 @@ import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css'; // optional for styling
 import XBBCODE from '.././xbbcode'
 import { mapState, mapMutations } from 'vuex'
-import { _throttle, _debounce } from './../public'
-import { getPostTitle, getPostTag, getTime, dzq } from './../public.js'
+import { _throttle, _debounce } from '@/public'
+import { getPostTitle, getPostTag, getTime, dzq } from '@/public'
 import IncludedHelper from '../helpers/includedHelper'
 
 export default {
@@ -223,7 +223,7 @@ export default {
     ).then((topic) => {
       //获取楼层数据
       let floor = 1, page = 1
-      if(location.search.substr(0, 3) == '?n='){
+      if(location.search.substr(0, 3) === '?n='){
         floor = parseInt(location.search.substr(3))
         page = Math.ceil((floor - 1) / 20)
       }
@@ -304,7 +304,7 @@ export default {
     getTime,
     //渲染点赞用户
     getLikedUser(users) {
-      if (users == undefined) return;
+      if (users === undefined) return;
 
       let list = ''
       if(users.length <= 3){
@@ -362,7 +362,7 @@ export default {
         this.included[item.type + '.' + item.id] = item
       })
       //存放回复数据
-      if(post.data != ''){
+      if(post.data !== ''){
         post.included.forEach((item) => {
           this.included[item.type + '.' + item.id] = item
         })
@@ -391,7 +391,7 @@ export default {
       this.seekbarFloor = floor
       this.seekbarPercent = parseInt(floor / this.allFloor * 100)
       this.$nextTick(() => {
-        if(floor != 1){
+        if(floor !== 1){
           this.jumpFloor()
         }
         tippy('[data-tippy-content]', {
@@ -400,7 +400,7 @@ export default {
       })
     },
     getContent(content) {
-      if (content == undefined || content == null || content == '') return;
+      if (content === undefined || content == null || content === '') return;
       return XBBCODE.process({
         text: content,
         removeMisalignedTags: false,
@@ -447,7 +447,7 @@ export default {
             this.loadFlag = 0
           })
         })
-      }else if(body.scrollTop < 800 && !this.loadFlag && this.loadPage[0] != 1){
+      }else if(body.scrollTop < 800 && !this.loadFlag && this.loadPage[0] !== 1){
         let oldScrollHeight = body.scrollHeight
         let oldScrollTop = body.scrollTop
         this.loadFlag = 1
@@ -525,13 +525,13 @@ export default {
           clean: true
         }).clean
         //如回复贴为楼主，则楼层为1
-        if(id == this.topic.relationships.firstPost.data.id){
+        if(id === this.topic.relationships.firstPost.data.id){
           data.floor = 1
         }else{
           //遍历获取楼层号
           let floor
           for(floor in this.showPost){
-            if(this.showPost[floor] == id){
+            if(this.showPost[floor] === id){
               break
             }
           }

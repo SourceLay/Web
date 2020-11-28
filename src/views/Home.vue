@@ -3,7 +3,7 @@
   <!-- 首页-banner -->
   <div class="index-banner">
     <ul class="banner">
-      <li v-for="(banner, index) in indexBanner" :key="index" :style="{'background': banner[5]}" :class="[indexBannerActive == index ? 'banner-active' : '']">
+      <li v-for="(banner, index) in indexBanner" :key="index" :style="{'background': banner[5]}" :class="[indexBannerActive === index ? 'banner-active' : '']">
         <div class="banner-content">
           <p>{{banner[0]}}</p>
           <h1>{{banner[1]}}</h1>
@@ -14,7 +14,7 @@
     </ul>
     <div class="banner-dots">
       <ul class="banner-dot">
-        <li v-for="(banner, index) in indexBanner" :key="index" :class="[indexBannerActive == index ? 'banner-current' : '']" @mouseover="showIndexBanner(index)"></li>
+        <li v-for="(banner, index) in indexBanner" :key="index" :class="[indexBannerActive === index ? 'banner-current' : '']" @mouseover="showIndexBanner(index)"></li>
       </ul>
     </div>
   </div>
@@ -29,7 +29,7 @@
       <!-- 轮播 -->
       <div @mouseover="sliderBar(1)" @mouseleave="sliderBar(0)" class="slidershow">
         <ul :style="{'transform': [sliderBarActive ? 'none' : 'translate(100%, 0)']}" class="slider-bar">
-          <li @mouseover="showSlider(index)" :style="{'opacity' : [slidershowActive == index ? '1' : '0.5']}" v-for="(slider, index) in sliderContent" :key="index">
+          <li @mouseover="showSlider(index)" :style="{'opacity' : [slidershowActive === index ? '1' : '0.5']}" v-for="(slider, index) in sliderContent" :key="index">
             <img :src="require('../assets/' + slider[2])" alt="">
           </li>
         </ul>
@@ -46,7 +46,7 @@
       <!-- 热点 -->
       <div class="posts">
         <ul class="posts-option">
-          <li @mouseover="showPost(index)" v-for="(item, index) in postInfo" :key="index" :class="[postInfoActive == index ? 'option-active' : '']">{{item}}</li>
+          <li @mouseover="showPost(index)" v-for="(item, index) in postInfo" :key="index" :class="[postInfoActive === index ? 'option-active' : '']">{{item}}</li>
         </ul>
         <ul class="post">
           <li>
@@ -196,7 +196,7 @@ export default {
       let max = this.sliderContent.length
       this.sliderTimer = setInterval(() => {
         this.slidershowActive ++
-        if(this.slidershowActive == max){
+        if(this.slidershowActive === max){
           this.slidershowActive = 0
         }
       },5000)
@@ -219,7 +219,7 @@ export default {
       let max = this.indexBanner.length
       setInterval(() => {
         this.indexBannerActive ++
-        if(this.indexBannerActive == max){
+        if(this.indexBannerActive === max){
           this.indexBannerActive = 0
         }
       },10000)

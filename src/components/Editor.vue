@@ -1,5 +1,5 @@
 <template>
-  <div :class="[$route.name == 'Topic' ? 'topic' : '']" class="editor">
+  <div :class="[$route.name === 'Topic' ? 'topic' : '']" class="editor">
     <!-- 加载图片 -->
     <input @change="changeImage()" ref="load_pic" type="file" multiple accept="image/jpg,image/jpeg,image/png,image/gif" style="display: none">
     <!-- 顶部工具栏 -->
@@ -7,7 +7,7 @@
       <div @click="closeEditor" class="header-btn close">
         <i class="iconfont icon-guanbi"></i>
       </div>
-      <div v-if="$route.name == 'Topic'" @click="changeFixed" :style="{opacity: fixedEditor ? '1' : '0.5'}" class="header-btn fixed">
+      <div v-if="$route.name === 'Topic'" @click="changeFixed" :style="{opacity: fixedEditor ? '1' : '0.5'}" class="header-btn fixed">
         <i class="iconfont icon-guding"></i>
       </div>
     </div>
@@ -30,8 +30,8 @@
         <ul class="btns-left">
           <li v-for="(tool, index) in toolInfo" :key="tool.name" @mouseleave="closetool" class="item">
             <i @click="add(tool.action)" @mouseover="opentool(index)" :class="['icon-' + tool.name, 'iconfont']"></i>
-            <div v-if="toolIndex == index" class="tool">
-              <ul v-if="tool.optionType == 'color'" :class="['tool-' + tool.optionType, 'tool-content']">
+            <div v-if="toolIndex === index" class="tool">
+              <ul v-if="tool.optionType === 'color'" :class="['tool-' + tool.optionType, 'tool-content']">
                 <li @click="add(tool.action, tool.actionValue[index])" v-for="(option, index) in tool.option" :key="index" :class="[option]"></li>
               </ul>
               <ul v-else :class="['tool-' + tool.optionType, 'tool-content']">
@@ -175,7 +175,7 @@ export default {
         bbcodeL = '[' + action + ']'
       }else if(typeof actionValue != 'undefined'){
         console.log('选择了带属性项目' + action + '属性为' + actionValue)
-        if(action == 'img' && actionValue == 'local'){
+        if(action === 'img' && actionValue === 'local'){
           this.$refs.load_pic.files = null
           this.$refs.load_pic.click()
           return
@@ -187,7 +187,7 @@ export default {
       bbcodeR = '[/' + action + ']'
 
       var content = this.$refs.content
-      if(content.selectionStart == content.selectionEnd){
+      if(content.selectionStart === content.selectionEnd){
         var oldSelection = content.selectionStart
         this.content = this.content.slice(0, content.selectionStart) + bbcodeL + bbcodeR + this.content.slice(content.selectionStart)
         this.$refs.content.focus()
@@ -207,7 +207,7 @@ export default {
     },
     send() {
       this.sendLoad = 1
-      if(this.$route.name == 'Forum'){
+      if(this.$route.name === 'Forum'){
         if(!this.title || !this.content){
           this.isError = 1
           this.error = '标题或正文为空！'
@@ -235,7 +235,7 @@ export default {
             this.error = error.response.data.errors[0].detail[0]
           })
         }
-      }else if(this.$route.name == 'Topic'){
+      }else if(this.$route.name === 'Topic'){
         if(!this.content){
           this.isError = 1
           this.error = '正文为空！'

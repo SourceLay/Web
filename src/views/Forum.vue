@@ -65,7 +65,7 @@
           </div>
         </router-link>
       </li>
-      <img v-if="topPost == 0" class="empty" src="../assets/empty.png" alt="">
+      <img v-if="topPost === 0" class="empty" src="../assets/empty.png" alt="">
     </ul>
     <ul class="posts">
       <h2 class="part-title">主题</h2>
@@ -101,30 +101,30 @@
           </div>
         </router-link>
       </li>
-      <img v-if="post == 0" class="empty" src="../assets/empty.png" alt="">
+      <img v-if="post === 0" class="empty" src="../assets/empty.png" alt="">
     </ul>
     <ul class="pages">
-      <li :style="{pointerEvents: page == 1 ? 'none' : ''}" class="pages-btn">
+      <li :style="{pointerEvents: page === 1 ? 'none' : ''}" class="pages-btn">
         <router-link :to="{params: {page : Number(page) - 1}}">上一页</router-link>
       </li>
 
-      <li :class="page == 1 ? 'pages-active' : ''">
+      <li :class="page === 1 ? 'pages-active' : ''">
         <router-link :to="{params: {page : 1}}">1</router-link>
       </li>
       
-      <li v-if="pageList != '' && pageList[0] != 2">…</li>
+      <li v-if="pageList !== '' && pageList[0] !== 2">…</li>
       
-      <li v-for="p in pageList" :key="p" :class="page == p ? 'pages-active' : ''">
+      <li v-for="p in pageList" :key="p" :class="page === p ? 'pages-active' : ''">
         <router-link :to="{params: {page : p}}">{{p}}</router-link>
       </li>
 
-      <li v-if="pageList != '' && pageList[pageList.length - 1] != allPage -1">…</li>
+      <li v-if="pageList !== '' && pageList[pageList.length - 1] !== allPage -1">…</li>
 
-      <li v-if="allPage != 1" :class="page == allPage ? 'pages-active' : ''">
+      <li v-if="allPage !== 1" :class="page === allPage ? 'pages-active' : ''">
         <router-link :to="{params: {page : allPage}}">{{allPage}}</router-link>
       </li>
 
-      <li :style="{pointerEvents: page == allPage ? 'none' : ''}" class="pages-btn">
+      <li :style="{pointerEvents: page === allPage ? 'none' : ''}" class="pages-btn">
         <router-link :to="{params: {page : Number(page) + 1}}">下一页</router-link>
       </li>
     </ul>
@@ -138,7 +138,7 @@ import Editor from './../components/Editor.vue'
 import UserCard from './../components/UserCard.vue'
 import axios from 'axios'
 import tippy from 'tippy.js';
-import { getPostTitle, getPostTag, getTime, dzq} from './../public.js'
+import { getPostTitle, getPostTag, getTime, dzq} from '@/public'
 import 'tippy.js/dist/tippy.css'; // optional for styling
 export default {
   name: 'forum',
@@ -267,10 +267,10 @@ export default {
       page = Number(page)
 
       this.allPage = post.meta.pageCount
-      if(this.allPage == 0){
+      if(this.allPage === 0){
         this.allPage = 1
       }
-      if(this.allPage == 1){
+      if(this.allPage === 1){
         this.pageList = []
       }else if(this.allPage <= 10){
         this.pageList = Array.from(new Array(this.allPage - 2), (x,i) => i + 2)
@@ -319,12 +319,12 @@ export default {
       let ret = "";
 
       let board = this.boardInfo.original[this.id]?.translated;
-      if (board == undefined) return;
+      if (board === undefined) return;
 
       let pboard = board.parent;      
 
-      while (pboard != undefined) {
-        if (pboard.id != undefined) 
+      while (pboard !== undefined) {
+        if (pboard.id !== undefined)
           ret = "<span><a href=/forums/"+pboard.id+">" + pboard.name + "</a></span>" + ret;
         pboard = pboard.parent;
       }

@@ -4,7 +4,7 @@ class CategoriesTranslator {
         this.original = [];
 
         for (let a_categories of categories.data) {
-            if (a_categories.type == "categories") {
+            if (a_categories.type === "categories") {
                 this.add(a_categories);
             }
         }

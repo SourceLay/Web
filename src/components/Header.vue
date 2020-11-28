@@ -1,5 +1,5 @@
 <template>
-  <div @mouseleave="closeBox" :class="[headerAbove ? 'header-above' : '', $route.name == 'Home' ? '' : 'fourm-header', 'header']">
+  <div @mouseleave="closeBox" :class="[headerAbove ? 'header-above' : '', $route.name === 'Home' ? '' : 'fourm-header', 'header']">
     <div class="content">
       <div class="search">
         <i class="iconfont icon-sousuo"></i>
@@ -16,14 +16,14 @@
       </div>
       <div @mouseenter="openBox" class="avatar">
         <!-- TODO 改成更优雅的版本 -->
-        <img v-if="userInfo == undefined || userInfo.avatarUrl == '' || userInfo.avatarUrl == null" src="../assets/avatar.png" alt=""/>
-        <img v-if="userInfo != undefined && userInfo.avatarUrl != '' && userInfo.avatarUrl != null" :src="userInfo.avatarUrl" alt=""/>
+        <img v-if="userInfo === undefined || userInfo.avatarUrl === '' || userInfo.avatarUrl == null" src="../assets/avatar.png" alt=""/>
+        <img v-if="userInfo !== undefined && userInfo.avatarUrl !== '' && userInfo.avatarUrl != null" :src="userInfo.avatarUrl" alt=""/>
       </div>
       <!-- 登录框 -->
       <transition name="up">
       <div v-if="userBox" @mouseleave="closeBox" class="center">
         <!-- 登录框-游客 -->
-        <div v-if="status == 'guest'" class="guest">
+        <div v-if="status === 'guest'" class="guest">
           <div class="login">
             <h2>登录派瑞派对</h2>
             <div class="login-form">
@@ -47,7 +47,7 @@
           </div>
         </div>
         <!-- 登录框-用户 -->
-        <div v-if="status == 'login'" class="user">
+        <div v-if="status === 'login'" class="user">
           <h2>欢迎回来，{{userInfo.username}}</h2>
           <ul class="user-menu">
             <li><div></div><p>空间</p></li>

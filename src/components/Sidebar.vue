@@ -20,14 +20,14 @@
       </div>
       <ul class="menu-list">
         <router-link to="/">
-          <li :class="[$route.name == 'Home' ? 'menu-item-choose noise' : '', 'menu-item']">首页</li>
+          <li :class="[$route.name === 'Home' ? 'menu-item-choose noise' : '', 'menu-item']">首页</li>
         </router-link>
         <router-link to="/think">
-          <li :class="[$route.name == 'Think' ? 'menu-item-choose noise' : '', 'menu-item']">灵感</li>
+          <li :class="[$route.name === 'Think' ? 'menu-item-choose noise' : '', 'menu-item']">灵感</li>
         </router-link>
       </ul>
       <ul class="menu-dblist">
-        <router-link to="/forums/minecraft" :class="[$route.params.id == 'minecraft' ? 'menu-item-choose noise' : '', 'menu-dbitem']">
+        <router-link to="/forums/minecraft" :class="[$route.params.id === 'minecraft' ? 'menu-item-choose noise' : '', 'menu-dbitem']">
           <li>
             <img src="../assets/mc.jpeg" alt="">
             <p>我的世界</p>

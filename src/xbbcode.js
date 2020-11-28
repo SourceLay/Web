@@ -226,7 +226,7 @@ var XBBCODE = (function() {
               let inline = false;
               let languageFlag = true;
               for (let arg of args) {
-                  if (arg.toLowerCase() == 'inline') {
+                  if (arg.toLowerCase() === 'inline') {
                       inline = true;
                       continue;
                   }
@@ -261,7 +261,7 @@ var XBBCODE = (function() {
   
                 let inline = false;
                 for (let arg of args) {
-                    if (arg.toLowerCase() == 'inline') {
+                    if (arg.toLowerCase() === 'inline') {
                         inline = true;
                         break;
                     }
