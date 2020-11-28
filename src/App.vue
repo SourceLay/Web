@@ -3,6 +3,7 @@
     <Sidebar/>
     <div class="content">
       <TopHeader/>
+      <HeaderSentinel/>
       <!-- <transition name="fade"> -->
         <router-view/>
       <!-- </transition> -->
@@ -13,30 +14,16 @@
 <script>
 import Sidebar from './components/Sidebar.vue'
 import TopHeader from './components/Header.vue'
-import { _throttle } from './public'
+import HeaderSentinel from "@/components/HeaderSentinel";
 export default {
   components: {
+    HeaderSentinel,
     Sidebar,
     TopHeader
   },
   methods: {
-    contentScroll: _throttle(function() {
-      let body = document.documentElement
-      if(body.scrollTop > 60){
-        this.$store.commit('setData', {
-          key: 'headerAbove',
-          value: 0
-        })
-      }else{
-        this.$store.commit('setData', {
-          key: 'headerAbove',
-          value: 1
-        })
-      }
-    }, 200)
   },
   created() {
-    window.addEventListener('scroll', this.contentScroll, true)
     document.body.classList.add(this.$store.state.colorTheme + '-theme');
   }
 }
