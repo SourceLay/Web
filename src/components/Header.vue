@@ -171,6 +171,7 @@ export default {
   width: 1200px;
   height: 4em;
   margin: 0 auto;
+  max-width: calc(100% - 9em);
 }
 .fourm-header{
   background: rgba(255, 255, 255, 0.8);

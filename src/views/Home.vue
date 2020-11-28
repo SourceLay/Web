@@ -241,6 +241,7 @@ export default {
 .banner-content{
   position: relative;
   width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
   height: 100%;
   display: flex;
@@ -293,6 +294,7 @@ export default {
 }
 .banner-dot{
   width: 1200px;
+  max-width: calc(100% - 9em);
   margin: 0 auto;
   text-align: right;
 }
@@ -312,7 +314,7 @@ export default {
 /* 首页-区块 */
 .block{
   width: 1200px;
-  margin-bottom: 1em;
+  max-width: 100%;
   margin: 0 auto;
 }
 .block h2{
@@ -359,7 +361,7 @@ export default {
   bottom: 0;
   padding: 0.5em;
   color: var(--line-color);
-  background: rgb(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
 }
 .slider img{
   width: 100%;

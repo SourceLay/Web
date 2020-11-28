@@ -1,6 +1,9 @@
 <template>
   <div class="sidebar">
     <div class="header">
+      <div class="logo">
+        <!-- place logo here-->
+      </div>
       <div class="header-item">
         <ul>
           <li><i class="iconfont icon-guanzhu"></i></li>
@@ -73,12 +76,16 @@ export default {
   width: 100%;
   bottom: 0;
 }
+.header .logo {
+  height: 4em;
+  width: 100%;
+}
 .header li{
   width: 2.6em;
   height: 2.6em;
   line-height: 2.6em;
   border-radius: 50%;
-  margin: 1em auto;
+  margin: 0.7em auto;
   background: var(--item-color);
   list-style: none;
   text-align: center;
