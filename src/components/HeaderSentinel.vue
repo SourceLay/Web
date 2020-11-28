@@ -50,7 +50,7 @@ export default {
         })
       }
     }), {
-      threshold: [0.0, 0.01, 1.0]
+      threshold: [0.0, 0.01]
     });
 
     this.private_headerObserver.observe(this.$el);
