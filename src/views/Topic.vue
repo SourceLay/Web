@@ -39,7 +39,7 @@
           </div>
           <div class="post-bottom">
             <!-- 点赞 -->
-            <div v-if="included['posts.' + topic.relationships.firstPost.data.id].relationships.likedUsers !== undefined && included['posts.' + topic.relationships.firstPost.data.id].relationships.likedUsers.data !== ''">
+            <div v-if="included['posts.' + topic.relationships.firstPost.data.id].relationships.likedUsers !== undefined && included['posts.' + topic.relationships.firstPost.data.id].relationships.likedUsers.data !== undefined && included['posts.' + topic.relationships.firstPost.data.id].relationships.likedUsers.data.length > 0">
               <i class="iconfont icon-guanzhu"></i>
               <p class="post-likedUser" v-html="firstPost.likedUser"></p>
             </div>
@@ -87,7 +87,7 @@
           </div>
           <div class="post-bottom">
             <!-- 点赞 -->
-            <div v-if="included['posts.' + id].relationships.likedUsers !== undefined && included['posts.' + id].relationships.likedUsers.data !== ''">
+            <div v-if="included['posts.' + id].relationships.likedUsers !== undefined && included['posts.' + id].relationships.likedUsers.data !== undefined && included['posts.' + id].relationships.likedUsers.data.length > 0">
               <i class="iconfont icon-guanzhu"></i>
               <p class="post-likedUser" v-html="formatData['posts.' + id].likedUser"></p>
             </div>
@@ -305,6 +305,7 @@ export default {
     //渲染点赞用户
     getLikedUser(users) {
       if (users === undefined) return;
+      if (users.length === 0) return;
 
       let list = ''
       if(users.length <= 3){
@@ -362,7 +363,7 @@ export default {
         this.included[item.type + '.' + item.id] = item
       })
       //存放回复数据
-      if(post.data !== ''){
+      if(post.data !== undefined && post.data.length > 0){
         post.included.forEach((item) => {
           this.included[item.type + '.' + item.id] = item
         })

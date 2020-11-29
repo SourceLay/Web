@@ -112,13 +112,13 @@
         <router-link :to="{params: {page : 1}}">1</router-link>
       </li>
       
-      <li v-if="pageList !== '' && pageList[0] !== 2">…</li>
+      <li v-if="pageList !== undefined && pageList.length > 0 && pageList[0] !== 2">…</li>
       
       <li v-for="p in pageList" :key="p" :class="page === p ? 'pages-active' : ''">
         <router-link :to="{params: {page : p}}">{{p}}</router-link>
       </li>
 
-      <li v-if="pageList !== '' && pageList[pageList.length - 1] !== allPage -1">…</li>
+      <li v-if="pageList !== undefined && pageList.length > 0 && pageList[pageList.length - 1] !== allPage -1">…</li>
 
       <li v-if="allPage !== 1" :class="page === allPage ? 'pages-active' : ''">
         <router-link :to="{params: {page : allPage}}">{{allPage}}</router-link>
