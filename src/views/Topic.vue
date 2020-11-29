@@ -577,9 +577,17 @@ export default {
             }
         }
       }).then(response => {
-        this.included['posts.' + post_id].attributes.isLiked = response.data.data.attributes.isLiked;
+        this.included['posts.' + post_id] = response.data.data
+        response.data.included.forEach(item => {
+          this.included[item.type + '.' + item.id] = item
+        })
+        if(this.topic.relationships.firstPost.data.id === post_id){
+          this.firstPost.likedUser = this.getLikedUser(this.included['posts.' + post_id].relationships?.likedUsers?.data)
+        }else{
+          this.formatData['posts.' + post_id].likedUser = this.getLikedUser(this.included['posts.' + post_id].relationships?.likedUsers?.data)
+        }
+        this.$forceUpdate()
       });
-
     },
   },
   mounted() {
