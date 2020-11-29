@@ -47,7 +47,8 @@
             <ul class="post-func">
               <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canHide">删除</li>
               <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canEdit">编辑</li>
-              <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canLike">点赞</li>
+              <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canLike && included['posts.' + topic.relationships.firstPost.data.id].attributes.isLiked === false" @click="setLike($event, topic.relationships.firstPost.data.id, true)">点赞</li>
+              <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canLike && included['posts.' + topic.relationships.firstPost.data.id].attributes.isLiked === true" @click="setLike($event, topic.relationships.firstPost.data.id, false)">取赞</li>
               <li @click="setReply(1, topic.relationships.firstPost.data.id)">回复#1</li>
             </ul>
           </div>
@@ -95,7 +96,8 @@
             <ul class="post-func">
               <li v-if="included['posts.' + id].attributes.canHide">删除</li>
               <li v-if="included['posts.' + id].attributes.canEdit">编辑</li>
-              <li v-if="included['posts.' + id].attributes.canLike">点赞</li>
+              <li v-if="included['posts.' + id].attributes.canLike && included['posts.' + id].attributes.isLiked === false" @click="setLike($event, id, true)">点赞</li>
+              <li v-if="included['posts.' + id].attributes.canLike && included['posts.' + id].attributes.isLiked === true" @click="setLike($event, id, false)">取赞</li>
               <li @click="setReply(startFloor + index, id)">回复#{{startFloor + index}}</li>
             </ul>
           </div>
@@ -140,7 +142,8 @@
             <ul class="post-func">
               <li v-if="included['posts.' + id].attributes.canHide">删除</li>
               <li v-if="included['posts.' + id].attributes.canEdit">编辑</li>
-              <li v-if="included['posts.' + id].attributes.canLike">点赞</li>
+              <li v-if="included['posts.' + id].attributes.canLike && included['posts.' + id].attributes.isLiked === false" @click="setLike($event, id, true)">点赞</li>
+              <li v-if="included['posts.' + id].attributes.canLike && included['posts.' + id].attributes.isLiked === true" @click="setLike($event, id, false)">取赞</li>
               <li @click="setReply(selfPostFloor[index], id)">回复#{{selfPostFloor[index]}}</li>
             </ul>
           </div>
@@ -559,6 +562,24 @@ export default {
         })
       }
       return data
+    },
+    setLike(event, post_id, isLiked){
+      console.log(event);
+      
+      axios.patch(dzq({
+          name: 'posts/' + post_id
+        }), {
+        data: {
+            id: post_id,
+            type: "posts",
+            attributes: {
+                isLiked: isLiked
+            }
+        }
+      }).then(response => {
+        this.included['posts.' + post_id].attributes.isLiked = response.data.data.attributes.isLiked;
+      });
+
     },
   },
   mounted() {

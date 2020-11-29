@@ -122,7 +122,7 @@ export function dzq(e) {
   let parts = []
   Object.keys(e).forEach((item, index) => {
     if(index === 0){
-      url = '/api/' + e[item] + '?'
+      url = '/api/' + e[item]
     }else if(e[item] instanceof Array){
       parts.push(item + '=' + e[item].join(','))
     }else{
@@ -137,6 +137,8 @@ export function dzq(e) {
       }
     }
   })
-  url += parts.join('&')
+  if (parts.length > 0) {
+    url += '?' + parts.join('&') 
+  }
   return url
 }
