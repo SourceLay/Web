@@ -147,7 +147,7 @@ export default {
       }
       
       if (this.loginForm.confirmPassword.length < 6) {
-        this.loginErrorText= '你输入的两次密码不一样'
+        this.loginErrorText= '你输入的密码太短了。'
         this.loginError = 1
         setTimeout(() => {
           this.loginLoad = 0
