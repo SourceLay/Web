@@ -221,6 +221,8 @@ export default {
           'category',
           'user.groups',
           'firstPost.likedUsers',
+          'firstPost.file',
+          'firstPost.fileShare',
         ]
       })
     ).then((topic) => {
@@ -245,7 +247,9 @@ export default {
           include: [
             'user',
             'user.groups',
-            'likedUsers'
+            'likedUsers',
+            'file',
+            'fileShare',
           ],
           page: {
             number: page,
@@ -405,7 +409,9 @@ export default {
     },
     getContent(content) {
       if (content === undefined || content == null || content === '') return;
-      return XBBCODE.process({
+      let parser = XBBCODE();
+      parser.setIncluded(this.included);
+      return parser.process({
         text: content,
         removeMisalignedTags: false,
         addInLineBreaks: true

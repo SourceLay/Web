@@ -82,3 +82,42 @@
   background-color: #F5F2F0;
   border-radius: 5px;
 }
+
+.xbbcode-flieshare-block {
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  padding: 1em;
+  border: 1px solid hsla(0,0%,89.4%,.6);
+  background-color: rgba(216, 216, 216, 0.1);
+
+  display: flex;
+}
+
+.xbbcode-flieshare-block:hover {
+  border: 1px solid rgba(48, 192, 255, 0.8);
+  background-color: rgba(240, 255, 255, 0.8)
+}
+
+.xbbcode-flieshare-block-icon {
+  margin-top: 0.5em;
+}
+
+.xbbcode-flieshare-block-filename {
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
+.xbbcode-flieshare-block-size {
+  margin-left: 1em;
+  margin-right: 1em;
+  color: #aaaaaa;
+
+}
+
+.xbbcode-flieshare-block-protected {
+  position: absolute;
+  right: 0px;
+  margin-top: 0.5em;
+  margin-right: 3em;
+  color: rgba(196, 64, 255, 0.8)
+}

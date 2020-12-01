@@ -158,7 +158,8 @@ export default {
       this.toolIndex = -1
     },
     showPreview: function() {
-      this.preview = XBBCODE.process({
+      let parser = XBBCODE();
+      this.preview = parser.process({
         text: this.content,
         removeMisalignedTags: false,
         addInLineBreaks: true
