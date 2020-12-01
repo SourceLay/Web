@@ -23,7 +23,7 @@
       <transition name="up">
       <div v-if="userBox" @mouseleave="closeBox" class="center">
         <!-- 登录框-游客 -->
-        <div v-if="status === 'guest'" class="guest">
+        <div v-if="status === 'guest' && page === 1" class="guest">
           <div class="login">
             <h2>登录派瑞派对</h2>
             <div class="login-form">
@@ -43,9 +43,35 @@
           </div>
           <div class="register">
             <span>还没有账号？</span>
-            <p class="btn btn-reg">加入</p>
+            <p class="btn btn-reg" @click="onRegisterClick()">加入</p>
           </div>
         </div>
+
+        <div v-if="status === 'guest'  && page === 2" class="guest">
+          <div class="login">
+            <h2>注册派瑞派对</h2>
+            <div class="login-form">
+              <input v-model="loginForm.username" placeholder="用户名" type="text">
+              <input v-model="loginForm.password" placeholder="密码" type="password">
+              <input v-model="loginForm.confirmPassword" placeholder="确认密码" type="password">
+            </div>
+            <div class="login-btn">
+              <span class="forget">&ZeroWidthSpace;</span>
+              <p @click="register" :class="[loginLoad ? 'btn-load' : '']" class="btn btn-login">注册</p>
+            </div>
+            <transition name="zoom">
+            <div v-if="loginError" class="login-error">
+              <img :src="require('../assets/wangjingze.jpg')" alt="">
+              <p>{{loginErrorText}}</p>
+            </div>
+            </transition>
+          </div>
+          <div class="register">
+            <span>已有账号？</span>
+            <p class="btn btn-reg" @click="onLoginClick()">登陆</p>
+          </div>
+        </div>
+
         <!-- 登录框-用户 -->
         <div v-if="status === 'login'" class="user">
           <h2>欢迎回来，{{userInfo.username}}</h2>
@@ -70,11 +96,13 @@ export default {
   name: 'header',
   data: function() {
     return {
+      page: 1,
       userBox: 0,
       loginLoad: 0,
       loginForm: {
         username: '',
-        password: ''
+        password: '',
+        confirmPassword: ''
       },
       loginError: 0,
       loginErrorText: '你的用户名或密码有问题'
@@ -94,6 +122,78 @@ export default {
     },
     closeBox: function() {
       this.userBox = 0
+    },
+    register: function() {
+      this.loginLoad = 1
+
+      if (this.loginForm.username === '') {
+        this.loginErrorText= '用户名不得为空'
+        this.loginError = 1
+        setTimeout(() => {
+          this.loginLoad = 0
+          this.loginError = 0
+        },2000)
+        return
+      }
+
+      if (this.loginForm.password !== this.loginForm.confirmPassword) {
+        this.loginErrorText= '你输入的两次密码不一样'
+        this.loginError = 1
+        setTimeout(() => {
+          this.loginLoad = 0
+          this.loginError = 0
+        },2000)
+        return
+      }
+      
+      if (this.loginForm.confirmPassword.length < 6) {
+        this.loginErrorText= '你输入的密码太短了。'
+        this.loginError = 1
+        setTimeout(() => {
+          this.loginLoad = 0
+          this.loginError = 0
+        },2000)
+        return
+      }
+
+      this.axios.post('/api/register', {
+        data: {
+          attributes: {
+            username: this.loginForm.username,
+            password: this.loginForm.password
+          }
+        }
+      }).then((response) => {
+
+        console.log(response.data)
+        localStorage.setItem('access_token', response.data.data.attributes.access_token)
+        localStorage.setItem('refresh_token', response.data.data.attributes.refresh_token)
+
+        let includedInfo = new IncludedHelper(response.data.included);
+        let tmpUserInfo = includedInfo.get('users.' + response.data.data.id);
+
+        this.setData({
+          key: 'userInfo',
+          value: tmpUserInfo.attributes
+        })
+
+        this.setData({
+          key: 'status',
+          value: 'login'
+        })
+
+        this.loginLoad = 0
+
+      }).catch((error) => {
+        console.log(error)
+        this.loginErrorText= '注册过程出问题了'
+        this.loginError = 1
+        setTimeout(() => {
+          this.loginLoad = 0
+          this.loginError = 0
+        },2000)
+      })
+
     },
     login: function() {
       this.loginLoad = 1
@@ -127,6 +227,7 @@ export default {
 
       }).catch((error) => {
         console.log(error)
+        this.loginErrorText= '你的用户名或密码有问题'
         this.loginError = 1
         setTimeout(() => {
           this.loginLoad = 0
@@ -150,6 +251,12 @@ export default {
     },
     getAvatar: function() {
       return this.userInfo?.avatar ?? '../assets/avatar.png';
+    },
+    onRegisterClick: function(){
+      this.page = 2;
+    },
+    onLoginClick: function(){
+      this.page = 1;
     }
   }
 }
