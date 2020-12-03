@@ -7,6 +7,9 @@
   <el-dialog title="支付" width="30%" :visible="payVisible" @close="payVisible=false">
     <Pay></Pay>
   </el-dialog>
+  <el-dialog title="分享信息" :visible="setShareInfoVisible" @close="setShareInfoVisible=false">
+    <SetShareInfo></SetShareInfo>
+  </el-dialog>
   <div class="index-banner">
     <ul class="banner">
       <li v-for="(banner, index) in indexBanner" :key="index" :style="{'background': banner[5]}" :class="[indexBannerActive === index ? 'banner-active' : '']">
@@ -101,7 +104,7 @@
     <ul>
       <li @click="setUserInfoVisible=true">隐私和Cookies</li>
       <li @click="payVisible=true">使用条款</li>
-      <li>关于我们</li>
+      <li @click="setShareInfoVisible=true">关于我们</li>
       <li>© 2019 派瑞派对</li>
     </ul>
   </div>
@@ -112,13 +115,15 @@
 import { mapState } from 'vuex'
 import SetUserInfo from "@/components/SetUserInfo";
 import Pay from "@/components/Pay";
+import SetShareInfo from "@/components/SetShareInfo";
 export default {
   name: 'Home',
-  components: {Pay, SetUserInfo},
+  components: {SetShareInfo, Pay, SetUserInfo},
   data() {
     return {
       setUserInfoVisible:false,
       payVisible: false,
+      setShareInfoVisible:false,
       //当前banner
       indexBannerActive: 0,
       //当前轮播
