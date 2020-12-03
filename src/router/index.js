@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Forum from '../views/Forum.vue'
+import Files from '../views/Files.vue'
 import Topic from '../views/Topic.vue'
 import store from '../store/index'
 import axios from 'axios'
@@ -34,6 +35,11 @@ const routes = [
     path: '/forums/:id/:page?',
     name: 'Forum',
     component: Forum
+  },
+  {
+    path:'/files/:path*',
+    name:'Files',
+    component:Files
   }
 ]
 
