@@ -34,7 +34,7 @@
           </div>
           <!-- 内容 -->
           <div class="post-main">
-            <div v-html="firstPost.content" class="post-content bbcode">
+            <div v-html="firstPost.content" class="post-content bbcode" @click="onClickContent($event)">
             </div>
           </div>
           <div class="post-bottom">
@@ -83,7 +83,7 @@
               </span>
             </div>
             <!-- 正文 -->
-            <div v-html="formatData['posts.' + id].content" class="post-content bbcode">
+            <div v-html="formatData['posts.' + id].content" class="post-content bbcode" @click="onClickContent($event)">
             </div>
           </div>
           <div class="post-bottom">
@@ -134,7 +134,7 @@
               </div>
             </div>
             <!-- 内容 -->
-            <div v-html="formatData['posts.' + id].content" class="post-content bbcode">
+            <div v-html="formatData['posts.' + id].content" class="post-content bbcode" @click="onClickContent($event)">
             </div>
           </div>
           <div class="post-bottom">
@@ -594,6 +594,46 @@ export default {
         }
         this.$forceUpdate()
       });
+    },
+    onClickContent(event){
+      console.log(event);
+      
+      if (event.srcElement.tagName.toLowerCase() === "div" && event.srcElement.attributes.class?.value === "xbbcode-flieshare-block") {
+        let shareId = Number(event.srcElement.attributes.shareid?.value);
+        if (typeof(shareId) === 'undefined' || shareId === null) {
+          // TODO 
+        }
+        let shareInfo = this.included['sourcelay-fileshare.' + shareId];
+        let fileInfo = undefined;
+        console.log(shareInfo);
+
+        if (shareInfo) {
+            fileInfo = this.included['sourcelay-file.' + shareInfo.attributes.file_id];
+        }
+        console.log(fileInfo);
+
+        if (typeof(shareInfo) == 'undefined' || shareInfo === null || typeof(fileInfo) == 'undefined' || fileInfo === null) {
+          // TODO
+        }
+
+        if (shareInfo.attributes.downloadUrl) {
+          axios.get(shareInfo.attributes.downloadUrl, { responseType: 'blob' })
+            .then(response => {
+              const blob = new Blob([response.data], { type: shareInfo.attributes.type ?? 'application/octet-stream' })
+              const link = document.createElement('a')
+              link.href = URL.createObjectURL(blob)
+              link.download = fileInfo.attributes.name
+              link.click()
+              URL.revokeObjectURL(link.href)
+            }).catch(() => {
+              // TODO 加一个错误显示
+            })
+        }
+
+        // TODO 密码下载 
+        // TODO 付费下载
+
+      }
     },
   },
   mounted() {

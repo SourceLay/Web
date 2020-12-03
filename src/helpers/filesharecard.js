@@ -14,7 +14,11 @@ function size(size){
 }
 
 function render(fileInfo, shareInfo) {
-    let ret = '<div class="xbbcode-flieshare-block">';
+    if (fileInfo === null || shareInfo === null) {
+        return "";
+    }
+
+    let ret = '<div class="xbbcode-flieshare-block" shareId="'+ shareInfo.attributes.id +'">';
 
     let name = fileInfo.attributes.name;
     // let parts = name.split('.');
