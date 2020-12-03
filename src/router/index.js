@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Forum from '../views/Forum.vue'
 import Files from '../views/Files.vue'
+import ShareStream from '../views/ShareStream.vue'
 import Topic from '../views/Topic.vue'
 import store from '../store/index'
 import axios from 'axios'
@@ -40,6 +41,11 @@ const routes = [
     path:'/files/:path*',
     name:'Files',
     component:Files
+  },
+  {
+    path:'/stream',
+    name:'ShareStream',
+    component:ShareStream
   }
 ]
 
