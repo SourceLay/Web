@@ -1,5 +1,5 @@
 <template>
-  <div @mouseleave="closeBox" :class="[headerAbove ? 'header-above' : '', $route.name === 'Home' ? '' : 'fourm-header', 'header']">
+  <div @mouseleave="maybeHideLoginBox" :class="[headerAbove ? 'header-above' : '', $route.name === 'Home' ? '' : 'fourm-header', 'header']">
     <div class="content">
       <div class="search">
         <i class="iconfont icon-sousuo"></i>
@@ -14,14 +14,13 @@
           <li>帮助</li>
         </ul>
       </div>
-      <div @mouseenter="openBox" class="avatar">
+      <div @mouseenter="showLoginBox" class="avatar">
         <!-- TODO 改成更优雅的版本 -->
         <img v-if="userInfo === undefined || userInfo.avatarUrl === '' || userInfo.avatarUrl == null" src="../assets/avatar.png" alt=""/>
         <img v-if="userInfo !== undefined && userInfo.avatarUrl !== '' && userInfo.avatarUrl != null" :src="userInfo.avatarUrl" alt=""/>
       </div>
       <!-- 登录框 -->
-      <transition name="up">
-      <div v-if="userBox" @mouseleave="closeBox" class="center">
+      <div @mouseleave="maybeHideLoginBox" id="login-box" class="center" :class="{'mouse-on': userBox}">
         <!-- 登录框-游客 -->
         <div v-if="status === 'guest' && page === 1" class="guest">
           <div class="login">
@@ -83,7 +82,6 @@
           </ul>
         </div>
       </div>
-      </transition>
     </div>
   </div>
 </template>
@@ -97,7 +95,7 @@ export default {
   data: function() {
     return {
       page: 1,
-      userBox: 0,
+      userBox: false,
       loginLoad: 0,
       loginForm: {
         username: '',
@@ -117,11 +115,11 @@ export default {
     ...mapMutations([
       'setData'
     ]),
-    openBox: function() {
-      this.userBox = 1
+    showLoginBox: function() {
+      this.userBox = true
     },
-    closeBox: function() {
-      this.userBox = 0
+    maybeHideLoginBox: function() {
+      this.userBox = false
     },
     register: function() {
       this.loginLoad = 1
@@ -338,6 +336,23 @@ export default {
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
   border-radius: 0.2em;
   overflow: hidden;
+}
+#login-box {
+  transition: transform 0.3s, opacity 0.3s, visibility 0.3s;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(50px);
+  transition-delay: 0.3s;
+  will-change: transform, opacity, visibility;
+}
+#login-box.mouse-on,
+#login-box:focus,
+#login-box:hover,
+#login-box:focus-within {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition-delay: 0s;
 }
 .guest h2{
   font-size: 1em;
