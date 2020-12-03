@@ -11,6 +11,7 @@
     "@wenyan/highlight": "^0.1.2",
     "axios": "^0.19.2",
     "core-js": "^3.6.4",
+    "element-ui": "^2.14.1",
     "mathjax-full": "^3.0.5",
     "nprogress": "^0.2.0",
     "prismjs": "^1.22.0",
