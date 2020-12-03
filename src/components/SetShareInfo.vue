@@ -4,7 +4,7 @@
       <el-form-item label="分享描述" prop="description">
         <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" v-model="ruleForm.description"></el-input>
       </el-form-item>
-      <el-form-item label="分享类型" prop="description">
+      <el-form-item label="分享类型" prop="type">
         <el-select v-model="ruleForm.type" placeholder="请选择">
           <el-option
               v-for="item in options"
@@ -33,6 +33,28 @@ export default {
   name: 'SetShareInfo',
   data() {
     // 自定义验证逻辑
+    var validatePassword = (rule, value, callback) => {
+      if (this.ruleForm.type != 1)
+        callback();
+      if (value === '') {
+        callback(new Error('请输入密码'));
+      } else {
+        // 其他逻辑
+        callback();
+      }
+    };
+    var validateCost = (rule, value, callback) => {
+      if (this.ruleForm.type != 2)
+        callback();
+      if (value === '') {
+        callback(new Error('请输入价格'));
+      } else {
+        // 其他逻辑
+        if (isNaN(Number(value)))
+          callback(new Error('请输入数字'));
+        callback();
+      }
+    };
     return {
       options: [{
         value: 0,
@@ -51,6 +73,12 @@ export default {
         cost: 0,
       },
       rules: {
+        password:[
+          { validator: validatePassword, trigger: 'change'}
+        ],
+        cost:[
+          { validator: validateCost, trigger: 'change'}
+        ]
       }
     };
   },
