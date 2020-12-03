@@ -1,5 +1,6 @@
 <template>
   <div id="payPwd">
+    <header>输入密码</header>
     <input ref="pwd" type="tel" maxlength="6" v-model="msg" class="pwd" unselectable="on" />
     <ul class="pwd-wrap" @click="focus">
       <li><i v-if="msg.length > 0"></i></li>
