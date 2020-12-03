@@ -46,10 +46,7 @@
             <ul>
                 <li v-for="item in files" :key="item.attributes.id">
 
-
-
-
-                    <div id="fileItem" v-if="item.attributes.type==='text/directory'">
+                    <div id="fileItem" v-if="item.attributes.type==='text/directory'" @dblclick="enterFolder(item.attributes.name)">
                         <input id="fileCheck" v-model="item.selected" @change="checkboxOnclick(item)" type="checkbox"/>
                         <div id="fileIcon">
                             <svg t="1606829000232" class="icon" viewBox="0 0 1185 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="16670" width="48" height="48"><path d="M107.789474 0h319.218526A129.347368 129.347368 0 0 1 529.246316 50.176L840.757895 452.715789H0V107.789474a107.789474 107.789474 0 0 1 107.789474-107.789474z" fill="#EB9B00" p-id="16671"></path><path d="M138.186105 183.242105h909.312c48.074105 0 65.482105 5.012211 82.997895 14.389895 17.623579 9.377684 31.420632 23.174737 40.798316 40.744421 9.377684 17.569684 14.389895 35.031579 14.389895 82.997895v564.439579c0 48.074105-5.012211 65.482105-14.389895 82.997894-9.377684 17.623579-23.174737 31.420632-40.744421 40.798316-17.569684 9.377684-35.031579 14.389895-82.997895 14.389895H138.132211c-48.074105 0-65.482105-5.012211-82.997895-14.389895a97.926737 97.926737 0 0 1-40.798316-40.744421C5.012211 951.242105 0 933.834105 0 885.867789V321.374316c0-48.074105 5.012211-65.482105 14.389895-82.997895 9.377684-17.623579 23.174737-31.420632 40.744421-40.798316 17.569684-9.377684 35.031579-14.389895 82.997895-14.389894z" fill="#F8B700" p-id="16672"></path></svg>
@@ -63,7 +60,6 @@
                         <div id="file-fileSize"><div class="vertical-middle-align"><p id="fileSize"></p></div></div>
                         <div id="file-fileDate"><div class="vertical-middle-align"><p>{{new Date(item.attributes.updated_at).toLocaleString()}}</p></div></div>
                     </div>
-
 
                     <div id="fileItem" v-if="item.attributes.type!=='text/directory'">
                         <input id="fileCheck" v-model="item.selected" @change="checkboxOnclick(item)" type="checkbox"/>
@@ -79,8 +75,6 @@
                         <div id="file-fileSize"><div class="vertical-middle-align"><p>{{formatSize(item.attributes.size)}}</p></div></div>
                         <div id="file-fileDate"><div class="vertical-middle-align"><p>{{new Date(item.attributes.updated_at).toLocaleString()}}</p></div></div>
                     </div>
-
-
 
                 </li>
             </ul>
@@ -242,7 +236,25 @@ export default {
             }
             this.files = tmpFiles;
         });
-    }
+    },
+    enterFolder: function(folder){
+        if (folder.length > 0 && folder[0] == '/') {
+            folder.substring(1);
+        }
+        console.log(folder);
+
+        let path = this.$route.path;
+        console.log(path);
+
+        while (path.length > 0 && path[path.length - 1] == '/') {
+            path = path.substring(0, path.length - 1);
+        }
+
+        path = path + '/' + folder;
+        console.log(path);
+
+        this.$router.push({path: path});
+    },
   },
   mounted(){
       window.addEventListener('scroll', this.handleScroll);
