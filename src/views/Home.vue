@@ -3,6 +3,7 @@
   <!-- 首页-banner -->
   <el-dialog title="修改信息" :visible="setUserInfoVisible" @close="setUserInfoVisible=false">
     <SetUserInfo></SetUserInfo>
+    <PayPassword style="width: 60%"></PayPassword>
   </el-dialog>
   <div class="index-banner">
     <ul class="banner">
@@ -108,9 +109,10 @@
 <script>
 import { mapState } from 'vuex'
 import SetUserInfo from "@/components/SetUserInfo";
+import PayPassword from "@/components/PayPassword";
 export default {
   name: 'Home',
-  components: {SetUserInfo},
+  components: {PayPassword, SetUserInfo},
   data() {
     return {
       setUserInfoVisible:false,
