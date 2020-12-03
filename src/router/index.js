@@ -37,7 +37,7 @@ const routes = [
     component: Forum
   },
   {
-    path:'/files/:files_id*',
+    path:'/files/:path*',
     name:'Files',
     component:Files
   }
