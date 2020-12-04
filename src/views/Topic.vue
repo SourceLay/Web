@@ -168,6 +168,9 @@
       </div>
     </div>
   </div>
+  <el-dialog title="支付" width="30%" :visible="payVisible" @close="payVisible=false">
+    <Pay @handlePay="handlePay"></Pay>
+  </el-dialog>
 </div>
 </template>
 
@@ -186,6 +189,7 @@ export default {
   name: 'forum',
   data: function() {
     return {
+      payVisible: false,  //支付框是否可见
       topic: null,        //存放主题数据
       showPost: [],       //当前展示的帖子ID
       jumpUrl: {},
@@ -385,7 +389,7 @@ export default {
           this.included[item.type + '.' + item.id] = item
         })
       }
-      
+
       this.firstPost = {
         content : this.getContent(this.included['posts.' + this.topic.relationships.firstPost.data.id].attributes.content),
         likedUser : this.getLikedUser(this.included['posts.' + this.topic.relationships.firstPost.data.id].relationships.likedUsers?.data),
@@ -571,7 +575,7 @@ export default {
     },
     setLike(event, post_id, isLiked){
       console.log(event);
-      
+
       axios.patch(dzq({
           name: 'posts/' + post_id
         }), {
@@ -597,11 +601,11 @@ export default {
     },
     onClickContent(event){
       console.log(event);
-      
+
       if (event.srcElement.tagName.toLowerCase() === "div" && event.srcElement.attributes.class?.value === "xbbcode-flieshare-block") {
         let shareId = Number(event.srcElement.attributes.shareid?.value);
         if (typeof(shareId) === 'undefined' || shareId === null) {
-          // TODO 
+          // TODO
         }
         let shareInfo = this.included['sourcelay-fileshare.' + shareId];
         let fileInfo = undefined;
@@ -630,11 +634,16 @@ export default {
             })
         }
 
-        // TODO 密码下载 
+        // TODO 密码下载
         // TODO 付费下载
-
+        this.payVisible = true; //显示付款界面
       }
     },
+  // 处理确认付款后的返回函数 返回密码
+  handlePay(ret) {
+    console.log(ret);
+    this.payVisible = false;
+  }
   },
   mounted() {
     window.addEventListener('scroll', this.scroll, true)

@@ -4,9 +4,6 @@
   <el-dialog title="修改信息" :visible="setUserInfoVisible" @close="setUserInfoVisible=false">
     <SetUserInfo></SetUserInfo>
   </el-dialog>
-  <el-dialog title="支付" width="30%" :visible="payVisible" @close="payVisible=false">
-    <Pay @handlePay="handlePay"></Pay>
-  </el-dialog>
   <div class="index-banner">
     <ul class="banner">
       <li v-for="(banner, index) in indexBanner" :key="index" :style="{'background': banner[5]}" :class="[indexBannerActive === index ? 'banner-active' : '']">
@@ -111,11 +108,10 @@
 <script>
 import { mapState } from 'vuex'
 import SetUserInfo from "@/components/SetUserInfo";
-import Pay from "@/components/Pay";
 
 export default {
   name: 'Home',
-  components: {Pay, SetUserInfo},
+  components: {SetUserInfo},
   data() {
     return {
       setUserInfoVisible:false,
@@ -223,11 +219,6 @@ export default {
     },
     showPost(e) {
       this.postInfoActive = e
-    },
-    // 处理付款后的返回函数
-    handlePay(ret) {
-      console.log(ret);
-      this.payVisible = false;
     }
   },
   mounted() {
