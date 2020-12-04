@@ -76,24 +76,35 @@
           <h2>欢迎回来，{{userInfo.username}}</h2>
           <ul class="user-menu">
             <li><div></div><p>空间</p></li>
-            <li><div></div><p>设置</p></li>
+            <li @click="setUserInfoVisible=true"><div></div><p>设置</p></li>
             <li><div></div><p>徽章</p></li>
             <li @click="exit"><div></div><p>注销</p></li>
           </ul>
         </div>
       </div>
     </div>
+    <el-dialog
+        title="设置"
+        width="40%"
+        :visible="setUserInfoVisible"
+        :modal-append-to-body='false'
+        @close="setUserInfoVisible=false">
+      <SetUserInfo @handleSetUserInfo="handleSetUserInfo"></SetUserInfo>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { mapState, mapMutations } from 'vuex'
 import IncludedHelper from '../helpers/includedHelper'
+import SetUserInfo from "@/components/SetUserInfo";
 
 export default {
   name: 'header',
+  components: {SetUserInfo},
   data: function() {
     return {
+      setUserInfoVisible:false,
       page: 1,
       userBox: false,
       loginLoad: 0,
@@ -143,7 +154,7 @@ export default {
         },2000)
         return
       }
-      
+
       if (this.loginForm.confirmPassword.length < 6) {
         this.loginErrorText= '你输入的密码太短了。'
         this.loginError = 1
@@ -255,6 +266,19 @@ export default {
     },
     onLoginClick: function(){
       this.page = 1;
+    },
+    // 处理设置用户信息的返回值
+    handleSetUserInfo: function (ret) {
+      // 返回值格式：
+      // ruleForm: {
+      //   oldPassword: '',
+      //       newPassword: '',
+      //       confirmNewPassword: '',
+      //       payPassword: '',
+      //       confirmPayPassword: '',
+      //       mobileNumber: ''
+      // },
+      console.log(ret);
     }
   }
 }

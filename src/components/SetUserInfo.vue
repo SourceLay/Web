@@ -123,11 +123,12 @@ export default {
   },
   methods: {
     submitForm(formName) {
+      var that = this;
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('submit!');
+          that.$emit('handleSetUserInfo', that.ruleForm);
         } else {
-          console.log('error submit!!');
+          alert('无效输入')
           return false;
         }
       });
