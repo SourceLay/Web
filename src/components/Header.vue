@@ -98,6 +98,8 @@
 import { mapState, mapMutations } from 'vuex'
 import IncludedHelper from '../helpers/includedHelper'
 import SetUserInfo from "@/components/SetUserInfo";
+import { dzq } from '@/public'
+import store from '../store/index'
 
 export default {
   name: 'header',
@@ -186,6 +188,11 @@ export default {
           value: tmpUserInfo.attributes
         })
 
+        store.commit('setData', {
+          key: 'userInfo',
+          value: tmpUserInfo.attributes
+        })
+
         this.setData({
           key: 'status',
           value: 'login'
@@ -223,6 +230,11 @@ export default {
         let tmpUserInfo = includedInfo.get('users.' + response.data.data.id);
 
         this.setData({
+          key: 'userInfo',
+          value: tmpUserInfo.attributes
+        })
+
+        store.commit('setData', {
           key: 'userInfo',
           value: tmpUserInfo.attributes
         })
@@ -272,13 +284,77 @@ export default {
       // 返回值格式：
       // ruleForm: {
       //   oldPassword: '',
-      //       newPassword: '',
-      //       confirmNewPassword: '',
-      //       payPassword: '',
-      //       confirmPayPassword: '',
-      //       mobileNumber: ''
+      //   newPassword: '',
+      //   confirmNewPassword: '',
+      //   oldPayPassword: '',
+      //   payPassword: '',
+      //   confirmPayPassword: '',
+      //   email: ''
       // },
       console.log(ret);
+
+      let data = {};
+      data.password = ret.oldPassword;
+      data.newPassword = ret.newPassword;
+      data.password_confirmation = ret.confirmNewPassword;
+      data.payPassword = ret.payPassword;
+      data.pay_password_confirmation = ret.confirmPayPassword;
+      data.email= ret.email;
+
+      // TODO 逻辑优化
+      // 1. 如果没有修改支付密码则不发起支付密码修改请求
+      if (this.userInfo.hasPayPassword) {
+        this.axios.post(
+          dzq({
+            name: 'users/pay-password/reset'
+          }),
+          {
+            data: {
+              attributes: {
+                pay_password: ret.payPassword
+              }
+            }
+          }
+        ).then((response) => {
+          console.log(response.data)
+          data.pay_password_token = response.data.data.attributes.sessionId;
+          this.updateProfile(data);
+        }).catch((err) => {
+          if (err.response) {
+            console.log(err.response)
+          }
+        })
+      } else {
+        this.updateProfile(data);
+      }
+    },
+    updateProfile: function(data) {
+      this.axios.patch(
+        dzq({
+          name: 'users/' + this.userInfo.id
+        }),
+        {
+          data: {
+            attributes: data
+          }
+        }
+      ).then((response) => {
+        console.log(response.data)
+        
+        this.setData({
+          key: 'userInfo',
+          value: response.data.data.attributes
+        })
+        store.commit('setData', {
+          key: 'userInfo',
+          value: response.data.data.attributes
+        })
+
+      }).catch((err) => {
+          if (err.response) {
+            console.log(err.response)
+          }
+      })
     }
   }
 }

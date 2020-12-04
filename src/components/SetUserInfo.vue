@@ -1,7 +1,7 @@
 <template>
   <div style="width: 90%">
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-      <el-form-item label="原密码" prop="oldPassword">
+      <el-form-item label="原密码" prop="oldPassword" v-if="profile.hasPassword">
         <el-input type="password" v-model="ruleForm.oldPassword"></el-input>
       </el-form-item>
       <el-form-item label="新密码" prop="newPassword">
@@ -10,14 +10,17 @@
       <el-form-item label="确认新密码" prop="confirmNewPassword">
         <el-input type="password" v-model="ruleForm.confirmNewPassword"></el-input>
       </el-form-item>
+      <el-form-item label="旧支付密码" prop="oldPayPassword" v-if="profile.hasPayPassword">
+        <el-input type="password" v-model="ruleForm.oldPayPassword"></el-input>
+      </el-form-item>
       <el-form-item label="支付密码" prop="payPassword">
         <el-input type="password" v-model="ruleForm.payPassword"></el-input>
       </el-form-item>
       <el-form-item label="确认支付密码" prop="confirmPayPassword">
         <el-input type="password" v-model="ruleForm.confirmPayPassword"></el-input>
       </el-form-item>
-      <el-form-item label="手机号" prop="mobileNumber">
-        <el-input v-model="ruleForm.mobileNumber"></el-input>
+      <el-form-item label="邮箱地址" prop="email">
+        <el-input v-model="ruleForm.email"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm('ruleForm')">修改</el-button>
@@ -28,11 +31,16 @@
 </template>
 
 <script>
+import store from '../store/index'
+
 export default {
   name: 'SetUserInfo',
   data() {
     // 自定义验证逻辑
     var validateOldPassword = (rule, value, callback) => {
+      if (this.profile.hasPassword !== true) {
+        callback();
+      }
       if (value === '') {
         callback(new Error('请输入原密码'));
       } else {
@@ -58,6 +66,19 @@ export default {
         callback();
       }
     };
+    var validateoldPayPassword = (rule, value, callback) => {
+      if (this.profile.hasPayPassword !== true) {
+        callback()
+      }
+      if (value === '') {
+        callback(new Error('请输入旧支付密码'));
+      } else {
+        // 其他逻辑
+        if (value.length != 6 || !/^\d+$/.test(value))
+          callback(new Error('支付密码必须为六位数字'));
+        callback();
+      }
+    };
     var validatePayPassword = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入支付密码'));
@@ -78,26 +99,27 @@ export default {
         callback();
       }
     };
-    var validateMobileNumber = (rule, value, callback) => {
+    var validateEmail = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请输入手机号'));
-      } else {
-        // 其他逻辑
-        if (!/^\d+$/.test(value))
-          callback(new Error('手机号必须为数字'));
-        if (value.length < 6)
-          callback(new Error('手机号长度过短'));
         callback();
       }
+      if (value.indexOf("@") === -1 ) {
+        callback(new Error('邮箱格式有误'));
+      }
+      callback();
     };
     return {
+      profile: {
+        hasPayPassword: store.state.userInfo.hasPayPassword,
+        hasPassword: store.state.userInfo.hasPassword,
+      },
       ruleForm: {
         oldPassword: '',
         newPassword: '',
         confirmNewPassword: '',
         payPassword: '',
         confirmPayPassword: '',
-        mobileNumber: ''
+        email: store.state.userInfo.email
       },
       rules: {
         oldPassword: [
@@ -109,14 +131,17 @@ export default {
         confirmNewPassword: [
           { validator: validateConfirmNewPassword, trigger: 'change'}
         ],
+        oldPayPassword: [
+          { validator: validateoldPayPassword, trigger: 'change'}
+        ],
         payPassword: [
           { validator: validatePayPassword, trigger: 'change'}
         ],
         confirmPayPassword: [
           { validator: validateConfirmPayPassword, trigger: 'change'}
         ],
-        mobileNumber: [
-          { validator: validateMobileNumber, trigger: 'change'}
+        email: [
+          { validator: validateEmail, trigger: 'change'}
         ]
       }
     };
@@ -128,7 +153,6 @@ export default {
         if (valid) {
           that.$emit('handleSetUserInfo', that.ruleForm);
         } else {
-          alert('无效输入')
           return false;
         }
       });
