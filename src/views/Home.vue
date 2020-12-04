@@ -5,7 +5,7 @@
     <SetUserInfo></SetUserInfo>
   </el-dialog>
   <el-dialog title="支付" width="30%" :visible="payVisible" @close="payVisible=false">
-    <Pay></Pay>
+    <Pay @handlePay="handlePay"></Pay>
   </el-dialog>
   <el-dialog title="分享信息" :visible="setShareInfoVisible" @close="setShareInfoVisible=false">
     <SetShareInfo @handleShareReturn="handleShareReturn"></SetShareInfo>
@@ -238,6 +238,12 @@ export default {
       //       cost: 0,
       // },
       console.log(ret);
+      this.setShareInfoVisible = false;
+    },
+    // 处理付款后的返回函数
+    handlePay(ret) {
+      console.log(ret);
+      this.payVisible = false;
     }
   },
   mounted() {

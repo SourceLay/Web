@@ -3,9 +3,9 @@
   <h1 style="text-align: center">信息1</h1>
   <h1 style="text-align: center">信息2</h1>
   <h1 style="text-align: center">信息3</h1>
-  <PayPassword></PayPassword>
+  <PayPassword @handleChangePassword="handleChangePassword"></PayPassword>
   <div style="text-align: center">
-    <el-button>支付</el-button>
+    <el-button @click="handlePay">支付</el-button>
   </div>
 </div>
 </template>
@@ -14,7 +14,22 @@
 import PayPassword from "@/components/PayPassword";
 export default {
 name: "Pay",
-  components: {PayPassword}
+  components: {PayPassword},
+  data() {
+    return {
+      password: ''
+    }
+  },
+  methods: {
+    handleChangePassword(ret) {
+      // 处理返回的密码的逻辑
+      this.password = ret
+    },
+    handlePay() {
+      // 处理点击确认后的逻辑
+      this.$emit('handlePay', this.password);
+    }
+  }
 }
 </script>
 
