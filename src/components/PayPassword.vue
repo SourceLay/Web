@@ -27,6 +27,7 @@ export default {
       if(/[^\d]/g.test(curVal)) {
         this.msg = this.msg.replace(/[^\d]/g, '');
       }
+      this.$emit('handleChangePassword',this.msg);
     },
   },
   methods: {
