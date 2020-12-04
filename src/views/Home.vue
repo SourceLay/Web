@@ -8,7 +8,7 @@
     <Pay></Pay>
   </el-dialog>
   <el-dialog title="分享信息" :visible="setShareInfoVisible" @close="setShareInfoVisible=false">
-    <SetShareInfo></SetShareInfo>
+    <SetShareInfo @handleShareReturn="handleShareReturn"></SetShareInfo>
   </el-dialog>
   <div class="index-banner">
     <ul class="banner">
@@ -227,6 +227,17 @@ export default {
     },
     showPost(e) {
       this.postInfoActive = e
+    },
+    // 处理设置分享的返回函数
+    handleShareReturn(ret) {
+      // 返回值类型：
+      // ruleForm: {
+      //        description: '',
+      //       type: 0,
+      //       password: '',
+      //       cost: 0,
+      // },
+      console.log(ret);
     }
   },
   mounted() {
