@@ -3,12 +3,12 @@
   <!-- 首页-banner -->
   <div class="index-banner">
     <ul class="banner">
-      <li v-for="(banner, index) in indexBanner" :key="index" :style="{'background': banner[5]}" :class="[indexBannerActive === index ? 'banner-active' : '']">
+      <li v-for="(banner, index) in indexBanner" :key="index" :style="{'background': banner.background}" :class="[indexBannerActive === index ? 'banner-active' : '']">
         <div class="banner-content">
-          <p>{{banner[0]}}</p>
-          <h1>{{banner[1]}}</h1>
-          <a :href="banner[3]">{{banner[2]}}</a>
-          <img :src="require('../assets/' + banner[4])" alt="">
+          <p>{{banner.subTitle}}</p>
+          <h1>{{banner.title}}</h1>
+          <a :href="banner.url">{{banner.btnText}}</a>
+          <img :src="banner.image" alt="">
         </div>
       </li>
     </ul>
@@ -30,15 +30,15 @@
       <div @mouseover="sliderBar(1)" @mouseleave="sliderBar(0)" class="slidershow">
         <ul :style="{'transform': [sliderBarActive ? 'none' : 'translate(100%, 0)']}" class="slider-bar">
           <li @mouseover="showSlider(index)" :style="{'opacity' : [slidershowActive === index ? '1' : '0.5']}" v-for="(slider, index) in sliderContent" :key="index">
-            <img :src="require('../assets/' + slider[2])" alt="">
+            <img :src="slider.image" alt="">
           </li>
         </ul>
         <ul :style="{'transform':'translateX(-' + 100 * slidershowActive + '%)'}" class="sliders">
           <li v-for="(slider, index) in sliderContent" :key="index" class="slider">
-            <img :src="require('../assets/' + slider[2])" alt="">
+            <img :src="slider.image" alt="">
             <div class="slider-info">
-              <p>{{slider[0]}}</p>
-              <p>{{slider[1]}}</p>
+              <p>{{slider.title}}</p>
+              <p>{{slider.author}}</p>
             </div>
           </li>
         </ul>
@@ -51,16 +51,16 @@
         <ul class="post postList">
           <li v-for="(item, index) in postInfoList" :key="index">
               <span class="post-num">{{index + 1}}</span>
-              <router-link v-if="item.activited === true" :to="{path: '/forums/topics/' + item.tid}">
+              <router-link v-if="item.tid > 0" :to="{path: '/forums/topics/' + item.tid}">
                 <span>{{item.title}}</span>
               </router-link>
-              <div v-if="item.activited === false">
+              <div v-if="item.tid === 0">
                 <span>{{item.title}}</span>
               </div>
-              <!-- <router-link v-if="item.activited === true" :to="{path: '/forums/topics/' + item.tid}">
+              <!-- <router-link v-if="item.tid > 0" :to="{path: '/forums/topics/' + item.tid}">
                 <span class="post-writer">{{item.author}}</span>
               </router-link> -->
-              <!-- <div v-if="item.activited === false"> -->
+              <!-- <div v-if="item.tid === 0"> -->
                 <span class="post-writer">{{item.author}}</span>
               <!-- </div> -->
           </li>
@@ -123,100 +123,65 @@ export default {
       sliderTimer: null,
       //banner内容
       indexBanner: [
-        [
-          "这个寒假，一起哈啤！",
-          "Server 鸽子号 is now online.",
-          "立即前往 ▶",
-          "",
-          "banner.png",
-          "linear-gradient( 135deg, #79F1A4 10%, #0E5CAD 100%)"
-        ],
-        [
-          "众人喜笑颜开",
-          "Hyt搞黄色，快来欣赏",
-          "立即前往 ▶",
-          "",
-          "banner.png",
-          "linear-gradient( 135deg, #FDEB71 10%, #F8D800 100%)"
-        ],
-        [
-          "喜闻乐见",
-          "剑羽十年努力，终于成为太空人！",
-          "立即前往 ▶",
-          "",
-          "banner.png",
-          "linear-gradient( 135deg, #E2B0FF 10%, #9F44D3 100%)"
-        ]
+        {
+          subTitle: "这个寒假，一起哈啤！",
+          title: "Server 鸽子号 is now online.",
+          btnText: "立即前往 ▶",
+          url: "",
+          image: require('../assets/banner.png'),
+          background: "linear-gradient( 135deg, #79F1A4 10%, #0E5CAD 100%)"
+        }
       ],
       //轮播内容
       sliderContent: [
-        [
-          '标题1',
-          '作者1',
-          'share.png'
-        ],
-        [
-          '标题2',
-          '作者2',
-          'share.png'
-        ],
-        [
-          '标题3',
-          '作者3',
-          'share.png'
-        ],
-        [
-          '标题4',
-          '作者4',
-          'share.png'
-        ],
-        [
-          '标题5',
-          '作者5',
-          'share.png'
-        ]
+        {
+          title: '标题1',
+          author: '作者1',
+          image: require('../assets/share.png'),
+          tid: 0
+        }
       ],
       //主题菜单
       postInfo: [
         '最新主题', '最新回复', '热门主题'
       ],
       postInfoList: [
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
       ],
       postInfoListPending: [[
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
       ],[
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
       ],[
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
-        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
       ],]
     }
   },
@@ -239,12 +204,9 @@ export default {
       this.slidershowActive = index
     },
     roundSlider() {
-      let max = this.sliderContent.length
       this.sliderTimer = setInterval(() => {
-        this.slidershowActive ++
-        if(this.slidershowActive === max){
-          this.slidershowActive = 0
-        }
+        let max = this.sliderContent.length
+        this.slidershowActive = (this.slidershowActive + 1) % max
       },5000)
     },
     sliderBar(e) {
@@ -261,7 +223,7 @@ export default {
     },
     homePageRecommended(){
       axios.get(
-        dzq({name: 'paraparty/mainpage'})
+        dzq({name: 'paraparty/homepage'})
       ).then(response => {
         let includedInfo = new IncludedHelper(response.data.included);
 
@@ -271,6 +233,10 @@ export default {
 
         this.postInfoList = this.postInfoListPending[this.postInfoActive];
         console.log(this.postInfoListPending);
+
+        this.homePageBannersInit(response.data.data.relationships.banners, includedInfo);
+        this.homePageSlidersInit(response.data.data.relationships.sliders, includedInfo);
+
       });
     },homePageRecommendedFormat(index, data, includedInfo){
         data = data.data;
@@ -284,18 +250,42 @@ export default {
           this.postInfoListPending[index][i].uid = author.id;
           this.postInfoListPending[index][i].activited = true;
         }
-
+    },homePageBannersInit(data, includedInfo) {
+      let tmpBanners = [];
+      for (let s of data.data) {
+        let item = includedInfo.get(s.type + '.' + s.id);
+        let tmp = {
+          title: item.attributes.title,
+          subTitle: item.attributes.subTitle,
+          btnText: item.attributes.btnText,
+          url: item.attributes.url,
+          image: item.attributes.image,
+          background: item.attributes.background,
+        }
+        tmpBanners.push(tmp);
+      }
+      this.indexBanner = tmpBanners;
+    },homePageSlidersInit(data, includedInfo) {
+      let tmpSliders = [];
+      for (let s of data.data) {
+        let item = includedInfo.get(s.type + '.' + s.id);
+        let tmp = {
+          title: item.attributes.title,
+          author: item.attributes.author,
+          image: item.attributes.image,
+          tid: item.attributes.thread_id,
+        }
+        tmpSliders.push(tmp);
+      }
+      this.sliderContent = tmpSliders;
     }
   },
   mounted() {
     //轮播
     let roundIndexBanner = () => {
-      let max = this.indexBanner.length
       setInterval(() => {
-        this.indexBannerActive ++
-        if(this.indexBannerActive === max){
-          this.indexBannerActive = 0
-        }
+        let max = this.indexBanner.length
+        this.indexBannerActive = (this.indexBannerActive + 1) % max
       },10000)
     }
     roundIndexBanner()
