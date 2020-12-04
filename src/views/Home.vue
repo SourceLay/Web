@@ -48,8 +48,23 @@
         <ul class="posts-option">
           <li @mouseover="showPost(index)" v-for="(item, index) in postInfo" :key="index" :class="[postInfoActive === index ? 'option-active' : '']">{{item}}</li>
         </ul>
-        <ul class="post">
-          <li>
+        <ul class="post postList">
+          <li v-for="(item, index) in postInfoList" :key="index">
+              <span class="post-num">{{index + 1}}</span>
+              <router-link v-if="item.activited === true" :to="{path: '/forums/topics/' + item.tid}">
+                <span>{{item.title}}</span>
+              </router-link>
+              <div v-if="item.activited === false">
+                <span>{{item.title}}</span>
+              </div>
+              <!-- <router-link v-if="item.activited === true" :to="{path: '/forums/topics/' + item.tid}">
+                <span class="post-writer">{{item.author}}</span>
+              </router-link> -->
+              <!-- <div v-if="item.activited === false"> -->
+                <span class="post-writer">{{item.author}}</span>
+              <!-- </div> -->
+          </li>
+          <!-- <li>
             <span class="post-num">1</span>
             <span>[我的世界] 为什么这个村民在哭？</span>
             <span class="post-writer">陆陆侠</span>
@@ -65,7 +80,7 @@
           <li><span class="post-num">6</span>[板块名] 主题名</li>
           <li><span class="post-num">7</span>[板块名] 主题名</li>
           <li><span class="post-num">8</span>[板块名] 主题名</li>
-          <li><span class="post-num">9</span>[板块名] 主题名</li>
+          <li><span class="post-num">9</span>[板块名] 主题名</li> -->
         </ul>
       </div>
     </div>
@@ -104,6 +119,11 @@
 
 <script>
 import { mapState } from 'vuex'
+import axios from 'axios'
+import { dzq } from '@/public'
+import IncludedHelper from '../helpers/includedHelper'
+
+
 export default {
   name: 'Home',
   data() {
@@ -176,7 +196,45 @@ export default {
       //主题菜单
       postInfo: [
         '最新主题', '最新回复', '热门主题'
-      ]
+      ],
+      postInfoList: [
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+      ],
+      postInfoListPending: [[
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+      ],[
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+      ],[
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+        {title:"", author:"", activited:false, tid:0},
+      ],]
     }
   },
   computed: {
@@ -184,6 +242,11 @@ export default {
       'boardInfo'
     ]),
 
+  },
+  beforeRouteEnter (to, from, next) {
+    next((vm) => {
+      vm.homePageRecommended();
+    })
   },
   methods: {
     showIndexBanner(index) {
@@ -211,6 +274,34 @@ export default {
     },
     showPost(e) {
       this.postInfoActive = e
+      this.postInfoList = this.postInfoListPending[this.postInfoActive];
+    },
+    homePageRecommended(){
+      axios.get(
+        dzq({name: 'paraparty/mainpage'})
+      ).then(response => {
+        let includedInfo = new IncludedHelper(response.data.included);
+
+        this.homePageRecommendedFormat(0, response.data.data.relationships.latestThreads, includedInfo);
+        this.homePageRecommendedFormat(1, response.data.data.relationships.latestReplied, includedInfo);
+        this.homePageRecommendedFormat(2, response.data.data.relationships.hottestThreads, includedInfo);
+
+        this.postInfoList = this.postInfoListPending[this.postInfoActive];
+        console.log(this.postInfoListPending);
+      });
+    },homePageRecommendedFormat(index, data, includedInfo){
+        data = data.data;
+        for (let i = 0; i < data.length; i++) {
+          let thread = includedInfo.get(data[i].type + '.' + data[i].id);
+          this.postInfoListPending[index][i].title = thread.attributes.title;
+          this.postInfoListPending[index][i].tid = thread.id;
+          let author = thread.relationships.user.data;
+          author = includedInfo.get(author.type + '.' + author.id);
+          this.postInfoListPending[index][i].author = author.attributes.username;
+          this.postInfoListPending[index][i].uid = author.id;
+          this.postInfoListPending[index][i].activited = true;
+        }
+
     }
   },
   mounted() {
@@ -529,4 +620,5 @@ export default {
   margin-right: 0.2em;
   vertical-align: text-bottom;
 }
+
 </style>
