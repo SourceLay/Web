@@ -4,12 +4,6 @@
   <el-dialog title="修改信息" :visible="setUserInfoVisible" @close="setUserInfoVisible=false">
     <SetUserInfo></SetUserInfo>
   </el-dialog>
-  <el-dialog title="支付" width="30%" :visible="payVisible" @close="payVisible=false">
-    <Pay @handlePay="handlePay"></Pay>
-  </el-dialog>
-  <el-dialog title="分享信息" :visible="setShareInfoVisible" @close="setShareInfoVisible=false">
-    <SetShareInfo @handleShareReturn="handleShareReturn"></SetShareInfo>
-  </el-dialog>
   <div class="index-banner">
     <ul class="banner">
       <li v-for="(banner, index) in indexBanner" :key="index" :style="{'background': banner[5]}" :class="[indexBannerActive === index ? 'banner-active' : '']">
@@ -114,16 +108,14 @@
 <script>
 import { mapState } from 'vuex'
 import SetUserInfo from "@/components/SetUserInfo";
-import Pay from "@/components/Pay";
-import SetShareInfo from "@/components/SetShareInfo";
+
 export default {
   name: 'Home',
-  components: {SetShareInfo, Pay, SetUserInfo},
+  components: {SetUserInfo},
   data() {
     return {
       setUserInfoVisible:false,
       payVisible: false,
-      setShareInfoVisible:false,
       //当前banner
       indexBannerActive: 0,
       //当前轮播
@@ -227,23 +219,6 @@ export default {
     },
     showPost(e) {
       this.postInfoActive = e
-    },
-    // 处理设置分享的返回函数
-    handleShareReturn(ret) {
-      // 返回值类型：
-      // ruleForm: {
-      //        description: '',
-      //       type: 0,
-      //       password: '',
-      //       cost: 0,
-      // },
-      console.log(ret);
-      this.setShareInfoVisible = false;
-    },
-    // 处理付款后的返回函数
-    handlePay(ret) {
-      console.log(ret);
-      this.payVisible = false;
     }
   },
   mounted() {
