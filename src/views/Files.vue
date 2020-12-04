@@ -90,7 +90,7 @@
           @close="newFolderVisible=false">
         <el-input v-model="newFolderName"></el-input>
         <div style="text-align: center;margin-top: 1em;">
-          <el-button type="primary" size="small" @click="newFolderVisible=false">确认</el-button>
+          <el-button type="primary" size="small" @click="handleNewFolderReturn">确认</el-button>
         </div>
       </el-dialog>
     </div>
@@ -317,6 +317,19 @@ export default {
         });
 
     },
+    // 点击确认新建文件夹后的逻辑
+    handleNewFolderReturn() {
+      // TODO 判定输入是否有效
+      if (this.newFolderName === '') {
+        alert('文件夹不能为空')
+        return
+      }
+      // 业务逻辑
+      console.log(this.newFolderName);
+      // 关闭弹窗 还原状态
+      this.newFolderName = '';
+      this.newFolderVisible = false;
+    }
   },
   mounted(){
       window.addEventListener('scroll', this.handleScroll);
