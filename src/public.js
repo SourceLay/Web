@@ -59,12 +59,12 @@ export function getTime(time) {
 //获取帖子是否为特殊Tag
 export function getPostTag(id, title, star) {
   let tag = title.slice(0, 4)
-  if(this.included['users.' + id].relationships.groups.data[0].id == 1 && ['[公告]', '[活动]', '[版规]'].includes(tag)){
-    if(tag == '[公告]'){
+  if(this.included['users.' + id].relationships.groups.data[0].id === 1 && ['[公告]', '[活动]', '[版规]'].includes(tag)){
+    if(tag === '[公告]'){
       return 'tag-notice'
-    }else if(tag == '[活动]'){
+    }else if(tag === '[活动]'){
       return 'tag-activity'
-    }else if(tag == '[版规]'){
+    }else if(tag === '[版规]'){
       return 'tag-rule'
     }
   }else if(star){
@@ -88,7 +88,7 @@ export function getPostTitle(title) {
       let c = s[i];
       if (check_status) {
         check_str = check_str + c;
-        if (c == ']') {
+        if (c === ']') {
           if (!['[公告]', '[活动]', '[版规]'].includes(check_str)) {	// 这里可以判断一下 check_str 是否合法，如果
             tags.push(check_str);
             check_status = false;
@@ -96,15 +96,15 @@ export function getPostTitle(title) {
           } else {
             break;
           }
-        } else if (c == '[') {	// 这里表示标签中不允许出现的符号
+        } else if (c === '[') {	// 这里表示标签中不允许出现的符号
           break;
         }
       } else {
-        if (c == '[') {
+        if (c === '[') {
           check_str = '[';
           check_status = true;
         }
-        else if (c == ' ') {
+        else if (c === ' ') {
           continue;
         }
         else break;
@@ -121,8 +121,8 @@ export function dzq(e) {
   let url = ''
   let parts = []
   Object.keys(e).forEach((item, index) => {
-    if(index == 0){
-      url = '/api/' + e[item] + '?'
+    if(index === 0){
+      url = '/api/' + e[item]
     }else if(e[item] instanceof Array){
       parts.push(item + '=' + e[item].join(','))
     }else{
@@ -137,6 +137,8 @@ export function dzq(e) {
       }
     }
   })
-  url += parts.join('&')
+  if (parts.length > 0) {
+    url += '?' + parts.join('&') 
+  }
   return url
 }

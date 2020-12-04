@@ -12,7 +12,7 @@ import UserCard from './../components/UserCard.vue'
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css'; // optional for styling
 import { mapMutations } from 'vuex';
-import { getPostTitle, getPostTag } from './../public'
+import { getPostTitle, getPostTag } from '@/public'
 export default {
   components: {
     UserCard
@@ -33,7 +33,7 @@ export default {
       let url = ''
       let parts = []
       Object.keys(e).forEach((item, index) => {
-        if(index == 0){
+        if(index === 0){
           url = '/api/' + e[item] + '?'
         }
         if(e[item] instanceof Array){
