@@ -8,7 +8,7 @@
                     <p>上传</p>
                 </div>
 
-                <div class="iconBtn">
+                <div class="iconBtn" @click="newFolderVisible=true">
                     <svg t="1606903568218" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2856" width="200" height="200"><path d="M1018.23488 882.664107c0 0 0-559.342933 0-621.01504 0-83.749547-76.26752-75.97056-76.26752-75.97056s-363.779413 0.539307-339.69152 0c-26.170027 0.58368-39.03488-13.70112-39.03488-13.70112s-18.10432-31.20128-50.72896-80.530773c-34.194773-51.725653-73.786027-43.277653-73.786027-43.277653L102.85056 48.16896c-93.057707 0-94.08512 89.51808-94.08512 89.51808s0 675.874133 0 740.3008c0 99.853653 75.421013 87.487147 75.421013 87.487147s807.857493 0 864.679253 0C1029.533013 965.471573 1018.23488 882.664107 1018.23488 882.664107zM857.091413 873.68704c-56.825173 0-681.12384 0-681.12384 0s-75.424427 12.36992-75.424427-87.487147c0-64.41984 0-556.73856 0-556.73856s1.030827-89.51808 94.088533-89.51808l175.264427 0c0 0 39.594667-8.448 73.78944 43.281067 32.62464 49.329493 50.72896 80.52736 50.72896 80.52736s12.858027 14.288213 39.031467 13.704533c-24.087893 0.535893 316.740267 0 316.740267 0s76.27776-7.775573 76.27776 75.97056c0 61.672107 0 437.46304 0 437.46304S937.751893 873.68704 857.091413 873.68704z" p-id="2857" fill="#ffffff"></path><path d="M685.605547 553.079467l-149.138773 0 0-149.138773c0-6.331733-5.13024-11.472213-11.472213-11.472213l-22.944427 0c-6.33856 0-11.472213 5.14048-11.472213 11.472213l0 149.138773-149.138773 0c-6.341973 0-11.472213 5.143893-11.472213 11.472213l0 22.94784c0 6.335147 5.126827 11.461973 11.472213 11.461973l149.138773 0 0 149.1456c0 6.341973 5.133653 11.472213 11.472213 11.472213l22.944427 0c6.341973 0 11.472213-5.13024 11.472213-11.472213l0-149.1456 149.138773 0c6.341973 0 11.475627-5.126827 11.475627-11.461973l0-22.94784C697.084587 558.22336 691.950933 553.079467 685.605547 553.079467z" p-id="2858" fill="#ffffff"></path></svg>
                     <p>新建文件夹</p>
                 </div>
@@ -35,7 +35,7 @@
         </div>
         <div id="content">
             <ul id="filePath">
-                <li><router-link :to="{path: '/files/' + root}"><a>全部文件</a></router-link></li> 
+                <li><router-link :to="{path: '/files/' + root}"><a>全部文件</a></router-link></li>
                 <li v-for="item in paths" :key="item.id">
                     / <router-link :to="{path: '/files/' + item.path}"><a>{{item.name}}</a></router-link>
                 </li>
@@ -45,7 +45,7 @@
                 <div id="title-fileSize">大小</div>
                 <div id="title-fileDate">修改日期</div>
             </div>
-            <form action="" method="get"> 
+            <form action="" method="get">
             <ul>
                 <li v-for="item in files" :key="item.attributes.id">
 
@@ -83,6 +83,16 @@
             </ul>
             </form>
         </div>
+      <el-dialog
+          title="请输入文件夹名"
+          width="30%"
+          :visible="newFolderVisible"
+          @close="newFolderVisible=false">
+        <el-input v-model="newFolderName"></el-input>
+        <div style="text-align: center;margin-top: 1em;">
+          <el-button type="primary" size="small" @click="newFolderVisible=false">确认</el-button>
+        </div>
+      </el-dialog>
     </div>
 </template>
 
@@ -105,6 +115,8 @@ import { dzq } from '@/public'
 export default {
   data(){
       return {
+        newFolderVisible:false,
+        newFolderName: '',
         selectedCount:0,
         needFixed:false,
         root:"",
@@ -146,7 +158,7 @@ export default {
         if (typeof(path) === 'undefined' || path === null || path === '') {
             path = '';
         }
-        
+
         let folder = '/users/' + store.state.userInfo.id + '/' + path;
         folder = folder.replace(/\/+/g, "/");
         while (folder.length > 0 && folder[folder.length - 1] === '/') {
@@ -282,15 +294,15 @@ export default {
             console.log(data);
 
             let uploadUrl = data.data.data.attributes.uploadUrl;
-            
+
             let file = e.target.files[0];
             //let param = new FormData();
             //param.append('file',file);
             //console.log(param.get('file'));
-            
+
             let config = {
                 headers:{'Content-Type':'multipart/form-data'}
-            }; 
+            };
             axios.put(uploadUrl, file, config)
             .then(()=>{
                  axios.put(
@@ -397,7 +409,7 @@ export default {
         display: grid;
         grid-template-columns: 7fr 0.8fr 2fr;
     }
-    
+
     .fileCheck{
         top: 50%;
         transform: translate(0,-50%);
@@ -405,14 +417,14 @@ export default {
 
     .fileIcon{
         margin-top:0.125em;
-        
+
         font-size:2em;
         text-align: center;
         display:inline-block;
         vertical-align:middle;
         height:100%;
     }
-   
+
     .fileHeader div{
         display: inline-block;
     }
@@ -431,14 +443,14 @@ export default {
     #title-fileName{
         padding:15px;
     }
-    
+
     #title-fileSize{
         padding:15px;
     }
 
     #title-fileDate{
         padding:15px;
-    }    
+    }
 
     .file-fileName{
         padding-left:15px;
@@ -446,7 +458,7 @@ export default {
         vertical-align:middle;
         height:100%;
     }
-    
+
     .file-fileSize{
         padding-left:15px;
         display:inline-block;
@@ -459,7 +471,7 @@ export default {
         display:inline-block;
         vertical-align:middle;
         height:100%;
-    }    
+    }
 
     .file-fileItem:hover{
         background: rgba(133, 212, 248, 0.199);
