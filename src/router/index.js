@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Forum from '../views/Forum.vue'
 import Topic from '../views/Topic.vue'
+import Search from '@/views/Search.vue'
 import store from '../store/index'
 import axios from 'axios'
 import nprogress from 'nprogress'
@@ -34,6 +35,11 @@ const routes = [
     path: '/forums/:id/:page?',
     name: 'Forum',
     component: Forum
+  },
+  {
+    path: '/search',
+    name: 'Search',
+    component: Search
   }
 ]
 

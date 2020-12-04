@@ -1,7 +1,7 @@
 <template>
   <div @mouseleave="closeBox" :class="[headerAbove ? 'header-above' : '', $route.name === 'Home' ? '' : 'fourm-header', 'header']">
     <div class="content">
-      <div class="search">
+      <div v-if="$route.name !== 'Search'" class="search">
         <i class="iconfont icon-sousuo"></i>
         <input placeholder="搜索" type="text">
       </div>
