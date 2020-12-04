@@ -64,23 +64,6 @@
                 <span class="post-writer">{{item.author}}</span>
               <!-- </div> -->
           </li>
-          <!-- <li>
-            <span class="post-num">1</span>
-            <span>[我的世界] 为什么这个村民在哭？</span>
-            <span class="post-writer">陆陆侠</span>
-          </li>
-          <li>
-            <span class="post-num">2</span>
-            <span>[板块名] 主题名</span>
-            <span class="post-writer">发帖人</span>
-          </li>
-          <li><span class="post-num">3</span>[板块名] 主题名</li>
-          <li><span class="post-num">4</span>[板块名] 主题名</li>
-          <li><span class="post-num">5</span>[板块名] 主题名</li>
-          <li><span class="post-num">6</span>[板块名] 主题名</li>
-          <li><span class="post-num">7</span>[板块名] 主题名</li>
-          <li><span class="post-num">8</span>[板块名] 主题名</li>
-          <li><span class="post-num">9</span>[板块名] 主题名</li> -->
         </ul>
       </div>
     </div>
@@ -620,5 +603,15 @@ export default {
   margin-right: 0.2em;
   vertical-align: text-bottom;
 }
-
+.postList a{
+    color: var(--link-normal);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+.postList a:hover {
+    color: var(--link-highlight);
+}
+.postList a:visited {
+    color: var(--link-visited);
+}
 </style>
