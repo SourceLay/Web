@@ -27,8 +27,12 @@ function globalErrorNotify(that, err, duration = 4500) {
     if (!err.response) {
         console.log(err)
     }
+    
     let data = err.response.data;
     console.log(data);
+    if (!data.errors) {
+        globalNotify(that, '发生了未知错误。', 'error', duration, '错误');
+    }
 
     let errors = data.errors;
     for (let error of errors) {
