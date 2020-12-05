@@ -99,21 +99,26 @@
       <li @click="setUserInfoVisible=true">隐私和Cookies</li>
       <li @click="payVisible=true">使用条款</li>
       <li @click="setShareInfoVisible=true">关于我们</li>
-      <li>© 2019 派瑞派对</li>
+      <li @click="shareListVisible=true">© 2019 派瑞派对</li>
     </ul>
   </div>
+  <el-dialog width="80%" title="分享列表" :visible="shareListVisible" @close="shareListVisible=false">
+    <ShareFileList></ShareFileList>
+  </el-dialog>
 </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import SetUserInfo from "@/components/SetUserInfo";
+import ShareFileList from "@/components/ShareFileList";
 
 export default {
   name: 'Home',
-  components: {SetUserInfo},
+  components: {ShareFileList, SetUserInfo},
   data() {
     return {
+      shareListVisible: false,
       setUserInfoVisible:false,
       payVisible: false,
       //当前banner
