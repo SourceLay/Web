@@ -382,7 +382,7 @@ export default {
         data.description = ret.description;
         data.type = ret.type;
         data.password = ret.password;
-        data.cost = ret.cost;
+        data.cost = ret.cost * 100;
         
         console.log(ret);
         console.log(data);
