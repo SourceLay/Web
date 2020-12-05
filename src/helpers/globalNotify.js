@@ -14,4 +14,8 @@ function globalNotify(that, msg, type, duration, title) {
     });
 }
 
-export default globalNotify;
+function globalErrorNotify(that, data, duration) {
+    globalNotify(that, data.errors[0].detail[0], 'error', duration, '错误');
+}
+
+export {globalNotify, globalErrorNotify}
