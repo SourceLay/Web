@@ -379,8 +379,8 @@ export default {
     handleShareReturn(ret) {
         let data = {};
         data.file_id = this.shareFileId;
-        data.description = ret.description;
-        data.type = ret.type;
+        data.shared_desc = ret.description;
+        data.shared_type = ret.type;
         data.password = ret.password;
         data.cost = ret.cost * 100;
         
