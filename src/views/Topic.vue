@@ -198,6 +198,7 @@ import { _throttle, _debounce } from '@/public'
 import { getPostTitle, getPostTag, getTime, dzq } from '@/public'
 import IncludedHelper from '../helpers/includedHelper'
 import Pay from "@/components/Pay";
+import {globalErrorNotify} from "@/helpers/globalNotify";
 
 export default {
   name: 'forum',
@@ -674,8 +675,7 @@ export default {
           link.click()
           URL.revokeObjectURL(link.href)
         }).catch((error) => {
-          // TODO 
-        console.log(error);
+          globalErrorNotify(this, error);
       })
     },
     handlePay(ret) {
@@ -703,8 +703,7 @@ export default {
         
         console.log(response)
       }).catch((error) => {
-        // TODO 
-        console.log(error);
+        globalErrorNotify(this, error);
       })
 
       console.log(this.sharePassword);

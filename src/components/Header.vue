@@ -100,6 +100,7 @@ import IncludedHelper from '../helpers/includedHelper'
 import SetUserInfo from "@/components/SetUserInfo";
 import { dzq } from '@/public'
 import store from '../store/index'
+import {globalErrorNotify} from "@/helpers/globalNotify";
 
 export default {
   name: 'header',
@@ -319,6 +320,8 @@ export default {
           data.pay_password_token = response.data.data.attributes.sessionId;
           this.updateProfile(data, callback);
         }).catch((err) => {
+          globalErrorNotify(this, err);
+
           if (err.response) {
             console.log(err.response)
           }
@@ -339,7 +342,7 @@ export default {
         }
       ).then((response) => {
         console.log(response.data)
-
+        
         this.setData({
           key: 'userInfo',
           value: response.data.data.attributes
@@ -353,9 +356,7 @@ export default {
         callback(response.data)
 
       }).catch((err) => {
-          if (err.response) {
-            console.log(err.response)
-          }
+          globalErrorNotify(this, err);
       })
     }
   }

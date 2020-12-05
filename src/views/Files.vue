@@ -115,6 +115,7 @@ import axios from 'axios'
 import { dzq } from '@/public'
 import SetShareInfo from "@/components/SetShareInfo";
 // import IncludedHelper from '../helpers/includedHelper'
+import {globalErrorNotify} from "@/helpers/globalNotify";
 
 export default {
   components: {SetShareInfo},
@@ -237,17 +238,18 @@ export default {
                 link.download = data.data.attributes.name
                 link.click()
                 URL.revokeObjectURL(link.href)
-            }).catch(() => {
-                // TODO 加一个错误显示
+            }).catch((err) => {
+                globalErrorNotify(this, err);
             })
+        }).catch(() => {
+            globalErrorNotify(this, "请刷新页面后重试。");
         });
     },
     deleteFile: function(fileId){
         axios.delete(
             dzq({
                 name: 'sourcelay/file/' + fileId,
-            }
-        )
+            })
         ).then(() => {
             let tmpFiles = [];
             for (let s of this.files) {
@@ -256,6 +258,8 @@ export default {
                 }
             }
             this.files = tmpFiles;
+        }).catch((err) => {
+            globalErrorNotify(this, err);
         });
     },
     enterFolder: function(folder){
@@ -315,8 +319,10 @@ export default {
             let config = {
                 headers:{'Content-Type':'multipart/form-data'}
             };
+
             axios.put(uploadUrl, file, config)
             .then(()=>{
+
                  axios.put(
                     dzq({
                         name: 'sourcelay/file',
@@ -324,8 +330,16 @@ export default {
                     data.data
                 ).then((data) => {
                     this.files.push(data.data.data);
-                })
-            })
+                }).catch((err) => {
+                    globalErrorNotify(this, err);
+                });
+
+            }).catch(() => {
+                globalErrorNotify(this, "请刷新页面后重试。");
+            });
+
+        }).catch((err) => {
+            globalErrorNotify(this, err);
         });
 
     },
