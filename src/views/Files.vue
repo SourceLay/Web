@@ -185,9 +185,7 @@ export default {
                 tmpFiles.push(fileInfo);
             }
             this.files = tmpFiles;
-
-            console.log(this.paths);
-            console.log(this.files);
+            console.log(this.data);
         });
 
     },
