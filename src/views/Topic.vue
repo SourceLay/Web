@@ -646,7 +646,7 @@ export default {
         }
 
         // 密码下载
-        if (shareInfo.attributes.shared_type === 1) {
+        if (shareInfo.attributes.shared_type === 1 && shareInfo.attributes.paid === false) {
           this.processingShareInfo = shareInfo;
           this.processingFileInfo = fileInfo;
 
