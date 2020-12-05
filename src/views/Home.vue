@@ -95,7 +95,7 @@
     <ul>
       <li @click="setUserInfoVisible=true">隐私和Cookies</li>
       <li @click="payVisible=true">使用条款</li>
-      <li @click="setShareInfoVisible=true">关于我们</li>
+      <li @click="testNotify">关于我们</li>
       <li @click="shareListVisible=true">© 2019 派瑞派对</li>
     </ul>
   </div>
@@ -208,6 +208,13 @@ export default {
     })
   },
   methods: {
+    testNotify() {
+      this.$notify({
+        title: '提示',
+        message: '这是一条不会自动关闭的消息',
+        duration: 0
+      });
+    },
     showIndexBanner(index) {
       this.indexBannerActive = index
     },

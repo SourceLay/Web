@@ -37,7 +37,6 @@ export default {
   margin: 0;
 }
 *, *::after, *::before{
-  position: relative;
   box-sizing: border-box;
 }
 html{
