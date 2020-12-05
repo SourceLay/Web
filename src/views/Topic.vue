@@ -168,6 +168,22 @@
       </div>
     </div>
   </div>
+  <el-dialog title="支付" width="30%" :visible="payVisible" @close="payVisible=false">
+    <Pay @handlePay="handlePay"></Pay>
+  </el-dialog>
+  <el-dialog title="输入分享密码"
+             width="30%"
+             :visible="sharePasswordVisible"
+             @close="sharePasswordVisible=false">
+    <form>
+      <el-input type="password" v-model="sharePassword" autocomplete="false"></el-input>
+    </form>
+    <div style="text-align: center;margin-top: 1em;">
+      <el-button type="primary" @click="handleSharePassword">
+        确认
+      </el-button>
+    </div>
+  </el-dialog>
 </div>
 </template>
 
@@ -181,11 +197,16 @@ import { mapState, mapMutations } from 'vuex'
 import { _throttle, _debounce } from '@/public'
 import { getPostTitle, getPostTag, getTime, dzq } from '@/public'
 import IncludedHelper from '../helpers/includedHelper'
+import Pay from "@/components/Pay";
 
 export default {
   name: 'forum',
   data: function() {
     return {
+      sharePasswordVisible: false, //分享密码框是否可见
+      sharePassword: '', //分享密码
+      payVisible: false,  //支付框是否可见
+      payPassword: '',
       topic: null,        //存放主题数据
       showPost: [],       //当前展示的帖子ID
       jumpUrl: {},
@@ -208,7 +229,10 @@ export default {
       loadPage: [1, 1],   //加载页面
       showBanner: 0,      //是否展示顶部栏
       loadFlag: 0,        //是否处于加载更多中……
-      formatData: {}
+      formatData: {},
+
+      processingShareInfo: {id: 0},
+      processingFileInfo: {id: 0},
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -264,7 +288,7 @@ export default {
     })
   },
   components: {
-    Editor
+    Editor, Pay
   },
   computed: {
     ...mapState([
@@ -385,7 +409,7 @@ export default {
           this.included[item.type + '.' + item.id] = item
         })
       }
-      
+
       this.firstPost = {
         content : this.getContent(this.included['posts.' + this.topic.relationships.firstPost.data.id].attributes.content),
         likedUser : this.getLikedUser(this.included['posts.' + this.topic.relationships.firstPost.data.id].relationships.likedUsers?.data),
@@ -571,7 +595,7 @@ export default {
     },
     setLike(event, post_id, isLiked){
       console.log(event);
-      
+
       axios.patch(dzq({
           name: 'posts/' + post_id
         }), {
@@ -597,11 +621,11 @@ export default {
     },
     onClickContent(event){
       console.log(event);
-      
+
       if (event.srcElement.tagName.toLowerCase() === "div" && event.srcElement.attributes.class?.value === "xbbcode-flieshare-block") {
         let shareId = Number(event.srcElement.attributes.shareid?.value);
         if (typeof(shareId) === 'undefined' || shareId === null) {
-          // TODO 
+          // TODO
         }
         let shareInfo = this.included['sourcelay-fileshare.' + shareId];
         let fileInfo = undefined;
@@ -616,25 +640,76 @@ export default {
           // TODO
         }
 
+        // 如果已经可以下载了
         if (shareInfo.attributes.downloadUrl) {
-          axios.get(shareInfo.attributes.downloadUrl, { responseType: 'blob' })
-            .then(response => {
-              const blob = new Blob([response.data], { type: shareInfo.attributes.type ?? 'application/octet-stream' })
-              const link = document.createElement('a')
-              link.href = URL.createObjectURL(blob)
-              link.download = fileInfo.attributes.name
-              link.click()
-              URL.revokeObjectURL(link.href)
-            }).catch(() => {
-              // TODO 加一个错误显示
-            })
+          this.downloadShareFile(shareInfo, fileInfo);
         }
 
-        // TODO 密码下载 
-        // TODO 付费下载
+        // 密码下载
+        if (shareInfo.attributes.shared_type === 1 && shareInfo.attributes.paid === false) {
+          this.processingShareInfo = shareInfo;
+          this.processingFileInfo = fileInfo;
 
+          this.sharePassword = '';//清空上次输入
+          this.sharePasswordVisible = true;
+        }
+
+        //付费下载
+        if (shareInfo.attributes.shared_type === 2 && shareInfo.attributes.paid === false) {
+          this.processingShareInfo = shareInfo;
+          this.processingFileInfo = fileInfo;
+
+          this.payPassword = '';//清空上次输入
+          this.payVisible = true;
+        }
       }
     },
+    downloadShareFile(shareInfo, fileInfo) {
+      axios.get(shareInfo.attributes.downloadUrl, { responseType: 'blob' })
+        .then(response => {
+          const blob = new Blob([response.data], { type: shareInfo.attributes.type ?? 'application/octet-stream' })
+          const link = document.createElement('a')
+          link.href = URL.createObjectURL(blob)
+          link.download = fileInfo.attributes.name
+          link.click()
+          URL.revokeObjectURL(link.href)
+        }).catch((error) => {
+          // TODO 
+        console.log(error);
+      })
+    },
+    handlePay(ret) {
+      this.payPassword = ret;
+      console.log("输入的支付密码：")
+      console.log(this.payPassword)
+      this.payVisible = false;
+    },
+    handleSharePassword() {
+  
+      axios.post(dzq({
+          name: 'sourcelay/fileshare/' + this.processingShareInfo.attributes.id
+        }), {
+        data: {
+          id: this.processingShareInfo.id,
+          type: "posts",
+          attributes: {
+            id: this.processingShareInfo.attributes.id,
+            password: this.sharePassword,
+          }
+        }
+
+      }).then((response) => {
+        this.downloadShareFile(response.data.data, this.processingFileInfo);
+        
+        console.log(response)
+      }).catch((error) => {
+        // TODO 
+        console.log(error);
+      })
+
+      console.log(this.sharePassword);
+      this.sharePasswordVisible = false;
+    }
   },
   mounted() {
     window.addEventListener('scroll', this.scroll, true)

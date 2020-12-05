@@ -13,9 +13,13 @@ function size(size){
     return ret;
 }
 
-function render(fileInfo, shareInfo) {
-    if (fileInfo === null || shareInfo === null) {
-        return "";
+function render(fileInfo, shareInfo, share_id) {
+    if (typeof(fileInfo) === 'undefined' || fileInfo === null) {
+        return "[fileshare]" + share_id + "[/fileshare]";
+    }
+
+    if (typeof(shareInfo) === 'undefined' || shareInfo === null) {
+        return "[fileshare]" + share_id + "[/fileshare]";
     }
 
     let ret = '<div class="xbbcode-flieshare-block" shareId="'+ shareInfo.attributes.id +'">';
@@ -44,9 +48,13 @@ function render(fileInfo, shareInfo) {
     ret += '</div>';
 
     if (shareInfo.attributes.shared_type === 2 && shareInfo.attributes.paid === false) {
-        ret += '<div class="xbbcode-flieshare-block-protected">' + '购买后下载附件' + '</div>'; 
-    } else if (shareInfo.attributes.shared_type === 1) {
+        ret += '<div class="xbbcode-flieshare-block-protected">' + '购买后下载文件' + '</div>'; 
+    } else if (shareInfo.attributes.shared_type === 2 && shareInfo.attributes.paid === true) {
+        ret += '<div class="xbbcode-flieshare-block-protected">' + '已购买可下载文件' + '</div>'; 
+    } else if (shareInfo.attributes.shared_type === 1 && shareInfo.attributes.paid === false) {
         ret += '<div class="xbbcode-flieshare-block-protected">' + '密码保护分享' + '</div>';
+    } else if (shareInfo.attributes.shared_type === 1 && shareInfo.attributes.paid === true) {
+        ret += '<div class="xbbcode-flieshare-block-protected">' + '[可下载] 密码保护分享' + '</div>';
     }
 
     ret += '</div>';

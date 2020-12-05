@@ -4,20 +4,14 @@
   <el-dialog title="修改信息" :visible="setUserInfoVisible" @close="setUserInfoVisible=false">
     <SetUserInfo></SetUserInfo>
   </el-dialog>
-  <el-dialog title="支付" width="30%" :visible="payVisible" @close="payVisible=false">
-    <Pay></Pay>
-  </el-dialog>
-  <el-dialog title="分享信息" :visible="setShareInfoVisible" @close="setShareInfoVisible=false">
-    <SetShareInfo></SetShareInfo>
-  </el-dialog>
   <div class="index-banner">
     <ul class="banner">
-      <li v-for="(banner, index) in indexBanner" :key="index" :style="{'background': banner[5]}" :class="[indexBannerActive === index ? 'banner-active' : '']">
+      <li v-for="(banner, index) in indexBanner" :key="index" :style="{'background': banner.background}" :class="[indexBannerActive === index ? 'banner-active' : '']">
         <div class="banner-content">
-          <p>{{banner[0]}}</p>
-          <h1>{{banner[1]}}</h1>
-          <a :href="banner[3]">{{banner[2]}}</a>
-          <img :src="require('../assets/' + banner[4])" alt="">
+          <p>{{banner.subTitle}}</p>
+          <h1>{{banner.title}}</h1>
+          <a :href="banner.url">{{banner.btnText}}</a>
+          <img :src="banner.image" alt="">
         </div>
       </li>
     </ul>
@@ -39,15 +33,15 @@
       <div @mouseover="sliderBar(1)" @mouseleave="sliderBar(0)" class="slidershow">
         <ul :style="{'transform': [sliderBarActive ? 'none' : 'translate(100%, 0)']}" class="slider-bar">
           <li @mouseover="showSlider(index)" :style="{'opacity' : [slidershowActive === index ? '1' : '0.5']}" v-for="(slider, index) in sliderContent" :key="index">
-            <img :src="require('../assets/' + slider[2])" alt="">
+            <img :src="slider.image" alt="">
           </li>
         </ul>
         <ul :style="{'transform':'translateX(-' + 100 * slidershowActive + '%)'}" class="sliders">
           <li v-for="(slider, index) in sliderContent" :key="index" class="slider">
-            <img :src="require('../assets/' + slider[2])" alt="">
+            <img :src="slider.image" alt="">
             <div class="slider-info">
-              <p>{{slider[0]}}</p>
-              <p>{{slider[1]}}</p>
+              <p>{{slider.title}}</p>
+              <p>{{slider.author}}</p>
             </div>
           </li>
         </ul>
@@ -57,24 +51,22 @@
         <ul class="posts-option">
           <li @mouseover="showPost(index)" v-for="(item, index) in postInfo" :key="index" :class="[postInfoActive === index ? 'option-active' : '']">{{item}}</li>
         </ul>
-        <ul class="post">
-          <li>
-            <span class="post-num">1</span>
-            <span>[我的世界] 为什么这个村民在哭？</span>
-            <span class="post-writer">陆陆侠</span>
+        <ul class="post postList">
+          <li v-for="(item, index) in postInfoList" :key="index">
+              <span class="post-num">{{index + 1}}</span>
+              <router-link v-if="item.tid > 0" :to="{path: '/forums/topics/' + item.tid}">
+                <span>{{item.title}}</span>
+              </router-link>
+              <div v-if="item.tid === 0">
+                <span>{{item.title}}</span>
+              </div>
+              <!-- <router-link v-if="item.tid > 0" :to="{path: '/forums/topics/' + item.tid}">
+                <span class="post-writer">{{item.author}}</span>
+              </router-link> -->
+              <!-- <div v-if="item.tid === 0"> -->
+                <span class="post-writer">{{item.author}}</span>
+              <!-- </div> -->
           </li>
-          <li>
-            <span class="post-num">2</span>
-            <span>[板块名] 主题名</span>
-            <span class="post-writer">发帖人</span>
-          </li>
-          <li><span class="post-num">3</span>[板块名] 主题名</li>
-          <li><span class="post-num">4</span>[板块名] 主题名</li>
-          <li><span class="post-num">5</span>[板块名] 主题名</li>
-          <li><span class="post-num">6</span>[板块名] 主题名</li>
-          <li><span class="post-num">7</span>[板块名] 主题名</li>
-          <li><span class="post-num">8</span>[板块名] 主题名</li>
-          <li><span class="post-num">9</span>[板块名] 主题名</li>
         </ul>
       </div>
     </div>
@@ -90,7 +82,6 @@
         <ul class="boards">
           <li v-for="(board, index) in info.children" :key="index" class="board">
             <router-link :to="{path: '/forums/' + board.id}">
-              <!-- 这里可以套娃展开，但是实际上没必要 -->
               <img src="../assets/mc.jpeg" alt="">
               <p class="board-name">{{board.name}}<span class="board-today">({{board.activitiesDaily.threads}} / {{board.activitiesDaily.posts}})</span></p>
               <p class="board-slogan">{{board.slogan}}</p>
@@ -105,25 +96,32 @@
       <li @click="setUserInfoVisible=true">隐私和Cookies</li>
       <li @click="payVisible=true">使用条款</li>
       <li @click="setShareInfoVisible=true">关于我们</li>
-      <li>© 2019 派瑞派对</li>
+      <li @click="shareListVisible=true">© 2019 派瑞派对</li>
     </ul>
   </div>
+  <el-dialog width="80%" title="分享列表" :visible="shareListVisible" @close="shareListVisible=false">
+    <ShareFileList></ShareFileList>
+  </el-dialog>
 </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import SetUserInfo from "@/components/SetUserInfo";
-import Pay from "@/components/Pay";
-import SetShareInfo from "@/components/SetShareInfo";
+import axios from 'axios'
+import { dzq } from '@/public'
+import IncludedHelper from '../helpers/includedHelper'
+import ShareFileList from "@/components/ShareFileList";
+
+
 export default {
   name: 'Home',
-  components: {SetShareInfo, Pay, SetUserInfo},
+  components: {ShareFileList, SetUserInfo},
   data() {
     return {
+      shareListVisible: false,
       setUserInfoVisible:false,
       payVisible: false,
-      setShareInfoVisible:false,
       //当前banner
       indexBannerActive: 0,
       //当前轮播
@@ -136,63 +134,66 @@ export default {
       sliderTimer: null,
       //banner内容
       indexBanner: [
-        [
-          "这个寒假，一起哈啤！",
-          "Server 鸽子号 is now online.",
-          "立即前往 ▶",
-          "",
-          "banner.png",
-          "linear-gradient( 135deg, #79F1A4 10%, #0E5CAD 100%)"
-        ],
-        [
-          "众人喜笑颜开",
-          "Hyt搞黄色，快来欣赏",
-          "立即前往 ▶",
-          "",
-          "banner.png",
-          "linear-gradient( 135deg, #FDEB71 10%, #F8D800 100%)"
-        ],
-        [
-          "喜闻乐见",
-          "剑羽十年努力，终于成为太空人！",
-          "立即前往 ▶",
-          "",
-          "banner.png",
-          "linear-gradient( 135deg, #E2B0FF 10%, #9F44D3 100%)"
-        ]
+        {
+          subTitle: "这个寒假，一起哈啤！",
+          title: "Server 鸽子号 is now online.",
+          btnText: "立即前往 ▶",
+          url: "",
+          image: require('../assets/banner.png'),
+          background: "linear-gradient( 135deg, #79F1A4 10%, #0E5CAD 100%)"
+        }
       ],
       //轮播内容
       sliderContent: [
-        [
-          '标题1',
-          '作者1',
-          'share.png'
-        ],
-        [
-          '标题2',
-          '作者2',
-          'share.png'
-        ],
-        [
-          '标题3',
-          '作者3',
-          'share.png'
-        ],
-        [
-          '标题4',
-          '作者4',
-          'share.png'
-        ],
-        [
-          '标题5',
-          '作者5',
-          'share.png'
-        ]
+        {
+          title: '标题1',
+          author: '作者1',
+          image: require('../assets/share.png'),
+          tid: 0
+        }
       ],
       //主题菜单
       postInfo: [
         '最新主题', '最新回复', '热门主题'
-      ]
+      ],
+      postInfoList: [
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+      ],
+      postInfoListPending: [[
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+      ],[
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+      ],[
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+        {title:"", author:"", tid:0},
+      ],]
     }
   },
   computed: {
@@ -200,6 +201,11 @@ export default {
       'boardInfo'
     ]),
 
+  },
+  beforeRouteEnter (to, from, next) {
+    next((vm) => {
+      vm.homePageRecommended();
+    })
   },
   methods: {
     showIndexBanner(index) {
@@ -209,12 +215,9 @@ export default {
       this.slidershowActive = index
     },
     roundSlider() {
-      let max = this.sliderContent.length
       this.sliderTimer = setInterval(() => {
-        this.slidershowActive ++
-        if(this.slidershowActive === max){
-          this.slidershowActive = 0
-        }
+        let max = this.sliderContent.length
+        this.slidershowActive = (this.slidershowActive + 1) % max
       },5000)
     },
     sliderBar(e) {
@@ -227,17 +230,73 @@ export default {
     },
     showPost(e) {
       this.postInfoActive = e
+      this.postInfoList = this.postInfoListPending[this.postInfoActive];
+    },
+    homePageRecommended(){
+      axios.get(
+        dzq({name: 'paraparty/homepage'})
+      ).then(response => {
+        let includedInfo = new IncludedHelper(response.data.included);
+
+        this.homePageRecommendedFormat(0, response.data.data.relationships.latestThreads, includedInfo);
+        this.homePageRecommendedFormat(1, response.data.data.relationships.latestReplied, includedInfo);
+        this.homePageRecommendedFormat(2, response.data.data.relationships.hottestThreads, includedInfo);
+
+        this.postInfoList = this.postInfoListPending[this.postInfoActive];
+        console.log(this.postInfoListPending);
+
+        this.homePageBannersInit(response.data.data.relationships.banners, includedInfo);
+        this.homePageSlidersInit(response.data.data.relationships.sliders, includedInfo);
+
+      });
+    },homePageRecommendedFormat(index, data, includedInfo){
+        data = data.data;
+        for (let i = 0; i < data.length; i++) {
+          let thread = includedInfo.get(data[i].type + '.' + data[i].id);
+          this.postInfoListPending[index][i].title = thread.attributes.title;
+          this.postInfoListPending[index][i].tid = thread.id;
+          let author = thread.relationships.user.data;
+          author = includedInfo.get(author.type + '.' + author.id);
+          this.postInfoListPending[index][i].author = author.attributes.username;
+          this.postInfoListPending[index][i].uid = author.id;
+          this.postInfoListPending[index][i].activited = true;
+        }
+    },homePageBannersInit(data, includedInfo) {
+      let tmpBanners = [];
+      for (let s of data.data) {
+        let item = includedInfo.get(s.type + '.' + s.id);
+        let tmp = {
+          title: item.attributes.title,
+          subTitle: item.attributes.subTitle,
+          btnText: item.attributes.btnText,
+          url: item.attributes.url,
+          image: item.attributes.image,
+          background: item.attributes.background,
+        }
+        tmpBanners.push(tmp);
+      }
+      this.indexBanner = tmpBanners;
+    },homePageSlidersInit(data, includedInfo) {
+      let tmpSliders = [];
+      for (let s of data.data) {
+        let item = includedInfo.get(s.type + '.' + s.id);
+        let tmp = {
+          title: item.attributes.title,
+          author: item.attributes.author,
+          image: item.attributes.image,
+          tid: item.attributes.thread_id,
+        }
+        tmpSliders.push(tmp);
+      }
+      this.sliderContent = tmpSliders;
     }
   },
   mounted() {
     //轮播
     let roundIndexBanner = () => {
-      let max = this.indexBanner.length
       setInterval(() => {
-        this.indexBannerActive ++
-        if(this.indexBannerActive === max){
-          this.indexBannerActive = 0
-        }
+        let max = this.indexBanner.length
+        this.indexBannerActive = (this.indexBannerActive + 1) % max
       },10000)
     }
     roundIndexBanner()
@@ -544,5 +603,16 @@ export default {
   font-size: 1.3em;
   margin-right: 0.2em;
   vertical-align: text-bottom;
+}
+.postList a{
+    color: var(--link-normal);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+.postList a:hover {
+    color: var(--link-highlight);
+}
+.postList a:visited {
+    color: var(--link-visited);
 }
 </style>

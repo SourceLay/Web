@@ -15,9 +15,10 @@
 <script>
 export default {
   components: {},
+  props: ['reset'],
   data() {
     return {
-      msg: '',
+      msg: ''
     }
   },
   created() {},
@@ -27,7 +28,11 @@ export default {
       if(/[^\d]/g.test(curVal)) {
         this.msg = this.msg.replace(/[^\d]/g, '');
       }
+      this.$emit('handleChangePassword',this.msg);
     },
+    reset() {
+      this.msg = '';
+    }
   },
   methods: {
     focus() {

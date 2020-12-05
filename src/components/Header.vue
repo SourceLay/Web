@@ -76,24 +76,37 @@
           <h2>欢迎回来，{{userInfo.username}}</h2>
           <ul class="user-menu">
             <li><div></div><p>空间</p></li>
-            <li><div></div><p>设置</p></li>
+            <li @click="setUserInfoVisible=true"><div></div><p>设置</p></li>
             <li><div></div><p>徽章</p></li>
             <li @click="exit"><div></div><p>注销</p></li>
           </ul>
         </div>
       </div>
     </div>
+    <el-dialog
+        title="设置"
+        width="40%"
+        :visible="setUserInfoVisible"
+        :modal-append-to-body='false'
+        @close="setUserInfoVisible=false">
+      <SetUserInfo @handleSetUserInfo="handleSetUserInfo"></SetUserInfo>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { mapState, mapMutations } from 'vuex'
 import IncludedHelper from '../helpers/includedHelper'
+import SetUserInfo from "@/components/SetUserInfo";
+import { dzq } from '@/public'
+import store from '../store/index'
 
 export default {
   name: 'header',
+  components: {SetUserInfo},
   data: function() {
     return {
+      setUserInfoVisible:false,
       page: 1,
       userBox: false,
       loginLoad: 0,
@@ -103,7 +116,7 @@ export default {
         confirmPassword: ''
       },
       loginError: 0,
-      loginErrorText: '你的用户名或密码有问题'
+      loginErrorText: '你的用户名或密码有问题',
     }
   },
   computed: {
@@ -143,7 +156,7 @@ export default {
         },2000)
         return
       }
-      
+
       if (this.loginForm.confirmPassword.length < 6) {
         this.loginErrorText= '你输入的密码太短了。'
         this.loginError = 1
@@ -171,6 +184,11 @@ export default {
         let tmpUserInfo = includedInfo.get('users.' + response.data.data.id);
 
         this.setData({
+          key: 'userInfo',
+          value: tmpUserInfo.attributes
+        })
+
+        store.commit('setData', {
           key: 'userInfo',
           value: tmpUserInfo.attributes
         })
@@ -216,6 +234,11 @@ export default {
           value: tmpUserInfo.attributes
         })
 
+        store.commit('setData', {
+          key: 'userInfo',
+          value: tmpUserInfo.attributes
+        })
+
         this.setData({
           key: 'status',
           value: 'login'
@@ -255,6 +278,85 @@ export default {
     },
     onLoginClick: function(){
       this.page = 1;
+    },
+    // 处理设置用户信息的返回值
+    handleSetUserInfo: function (ret, callback) {
+      // 返回值格式：
+      // ruleForm: {
+      //   oldPassword: '',
+      //   newPassword: '',
+      //   confirmNewPassword: '',
+      //   oldPayPassword: '',
+      //   payPassword: '',
+      //   confirmPayPassword: '',
+      //   email: ''
+      // },
+      console.log(ret);
+
+      let data = {};
+      if (ret.oldPassword !== '') data.password = ret.oldPassword;
+      if (ret.newPassword !== '') data.newPassword = ret.newPassword;
+      if (ret.confirmPassword !== '') data.password_confirmation = ret.confirmNewPassword;
+      if (ret.email !== this.userInfo.email) data.email = ret.email;
+
+      if (ret.payPassword !== '') data.payPassword = ret.payPassword;
+      if (ret.confirmPayPassword !== '') data.pay_password_confirmation = ret.confirmPayPassword;
+
+      if (this.userInfo.hasPayPassword && ret.oldPayPassword !== '') {
+        this.axios.post(
+          dzq({
+            name: 'users/pay-password/reset'
+          }),
+          {
+            data: {
+              attributes: {
+                pay_password: ret.payPassword
+              }
+            }
+          }
+        ).then((response) => {
+          console.log(response.data)
+          data.pay_password_token = response.data.data.attributes.sessionId;
+          this.updateProfile(data, callback);
+        }).catch((err) => {
+          if (err.response) {
+            console.log(err.response)
+          }
+        })
+      } else {
+        this.updateProfile(data, callback);
+      }
+    },
+    updateProfile: function(data, callback) {
+      this.axios.patch(
+        dzq({
+          name: 'users/' + this.userInfo.id
+        }),
+        {
+          data: {
+            attributes: data
+          }
+        }
+      ).then((response) => {
+        console.log(response.data)
+        
+        this.setData({
+          key: 'userInfo',
+          value: response.data.data.attributes
+        })
+
+        store.commit('setData', {
+          key: 'userInfo',
+          value: response.data.data.attributes
+        })
+
+        callback(response.data)
+
+      }).catch((err) => {
+          if (err.response) {
+            console.log(err.response)
+          }
+      })
     }
   }
 }

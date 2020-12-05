@@ -5,7 +5,7 @@
         <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" v-model="ruleForm.description"></el-input>
       </el-form-item>
       <el-form-item label="分享类型" prop="type">
-        <el-select v-model="ruleForm.type" placeholder="请选择">
+        <el-select v-model="ruleForm.type" placeholder="请选择" @change="resetOtherType">
           <el-option
               v-for="item in options"
               :key="item.value"
@@ -84,17 +84,29 @@ export default {
   },
   methods: {
     submitForm(formName) {
+      var that = this;
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('submit!');
+          that.$emit('handleShareReturn', that.ruleForm)
         } else {
-          console.log('error submit!!');
+          alert('无效输入');
           return false;
         }
       });
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
+    },
+    // 切换类型时清空另一组数据
+    resetOtherType() {
+      if (this.ruleForm.type === 0) {
+        this.ruleForm.cost = 0;
+        this.ruleForm.password = '';
+      }
+      else if (this.ruleForm.type === 1)
+        this.ruleForm.cost = 0;
+      else
+        this.ruleForm.password = '';
     }
   }
 }
