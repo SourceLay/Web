@@ -333,41 +333,41 @@ export default {
     },
     // 点击确认新建文件夹后的逻辑
     handleNewFolderReturn() {
-      // TODO 判定输入是否有效
-      if (this.newFolderName === '') {
-        alert('文件夹不能为空')
-        return
-      }
-      // 业务逻辑
-      console.log(this.newFolderName);
-
-        let step = this.paths[this.paths.length - 1].path;
-        if (step[0] !== '/') {
-            step = '/' + step;
+        // TODO 判定输入是否有效
+        if (this.newFolderName === '') {
+            alert('文件夹不能为空')
+            return
         }
-        let folder = '/users/' + store.state.userInfo.id + step;
+        // 业务逻辑
+        console.log(this.newFolderName);
 
-      axios.post(
-          dzq({
-              name: 'sourcelay/file',
-          }),
-          {
-              data: {
-                  attributes: {
-                      name: this.newFolderName,
-                      type: 'text/directory',
-                      size: 0,
-                      folder: folder,
-                  }
-              }
-          }
-      ).then((response) => {
-        this.files.push(response.data.data);
-      });
+            let step = this.paths[this.paths.length - 1].path;
+            if (step[0] !== '/') {
+                step = '/' + step;
+            }
+            let folder = '/users/' + store.state.userInfo.id + step;
 
-      // 关闭弹窗 还原状态
-      this.newFolderName = '';
-      this.newFolderVisible = false;
+        axios.post(
+            dzq({
+                name: 'sourcelay/file',
+            }),
+            {
+                data: {
+                    attributes: {
+                        name: this.newFolderName,
+                        type: 'text/directory',
+                        size: 0,
+                        folder: folder,
+                    }
+                }
+            }
+        ).then((response) => {
+            this.files.push(response.data.data);
+        });
+
+        // 关闭弹窗 还原状态
+        this.newFolderName = '';
+        this.newFolderVisible = false;
     },
     // 点击分享按钮触发的事件 传入fileId参数
     shareFile(fileId) {
@@ -377,15 +377,30 @@ export default {
     },
     // 处理设置分享的返回函数
     handleShareReturn(ret) {
-      // 返回值类型：
-      // ruleForm: {
-      //        description: '',
-      //       type: 0,
-      //       password: '',
-      //       cost: 0,
-      // },
-      console.log(ret);
-      this.setShareInfoVisible = false;
+        let data = {};
+        data.file_id = this.shareFileId;
+        data.shared_desc = ret.description;
+        data.shared_type = ret.type;
+        data.password = ret.password;
+        data.cost = ret.cost * 100;
+        
+        console.log(ret);
+        console.log(data);
+
+        axios.post(
+            dzq({
+                name: 'sourcelay/fileshare',
+            }),
+            {
+                data: {
+                    attributes: data
+                }
+            }
+        ).then((response) => {
+            console.log(response.data);
+        });
+
+        this.setShareInfoVisible = false;
     }
   },
   mounted(){

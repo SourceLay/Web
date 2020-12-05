@@ -615,7 +615,7 @@ var XBBCODE = function() {
                 console.log(fileInfo);
 
                 let render = require('./helpers/filesharecard').default;
-                ret = render(fileInfo, shareInfo);
+                ret = render(fileInfo, shareInfo, share_id);
             }
             return ret;
         },

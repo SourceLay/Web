@@ -13,9 +13,13 @@ function size(size){
     return ret;
 }
 
-function render(fileInfo, shareInfo) {
-    if (fileInfo === null || shareInfo === null) {
-        return "";
+function render(fileInfo, shareInfo, share_id) {
+    if (typeof(fileInfo) === 'undefined' || fileInfo === null) {
+        return "[fileshare]" + share_id + "[/fileshare]";
+    }
+
+    if (typeof(shareInfo) === 'undefined' || shareInfo === null) {
+        return "[fileshare]" + share_id + "[/fileshare]";
     }
 
     let ret = '<div class="xbbcode-flieshare-block" shareId="'+ shareInfo.attributes.id +'">';
