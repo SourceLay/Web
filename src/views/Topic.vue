@@ -175,7 +175,9 @@
              width="30%"
              :visible="sharePasswordVisible"
              @close="sharePasswordVisible=false">
-    <el-input type="password" v-model="sharePassword"></el-input>
+    <form>
+      <el-input type="password" v-model="sharePassword" autocomplete="false"></el-input>
+    </form>
     <div style="text-align: center;margin-top: 1em;">
       <el-button type="primary" @click="handleSharePassword">
         确认
@@ -227,7 +229,10 @@ export default {
       loadPage: [1, 1],   //加载页面
       showBanner: 0,      //是否展示顶部栏
       loadFlag: 0,        //是否处于加载更多中……
-      formatData: {}
+      formatData: {},
+
+      processingShareInfo: {id: 0},
+      processingFileInfo: {id: 0},
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -635,45 +640,73 @@ export default {
           // TODO
         }
 
+        // 如果已经可以下载了
         if (shareInfo.attributes.downloadUrl) {
-          axios.get(shareInfo.attributes.downloadUrl, { responseType: 'blob' })
-            .then(response => {
-              const blob = new Blob([response.data], { type: shareInfo.attributes.type ?? 'application/octet-stream' })
-              const link = document.createElement('a')
-              link.href = URL.createObjectURL(blob)
-              link.download = fileInfo.attributes.name
-              link.click()
-              URL.revokeObjectURL(link.href)
-            }).catch(() => {
-              // TODO 加一个错误显示
-            })
+          this.downloadShareFile(shareInfo, fileInfo);
         }
 
-        // TODO 密码下载
-        // TODO 付费下载
         // 密码下载
-        if (shareInfo.attributes.shared_type === 1) {
+        if (shareInfo.attributes.shared_type === 1 && shareInfo.attributes.paid === false) {
+          this.processingShareInfo = shareInfo;
+          this.processingFileInfo = fileInfo;
+
           this.sharePassword = '';//清空上次输入
           this.sharePasswordVisible = true;
         }
 
         //付费下载
-        if (shareInfo.attributes.shared_type === 2) {
+        if (shareInfo.attributes.shared_type === 2 && shareInfo.attributes.paid === false) {
+          this.processingShareInfo = shareInfo;
+          this.processingFileInfo = fileInfo;
+
           this.payPassword = '';//清空上次输入
           this.payVisible = true;
         }
       }
     },
-  // 处理确认付款后的返回函数 返回密码
-  handlePay(ret) {
-    this.payPassword = ret;
-    console.log("输入的支付密码：")
-    console.log(this.payPassword)
-    this.payVisible = false;
-  },
-    // 处理输入分享密码后点击确认的事件
+    downloadShareFile(shareInfo, fileInfo) {
+      axios.get(shareInfo.attributes.downloadUrl, { responseType: 'blob' })
+        .then(response => {
+          const blob = new Blob([response.data], { type: shareInfo.attributes.type ?? 'application/octet-stream' })
+          const link = document.createElement('a')
+          link.href = URL.createObjectURL(blob)
+          link.download = fileInfo.attributes.name
+          link.click()
+          URL.revokeObjectURL(link.href)
+        }).catch((error) => {
+          // TODO 
+        console.log(error);
+      })
+    },
+    handlePay(ret) {
+      this.payPassword = ret;
+      console.log("输入的支付密码：")
+      console.log(this.payPassword)
+      this.payVisible = false;
+    },
     handleSharePassword() {
-      console.log("输入的分享密码：")
+  
+      axios.post(dzq({
+          name: 'sourcelay/fileshare/' + this.processingShareInfo.attributes.id
+        }), {
+        data: {
+          id: this.processingShareInfo.id,
+          type: "posts",
+          attributes: {
+            id: this.processingShareInfo.attributes.id,
+            password: this.sharePassword,
+          }
+        }
+
+      }).then((response) => {
+        this.downloadShareFile(response.data.data, this.processingFileInfo);
+        
+        console.log(response)
+      }).catch((error) => {
+        // TODO 
+        console.log(error);
+      })
+
       console.log(this.sharePassword);
       this.sharePasswordVisible = false;
     }
