@@ -40,9 +40,8 @@
         </transition>
 
 
-        <div id="top">
-            <h1>文件分享大厅</h1>
-        </div>
+        <div id="top"/>
+        <h1 id="title">文件分享大厅</h1>
         <div id="stream">
             <div @click="popDetail(card)" class="fileCard" v-for="card in cards" :key="card.id">
                 <svg t="1606829000232" class="icon" viewBox="0 0 1185 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="16670" width="48" height="48"><path d="M107.789474 0h319.218526A129.347368 129.347368 0 0 1 529.246316 50.176L840.757895 452.715789H0V107.789474a107.789474 107.789474 0 0 1 107.789474-107.789474z" fill="#EB9B00" p-id="16671"></path><path d="M138.186105 183.242105h909.312c48.074105 0 65.482105 5.012211 82.997895 14.389895 17.623579 9.377684 31.420632 23.174737 40.798316 40.744421 9.377684 17.569684 14.389895 35.031579 14.389895 82.997895v564.439579c0 48.074105-5.012211 65.482105-14.389895 82.997894-9.377684 17.623579-23.174737 31.420632-40.744421 40.798316-17.569684 9.377684-35.031579 14.389895-82.997895 14.389895H138.132211c-48.074105 0-65.482105-5.012211-82.997895-14.389895a97.926737 97.926737 0 0 1-40.798316-40.744421C5.012211 951.242105 0 933.834105 0 885.867789V321.374316c0-48.074105 5.012211-65.482105 14.389895-82.997895 9.377684-17.623579 23.174737-31.420632 40.744421-40.798316 17.569684-9.377684 35.031579-14.389895 82.997895-14.389894z" fill="#F8B700" p-id="16672"></path></svg>
@@ -270,7 +269,7 @@ export default {
     width:800px;
     height:120px;
     backdrop-filter:blur(10px);
-    background:rgba(255, 255, 255, 0.6);
+    background:rgba(255, 255, 255, 0.8);
     border-radius: 5px 5px 0px 0px;
     display:grid;
     grid:50px 1fr / 60px 1fr;
@@ -333,14 +332,20 @@ export default {
 }
 
 #content{
-    padding-left:80px;
+    padding-left:4em;
+    padding-top:4em;
 }
 #top{
-    height:400px;
+    height:330px;
+    background-image: url('../assets/shareStream.jpg');
 }
-#top h1{
-    padding:100px;
+#title{
+    padding-left:100px;
+    padding-top:40px;
+    font-weight: normal;
+    background-image: url('../assets/lvbaoshi.png') no-repeat bottom right;
 }
+
 #bottom{
     height:400px;
 }
@@ -384,7 +389,7 @@ export default {
         flex-grow: 1;
     }
     #stream{
-        padding:50px;
+        padding:20px 50px;
         display:flex;
         flex-wrap: wrap;
     }
