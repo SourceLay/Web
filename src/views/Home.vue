@@ -112,7 +112,7 @@ import axios from 'axios'
 import { dzq } from '@/public'
 import IncludedHelper from '../helpers/includedHelper'
 import ShareFileList from "@/components/ShareFileList";
-
+import globalNotify from "@/helpers/globalNotify";
 
 export default {
   name: 'Home',
@@ -209,11 +209,12 @@ export default {
   },
   methods: {
     testNotify() {
-      this.$notify({
-        title: '提示',
-        message: '这是一条不会自动关闭的消息',
-        duration: 0
-      });
+      // this.$notify({
+      //   title: '提示',
+      //   message: '这是一条不会自动关闭的消息',
+      //   duration: 0
+      // });
+      globalNotify(this);
     },
     showIndexBanner(index) {
       this.indexBannerActive = index
