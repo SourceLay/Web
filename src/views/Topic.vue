@@ -171,6 +171,17 @@
   <el-dialog title="支付" width="30%" :visible="payVisible" @close="payVisible=false">
     <Pay @handlePay="handlePay"></Pay>
   </el-dialog>
+  <el-dialog title="输入分享密码"
+             width="30%"
+             visible="sharePasswordVisible"
+             @close="sharePasswordVisible=false">
+    <el-input type="password" v-model="sharePassword"></el-input>
+    <div style="text-align: center;margin-top: 1em;">
+      <el-button type="primary" @click="handleSharePassword">
+        确认
+      </el-button>
+    </div>
+  </el-dialog>
 </div>
 </template>
 
@@ -189,6 +200,8 @@ export default {
   name: 'forum',
   data: function() {
     return {
+      sharePasswordVisible: false, //分享密码框是否可见
+      sharePassword: '', //分享密码
       payVisible: false,  //支付框是否可见
       topic: null,        //存放主题数据
       showPost: [],       //当前展示的帖子ID
@@ -636,14 +649,18 @@ export default {
 
         // TODO 密码下载
         // TODO 付费下载
-        this.payVisible = true; //显示付款界面
       }
     },
   // 处理确认付款后的返回函数 返回密码
   handlePay(ret) {
     console.log(ret);
     this.payVisible = false;
-  }
+  },
+    // 处理输入分享密码后点击确认的事件
+    handleSharePassword() {
+      console.log(this.sharePassword);
+      this.sharePasswordVisible = false;
+    }
   },
   mounted() {
     window.addEventListener('scroll', this.scroll, true)
