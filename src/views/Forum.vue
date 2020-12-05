@@ -12,8 +12,17 @@
   <div class="banner">
     <img src="../assets/mc.jpg" alt="">
     <div class="banner-cover"></div>
-    <div class="intro">
-      <h1 v-html="this.getBoardName()"></h1>
+    <div class="intro boardName">
+      <h1>
+        <span v-for="(info, index) in boardName" :key="info.id">
+          <span v-if="index < boardName.length - 1"> 
+            <router-link :to="{path: '/forums/' + info.id}">{{info.name}}</router-link> /
+          </span>
+          <span v-if="index === boardName.length - 1">
+            {{info.name}}
+          </span>
+        </span>
+      </h1>
       <p>{{ boardDescription }}</p>
     </div>
   </div>
@@ -172,6 +181,7 @@ export default {
       allPage: 0,
       pageList: [],
       included: {},
+      boardName: [],
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -217,6 +227,7 @@ export default {
         next((vm) => {
           vm.getPost(top, post, page);
           vm.id = to.params.id;
+          vm.getBoardName();
         })
       })
     })
@@ -332,22 +343,21 @@ export default {
       })
     },
     getBoardName: function () {
-      let ret = "";
-
       let board = this.boardInfo.original[this.id]?.translated;
       if (board === undefined) return;
 
-      let pboard = board.parent;      
-
+      let tmpBoardName = [];
+      let pboard = board;
       while (pboard != undefined) {
-        if (pboard.id != undefined)
-          ret = "<span>" + pboard.name + "</span> / " + ret;
+        if (pboard.id != undefined) {
+          console.log(pboard);
+          tmpBoardName.push(pboard);
+        }
         pboard = pboard.parent;
       }
       
-      ret += board.name;
-
-      return ret;
+      this.boardName = tmpBoardName.reverse();
+      console.log(this.boardName);
     }
   }
 }
@@ -626,6 +636,15 @@ export default {
   font-size: 0.8em;
   margin-right: 0.2em;
 }
-
-
+.boardName a{
+    color: var(--link-normal);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+.boardName a:hover {
+    color: var(--link-highlight);
+}
+.boardName a:visited {
+    color: var(--link-visited);
+}
 </style>
