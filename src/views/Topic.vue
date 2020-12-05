@@ -173,7 +173,7 @@
   </el-dialog>
   <el-dialog title="输入分享密码"
              width="30%"
-             visible="sharePasswordVisible"
+             :visible="sharePasswordVisible"
              @close="sharePasswordVisible=false">
     <el-input type="password" v-model="sharePassword"></el-input>
     <div style="text-align: center;margin-top: 1em;">
@@ -195,6 +195,7 @@ import { mapState, mapMutations } from 'vuex'
 import { _throttle, _debounce } from '@/public'
 import { getPostTitle, getPostTag, getTime, dzq } from '@/public'
 import IncludedHelper from '../helpers/includedHelper'
+import Pay from "@/components/Pay";
 
 export default {
   name: 'forum',
@@ -203,6 +204,7 @@ export default {
       sharePasswordVisible: false, //分享密码框是否可见
       sharePassword: '', //分享密码
       payVisible: false,  //支付框是否可见
+      payPassword: '',
       topic: null,        //存放主题数据
       showPost: [],       //当前展示的帖子ID
       jumpUrl: {},
@@ -281,7 +283,7 @@ export default {
     })
   },
   components: {
-    Editor
+    Editor, Pay
   },
   computed: {
     ...mapState([
@@ -649,15 +651,29 @@ export default {
 
         // TODO 密码下载
         // TODO 付费下载
+        // 密码下载
+        if (shareInfo.attributes.shared_type === 1) {
+          this.sharePassword = '';//清空上次输入
+          this.sharePasswordVisible = true;
+        }
+
+        //付费下载
+        if (shareInfo.attributes.shared_type === 2) {
+          this.payPassword = '';//清空上次输入
+          this.payVisible = true;
+        }
       }
     },
   // 处理确认付款后的返回函数 返回密码
   handlePay(ret) {
-    console.log(ret);
+    this.payPassword = ret;
+    console.log("输入的支付密码：")
+    console.log(this.payPassword)
     this.payVisible = false;
   },
     // 处理输入分享密码后点击确认的事件
     handleSharePassword() {
+      console.log("输入的分享密码：")
       console.log(this.sharePassword);
       this.sharePasswordVisible = false;
     }

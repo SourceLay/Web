@@ -15,9 +15,10 @@
 <script>
 export default {
   components: {},
+  props: ['reset'],
   data() {
     return {
-      msg: '',
+      msg: ''
     }
   },
   created() {},
@@ -29,6 +30,9 @@ export default {
       }
       this.$emit('handleChangePassword',this.msg);
     },
+    reset() {
+      this.msg = '';
+    }
   },
   methods: {
     focus() {
