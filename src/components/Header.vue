@@ -100,7 +100,6 @@ import IncludedHelper from '../helpers/includedHelper'
 import SetUserInfo from "@/components/SetUserInfo";
 import { dzq } from '@/public'
 import store from '../store/index'
-import {globalErrorNotify} from "@/helpers/globalNotify";
 
 export default {
   name: 'header',
@@ -293,7 +292,7 @@ export default {
       //   email: ''
       // },
       console.log(ret);
-      var that = this;
+
       let data = {};
       if (ret.oldPassword !== '') data.password = ret.oldPassword;
       if (ret.newPassword !== '') data.newPassword = ret.newPassword;
@@ -340,7 +339,7 @@ export default {
         }
       ).then((response) => {
         console.log(response.data)
-        
+
         this.setData({
           key: 'userInfo',
           value: response.data.data.attributes
