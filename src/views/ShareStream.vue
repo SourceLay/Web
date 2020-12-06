@@ -65,8 +65,35 @@
 </template>
 
 <script>
+import axios from "axios";
+import {dzq} from "@/public";
+
 export default {
-    methods:{
+  created() {
+    axios.get(dzq({name: 'sourcelay/fileshare'})).then(
+        response => {
+          console.log(response);
+          this.cards = [];
+          response.data.data.forEach(file => {
+            this.cards.push(
+                {
+                  id: file.attributes.id,
+                  type: file.attributes.id.type,
+                  filename:"测试",
+                  downloadLink:"",
+                  isLiked:true,
+                  likedCount:114514,
+              Passge:[
+                {link:"",title:"轩轩轩轩轩"},
+                {link:"",title:"练练练练练"},
+                {link:"",title:"源源源源源"}
+              ]
+            })
+          })
+        }
+    )
+  },
+  methods:{
         popDetail:function(item){
             this.detail=item;
             this.showDetail=true;
