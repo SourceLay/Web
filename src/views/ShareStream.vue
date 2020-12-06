@@ -400,6 +400,7 @@ export default {
     #card-bottom{
         width:100%;
         height:50px;
+        position:relative;
     }
 }
 @media screen and (max-width: 800px) {
@@ -431,6 +432,7 @@ export default {
     #card-bottom{
         width:150px;
         height:50px;
+        position:relative;
     }
 }
 
