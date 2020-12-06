@@ -260,7 +260,12 @@ export default {
       this.page = 1;
     },
     goSearch () {
-      this.$router.push('search/?q=' + this.search)
+      this.$router.push({
+        path: '/search',
+        query: {
+          q: this.search
+        }
+      })
     }
   }
 }
