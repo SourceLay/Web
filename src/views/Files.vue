@@ -425,7 +425,7 @@ export default {
     .topheader.fixTop{
         position: fixed;
         padding:10px;
-        left:80px;
+        left:4em;
         top:0px;
         right:0px;
         z-index: 1;
@@ -433,9 +433,9 @@ export default {
     }
     .topheader.unfixed{
         background-image: linear-gradient(to right bottom, rgb(0, 132, 255) , rgb(0, 247, 255));
-        margin-top:80px;
+        margin-top:4em;
         padding:10px;
-        margin-left:80px;
+        margin-left:4em;
     }
     .iconBtn{
         border:2px solid white;
@@ -487,7 +487,7 @@ export default {
     }
     #content{
         background:white;
-        margin-left:80px;
+        margin-left:4em;
         font-size:15px;
     }
     #filePath{
