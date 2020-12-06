@@ -4,7 +4,8 @@
       <div v-if="$route.name !== 'Search'" class="search">
         <i class="iconfont icon-sousuo"></i>
         <form>
-        <input @keyup.enter="goSearch" v-model="search" placeholder="搜索" type="text">
+          <input type="text" style="display: none;">
+          <input @keyup.enter="goSearch" v-model="search" placeholder="搜索" type="text">
         </form>
       </div>
       <div class="menu">
