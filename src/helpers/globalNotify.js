@@ -22,10 +22,12 @@ function translateError(code) {
 function globalErrorNotify(that, err, duration = 4500) {
     if (typeof(err) === "string") {
         globalNotify(that, err, 'error', duration, '错误');
+        return;
     }
 
     if (!err.response) {
         console.log(err)
+        return;
     }
     
     let data = err.response.data;
