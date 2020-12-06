@@ -2,7 +2,7 @@
   <div class="para-content">
     <div class="banner">
       <div class="search">
-        <input placeholder="输入以搜索……" type="text">
+        <input @keyup.enter="goSearch" placeholder="输入以搜索……" v-model="search" type="text">
       </div>
     </div>
     <div class="content">
@@ -11,66 +11,145 @@
         <li>用户</li>
         <li>帖子</li>
       </ul>
-      <ul class="posts">
-        <h2 class="part-title">用户</h2>
+      <board :title="'相关用户' + userNum + '位'">
         <ul class="users">
-          <li class="user-card">
-            <img class="bg" src="../assets/mc.jpg" alt="">
-            <img class="avatar" src="../assets/avatar.png" alt=""/>
+          <li v-for="user in user" :key="user.id">
+            <img :src="user.attributes.avatarUrl" alt="">
             <div class="user-info">
-              <p class="user-name">陆陆侠</p>
-              <p class="user-intro">粉丝：12</p>
-            </div>
-          </li>
-          <li class="user-card">
-            <img class="bg" src="../assets/mc.jpg" alt="">
-            <img class="avatar" src="../assets/avatar.png" alt=""/>
-            <div class="user-info">
-              <p class="user-name">陆陆侠</p>
-              <p class="user-intro">粉丝：12</p>
+              <h1>{{user.attributes.username}}</h1>
+              <p>粉丝数 {{user.attributes.fansCount}}</p>
             </div>
           </li>
         </ul>
-      </ul>
-      <ul class="posts">
-        <h2 class="part-title">帖子</h2>
-        <li class="post">
-          <div class="post-tag">
-            <p class="tag tag-default"></p>
-          </div>
-          <div class="post-title">
-            <h2>123123</h2>
-            <p>123123</p>
-          </div>
-          <div class="post-other">
-            <div class="post-info">
-              <p>
-                作者：
-                <span class="user">
-                  123123
-                </span>
-              </p>
-              <p>123 回复 / 123 浏览</p>
-            </div>
-            <div class="post-time">
-              <p>
-                最后一次回复：
-                <span class="user">
-                  123
-                </span>
-              </p>
-              <p class="time">123</p>
-            </div>
-          </div>
-        </li>
-      </ul>
+      </board>
+      <board :title="'相关帖子' + postNum + '条'" :posts="post" :included="included"/>
     </div>
   </div>
 </template>
 
 <script>
+import board from '@/components/Forum/board.vue'
+import axios from 'axios'
+import { dzq } from '@/public'
 export default {
-
+  components: {
+    board
+  },
+  data () {
+    return {
+      search: '',
+      user: [],
+      userNum: 0,
+      post: [],
+      postNum: 0,
+      included: {}
+    }
+  },
+  beforeRouteEnter(to, from, next) {
+    let user
+    let post
+    let search = to.query.q
+    axios.get(
+      dzq({
+        name: 'users',
+        include: 'groups',
+        sort: 'createdAt',
+        page: {
+          limit: 10
+        },
+        filter: {
+          status: 'normal',
+          username: `*${search}*`
+        }
+      })
+    ).then(response => {
+      user = response.data
+      axios.get(
+        dzq({
+          name: 'threads',
+          include: ['user', 'user.groups', 'firstPost', 'lastPostedUser'],
+          filter: {
+            isApproved: 1,
+            isDeleted: 'no',
+            categoryId: 0,
+            q: search
+          },
+          page: {
+            number: 1,
+            limit: 10
+          }
+        })
+      ).then(response => {
+        post = response.data
+        next(vm => {
+          vm.getSearch(user, post, search)
+        })
+      })
+    })
+  },
+  beforeRouteUpdate(to, from, next){
+    let user
+    let post
+    let search = to.query.q
+    axios.get(
+      dzq({
+        name: 'users',
+        include: 'groups',
+        sort: 'createdAt',
+        page: {
+          limit: 10
+        },
+        filter: {
+          status: 'normal',
+          username: `*${search}*`
+        }
+      })
+    ).then(response => {
+      user = response.data
+      axios.get(
+        dzq({
+          name: 'threads',
+          include: ['user', 'user.groups', 'firstPost', 'lastPostedUser'],
+          filter: {
+            isApproved: 1,
+            isDeleted: 'no',
+            categoryId: 0,
+            q: search
+          },
+          page: {
+            number: 1,
+            limit: 10
+          }
+        })
+      ).then(response => {
+        post = response.data
+        this.getSearch(user, post, search)
+        next()
+      })
+    })
+  },
+  methods: {
+    getSearch (user, post, search) {
+      this.search = search
+      this.user = user.data
+      this.userNum = user.meta.total
+      this.post = post.data
+      this.postNum = post.meta.threadCount
+      if(user && typeof user.included != 'undefined'){
+        user.included.forEach((item) => {
+          this.included[item.type + '.' + item.id] = item
+        })
+      }
+      if(post && typeof post.included != 'undefined'){
+        post.included.forEach((item) => {
+          this.included[item.type + '.' + item.id] = item
+        })
+      }
+    },
+    goSearch () {
+      this.$router.push('?q=' + this.search)
+    }
+  }
 }
 </script>
 
@@ -122,157 +201,36 @@ export default {
   text-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
   background: var(--main-color) !important;
 }
-.posts{
-  background: #f8f8f8;
-  padding: 1em;
-  margin: 1em 0;
-  border-radius: 0.2em;
-}
-.part-title{
-  display: inline-block;
-  font-size: 1.25em;
-  color: var(--text-color);
-  margin-left: 0.5em;
-  margin-bottom: 0.5em;
-  letter-spacing: 0.2em;
-  font-weight: normal;
-}
-.part-title::after{
-  content: "";
-  width: calc(100% - 0.2em);
-  height: 0.11em;
-  background: var(--main-color);
-  display: block;
-}
-.post{
+
+.users{
   display: flex;
-  align-items: center;
-  list-style: none;
-  border-radius: 0.2em;
-  font-size: 0.8em;
-  padding: 0.5em 0;
-  color: var(--text-color);
-  position: relative;
-  transition: all 0.3s;
-  cursor: pointer;
 }
-.post a{
-  display: contents;
-  color: inherit;
-  text-decoration: none;
-}
-.post:hover{
-  background: var(--item-color);
-}
-.post div{
-  display: inline-block;
-}
-.post-title{
-  width: 62em;
-}
-.post-title h2{
-  font-weight: normal;
-  font-size: 1.4em;
-}
-.post-title p{
-  opacity: 0.7;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.post-title >>>div{
-  display: inline-block;
-}
-.post-title >>>span{
-  font-size: 0.8em;
-  margin-right: 0.2em;
-}
-.post-title >>>span:hover{
-  color: var(--main-color);
-}
-.post-other{
-  position: absolute;
-  right: 1em;
-}
-.post-info{
-  width: 10em;
-}
-.post-time{
-  width: 12em;
-}
-.time{
-  display: inline-block;
-}
-/* 论坛-主题Tag */
-.tag::before{
-  display: inline-block;
-  width: 2em;
-  border-radius: 0.2em;
-  padding: 0.2em 0.5em;
-  margin: 0 1em;
-}
-.tag-default::before{
-  content: '主题';
-  background: var(--hover-color);
-  color: var(--text-color);
-  opacity: 0.8;
-}
-.tag-notice::before{
-  content: '公告';
-  background: #3179db;
-  color: #fff;
-}
-.tag-activity::before{
-  content: '活动';
-  background: #4ebc55;
-  color: #fff;
-}
-.tag-rule::before{
-  content: '版规';
-  background: #ac48a2;
-  color: #fff;
-}
-.tag-star::before{
-  content: '精华';
-  background: #f6a231;
-  color: #fff;
-}
-.user-card{
-  display: inline-flex;
-  position: relative;
+.users li{
+  display: flex;
+  background: #ddd;
   padding: 0.5em;
-  margin: 0.5em;
-  width: 15em;
-  height: 4.6em;
+  height: fit-content;
+  width: 13em;
   border-radius: 0.2em;
-  overflow: hidden;
+  margin: 0.5em;
 }
-.avatar{
+.users img{
   width: 3.5em;
   height: 3.5em;
   border-radius: 50%;
-  border: 0.1em solid #fff;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-  margin-right: 0.5em;
-}
-.bg{
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  top: 0;
-  object-fit: cover;
-  filter: brightness(0.7);
+  border: 2px solid #fff;
 }
 .user-info{
-  display: inline-block;
-  color: #fff;
+  margin-left: 0.5em;
+  color: var(--text-color);
 }
-.user-name{
-  font-size: 1.1em;
+.user-info h1{
+  font-size: 1em;
+  font-weight: normal;
 }
-.user-intro{
+.user-info p{
   font-size: 0.8em;
+  margin-top: 0.2em;
   opacity: 0.8;
 }
 </style>

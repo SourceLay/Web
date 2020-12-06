@@ -2,6 +2,7 @@
   <ul class="posts">
     <h2 class="part-title">{{title}}</h2>
     <post v-for="post in posts" :post="post" :key="post.id" :included="included"/>
+    <slot></slot>
     <img v-if="posts === 0" class="empty" src="@/assets/empty.png" alt="">
   </ul>
 </template>
