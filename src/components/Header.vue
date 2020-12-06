@@ -1,10 +1,10 @@
 <template>
   <div @mouseleave="maybeHideLoginBox" :class="[headerAbove ? 'header-above' : '', $route.name === 'Home' ? '' : 'fourm-header', 'header']">
     <div class="content">
-      <div class="search">
+      <div v-if="$route.name !== 'Search'" class="search">
         <i class="iconfont icon-sousuo"></i>
         <form>
-          <input placeholder="搜索" type="text" autocomplete="false">
+        <input @keyup.enter="goSearch" v-model="search" placeholder="搜索" type="text">
         </form>
       </div>
       <div class="menu">
@@ -120,6 +120,7 @@ export default {
       },
       loginError: 0,
       loginErrorText: '你的用户名或密码有问题',
+      search: '',
     }
   },
   computed: {
@@ -282,6 +283,9 @@ export default {
     onLoginClick: function(){
       this.page = 1;
     },
+    goSearch () {
+      this.$router.push('search/?q=' + this.search)
+    },
     // 处理设置用户信息的返回值
     handleSetUserInfo: function (ret, callback) {
       // 返回值格式：
@@ -400,7 +404,6 @@ export default {
   opacity: 1
 }
 .menu{
-  margin-left: 0.5em;
   color: var(--text-color);
 }
 .menu li{
@@ -410,6 +413,7 @@ export default {
 }
 .search{
   position: relative;
+  margin-right: 0.5em;
 }
 .search input{
   padding: 0.5em;
