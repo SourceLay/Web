@@ -168,9 +168,11 @@
       </div>
     </div>
   </div>
+
   <el-dialog title="支付" width="30%" :visible="payVisible" @close="payVisible=false">
-    <Pay @handlePay="handlePay"></Pay>
+    <Pay @handlePay="handlePay" :fileInfo="processingFileInfo" :shareInfo="processingShareInfo"></Pay>
   </el-dialog>
+
   <el-dialog title="输入分享密码"
              width="30%"
              :visible="sharePasswordVisible"
@@ -184,6 +186,7 @@
       </el-button>
     </div>
   </el-dialog>
+
 </div>
 </template>
 
@@ -627,7 +630,7 @@ export default {
       if (event.srcElement.tagName.toLowerCase() === "div" && event.srcElement.attributes.class?.value === "xbbcode-flieshare-block") {
         let shareId = Number(event.srcElement.attributes.shareid?.value);
         if (typeof(shareId) === 'undefined' || shareId === null) {
-          // TODO
+          globalErrorNotify(this, "请刷新页面后重试。");
         }
         let shareInfo = this.included['sourcelay-fileshare.' + shareId];
         let fileInfo = undefined;
@@ -639,7 +642,7 @@ export default {
         console.log(fileInfo);
 
         if (typeof(shareInfo) == 'undefined' || shareInfo === null || typeof(fileInfo) == 'undefined' || fileInfo === null) {
-          // TODO
+          globalErrorNotify(this, "请刷新页面后重试。");
         }
 
         // 如果已经可以下载了
@@ -661,6 +664,8 @@ export default {
           if (store.state.userInfo.hasPayPassword === true) {
             this.processingShareInfo = shareInfo;
             this.processingFileInfo = fileInfo;
+
+            // 创建订单
 
             this.payPassword = '';//清空上次输入
             this.payVisible = true;
@@ -684,6 +689,9 @@ export default {
       })
     },
     handlePay(ret) {
+      // 支付订单
+
+
       this.payPassword = ret;
       console.log("输入的支付密码：")
       console.log(this.payPassword)
