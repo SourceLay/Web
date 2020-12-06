@@ -2,6 +2,7 @@
   <div class="para-content">
     <div class="banner">
       <div class="search">
+        <i class="iconfont icon-sousuo"></i>
         <input @keyup.enter="goSearch" placeholder="输入以搜索……" v-model="search" type="text">
       </div>
     </div>
@@ -172,6 +173,7 @@ export default {
 .search input{
   width: 100%;
   padding: 1em;
+  padding-left: 3em;
   border: 0;
   outline: none;
   background: rgb(255 255 255 / 0.8);
@@ -232,5 +234,14 @@ export default {
   font-size: 0.8em;
   margin-top: 0.2em;
   opacity: 0.8;
+}
+.icon-sousuo{
+  position: absolute;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+  font-size: 1.5em;
+  left: 0.5em;
 }
 </style>

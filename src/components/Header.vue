@@ -3,7 +3,7 @@
     <div class="content">
       <div v-if="$route.name !== 'Search'" class="search">
         <i class="iconfont icon-sousuo"></i>
-        <input placeholder="搜索" type="text">
+        <input @keyup.enter="goSearch" v-model="search" placeholder="搜索" type="text">
       </div>
       <div class="menu">
         <ul>
@@ -105,7 +105,8 @@ export default {
         confirmPassword: ''
       },
       loginError: 0,
-      loginErrorText: '你的用户名或密码有问题'
+      loginErrorText: '你的用户名或密码有问题',
+      search: '',
     }
   },
   computed: {
@@ -257,6 +258,9 @@ export default {
     },
     onLoginClick: function(){
       this.page = 1;
+    },
+    goSearch () {
+      this.$router.push('search/?q=' + this.search)
     }
   }
 }
@@ -292,7 +296,6 @@ export default {
   opacity: 1
 }
 .menu{
-  margin-left: 0.5em;
   color: var(--text-color);
 }
 .menu li{
@@ -302,6 +305,7 @@ export default {
 }
 .search{
   position: relative;
+  margin-right: 0.5em;
 }
 .search input{
   padding: 0.5em;
