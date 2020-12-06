@@ -168,9 +168,11 @@
       </div>
     </div>
   </div>
+
   <el-dialog title="支付" width="30%" :visible="payVisible" @close="payVisible=false">
-    <Pay @handlePay="handlePay"></Pay>
+    <Pay @handlePay="handlePay" :fileInfo="processingFileInfo" :shareInfo="processingShareInfo" :orderInfo="processingOrderInfo"></Pay>
   </el-dialog>
+
   <el-dialog title="输入分享密码"
              width="30%"
              :visible="sharePasswordVisible"
@@ -184,6 +186,7 @@
       </el-button>
     </div>
   </el-dialog>
+
 </div>
 </template>
 
@@ -198,7 +201,7 @@ import { _throttle, _debounce } from '@/public'
 import { getPostTitle, getPostTag, getTime, dzq } from '@/public'
 import IncludedHelper from '../helpers/includedHelper'
 import Pay from "@/components/Pay";
-import {globalErrorNotify} from "@/helpers/globalNotify";
+import {globalSuccessNotify, globalErrorNotify} from "@/helpers/globalNotify";
 import store from '../store/index'
 
 export default {
@@ -208,7 +211,6 @@ export default {
       sharePasswordVisible: false, //分享密码框是否可见
       sharePassword: '', //分享密码
       payVisible: false,  //支付框是否可见
-      payPassword: '',
       topic: null,        //存放主题数据
       showPost: [],       //当前展示的帖子ID
       jumpUrl: {},
@@ -235,6 +237,7 @@ export default {
 
       processingShareInfo: {id: 0},
       processingFileInfo: {id: 0},
+      processingOrderInfo: {id: 0},
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -627,7 +630,7 @@ export default {
       if (event.srcElement.tagName.toLowerCase() === "div" && event.srcElement.attributes.class?.value === "xbbcode-flieshare-block") {
         let shareId = Number(event.srcElement.attributes.shareid?.value);
         if (typeof(shareId) === 'undefined' || shareId === null) {
-          // TODO
+          globalErrorNotify(this, "请刷新页面后重试。");
         }
         let shareInfo = this.included['sourcelay-fileshare.' + shareId];
         let fileInfo = undefined;
@@ -639,7 +642,7 @@ export default {
         console.log(fileInfo);
 
         if (typeof(shareInfo) == 'undefined' || shareInfo === null || typeof(fileInfo) == 'undefined' || fileInfo === null) {
-          // TODO
+          globalErrorNotify(this, "请刷新页面后重试。");
         }
 
         // 如果已经可以下载了
@@ -662,15 +665,58 @@ export default {
             this.processingShareInfo = shareInfo;
             this.processingFileInfo = fileInfo;
 
-            this.payPassword = '';//清空上次输入
-            this.payVisible = true;
+            globalSuccessNotify(this, "正在创建订单。");
+
+            axios.post(
+              dzq({
+                name: 'orders'
+              }),
+              {
+                data: {
+                  attributes: {
+                    type: "17", // 购买文件的类型
+                    share_id: this.processingShareInfo.attributes.id,
+                  }
+                }
+              }
+
+            ).then((res) => {
+              this.processingOrderInfo = res.data.data;
+              this.payVisible = true;
+            }).catch((err) => {
+              globalErrorNotify(this, err);
+            })
+
           } else {
             globalErrorNotify(this, "您尚未设置支付密码。");
           }
         }
       }
     },
+    attemptRequireDownloadUrl(shareInfo, fileInfo) {
+      axios.get(
+        dzq({
+          name: 'fileshare/' + shareInfo.attributes.id
+        })
+      ).then((res) => {
+        if (res.data.data.attributes.downloadUrl) {
+          this.included['sourcelay-fileshare.' + res.data.data.attributes.id] = res.data.data;
+
+          this.downloadShareFile(res.data.data, fileInfo);
+        } else {
+          globalErrorNotify(this, "请刷新页面后重试。");  
+        }
+      }).catch((err) => {
+        globalErrorNotify(this, err);
+      })
+    },
     downloadShareFile(shareInfo, fileInfo) {
+      // 如果文件还没有下载地址我们就再请求一次下载地址
+      if (!shareInfo.attributes.downloadUrl) {
+        this.attemptRequireDownloadUrl(shareInfo, fileInfo);
+        return;
+      }
+
       axios.get(shareInfo.attributes.downloadUrl, { responseType: 'blob' })
         .then(response => {
           const blob = new Blob([response.data], { type: shareInfo.attributes.type ?? 'application/octet-stream' })
@@ -684,10 +730,31 @@ export default {
       })
     },
     handlePay(ret) {
-      this.payPassword = ret;
-      console.log("输入的支付密码：")
-      console.log(this.payPassword)
-      this.payVisible = false;
+      axios.post(
+        dzq({
+          name: 'trade/pay/order/' + this.processingOrderInfo.attributes.order_sn
+        }),
+        {
+          data: {
+            attributes: {
+              order_sn: this.processingOrderInfo.attributes.order_sn,
+              payment_type: 20, // 钱包支付
+              pay_password: ret,
+            }
+          }
+        }
+
+      ).then((res) => {
+        if (res.data.data.attributes.wallet_pay.result === "success") {
+          globalSuccessNotify(this, res.data.data.attributes.wallet_pay.message);
+          this.payVisible = false;
+          this.downloadShareFile(this.processingShareInfo, this.processingFileInfo)
+        } else {
+          globalErrorNotify(this, res.data.data.attributes.wallet_pay.message);
+        }
+      }).catch((err) => {
+        globalErrorNotify(this, err);
+      })
     },
     handleSharePassword() {
   
