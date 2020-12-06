@@ -3,9 +3,9 @@
   <h1 style="text-align: center">信息1</h1>
   <h1 style="text-align: center">信息2</h1>
   <h1 style="text-align: center">信息3</h1>
-  <PayPassword @handleChangePassword="handleChangePassword" :reset="reset"></PayPassword>
+  <PayPassword style="position: relative;margin-top: 1em;margin-bottom: -1em;" @handleChangePassword="handleChangePassword" :reset="reset"></PayPassword>
   <div style="text-align: center">
-    <el-button @click="handlePay">支付</el-button>
+    <el-button type="primary" @click="handlePay">支付</el-button>
   </div>
 </div>
 </template>
