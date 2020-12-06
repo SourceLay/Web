@@ -211,7 +211,6 @@ export default {
       sharePasswordVisible: false, //分享密码框是否可见
       sharePassword: '', //分享密码
       payVisible: false,  //支付框是否可见
-      payPassword: '',
       topic: null,        //存放主题数据
       showPost: [],       //当前展示的帖子ID
       jumpUrl: {},
@@ -675,17 +674,14 @@ export default {
               {
                 data: {
                   attributes: {
-                    type: "17",
+                    type: "17", // 购买文件的类型
                     share_id: this.processingShareInfo.attributes.id,
-                    is_anonymous: "1",
                   }
                 }
               }
 
             ).then((res) => {
               this.processingOrderInfo = res.data.data;
-
-              this.payPassword = '';//清空上次输入
               this.payVisible = true;
             }).catch((err) => {
               globalErrorNotify(this, err);
@@ -697,7 +693,30 @@ export default {
         }
       }
     },
+    attemptRequireDownloadUrl(shareInfo, fileInfo) {
+      axios.get(
+        dzq({
+          name: 'fileshare/' + shareInfo.attributes.id
+        })
+      ).then((res) => {
+        if (res.data.data.attributes.downloadUrl) {
+          this.included['sourcelay-fileshare.' + res.data.data.attributes.id] = res.data.data;
+
+          this.downloadShareFile(res.data.data, fileInfo);
+        } else {
+          globalErrorNotify(this, "请刷新页面后重试。");  
+        }
+      }).catch((err) => {
+        globalErrorNotify(this, err);
+      })
+    },
     downloadShareFile(shareInfo, fileInfo) {
+      // 如果文件还没有下载地址我们就再请求一次下载地址
+      if (!shareInfo.attributes.downloadUrl) {
+        this.attemptRequireDownloadUrl(shareInfo, fileInfo);
+        return;
+      }
+
       axios.get(shareInfo.attributes.downloadUrl, { responseType: 'blob' })
         .then(response => {
           const blob = new Blob([response.data], { type: shareInfo.attributes.type ?? 'application/octet-stream' })
@@ -711,13 +730,31 @@ export default {
       })
     },
     handlePay(ret) {
-      // 支付订单
+      axios.post(
+        dzq({
+          name: 'trade/pay/order/' + this.processingOrderInfo.attributes.order_sn
+        }),
+        {
+          data: {
+            attributes: {
+              order_sn: this.processingOrderInfo.attributes.order_sn,
+              payment_type: 20, // 钱包支付
+              pay_password: ret,
+            }
+          }
+        }
 
-
-      this.payPassword = ret;
-      console.log("输入的支付密码：")
-      console.log(this.payPassword)
-      this.payVisible = false;
+      ).then((res) => {
+        if (res.data.data.attributes.wallet_pay.result === "success") {
+          globalSuccessNotify(this, res.data.data.attributes.wallet_pay.message);
+          this.payVisible = false;
+          this.downloadShareFile(this.processingShareInfo, this.processingFileInfo)
+        } else {
+          globalErrorNotify(this, res.data.data.attributes.wallet_pay.message);
+        }
+      }).catch((err) => {
+        globalErrorNotify(this, err);
+      })
     },
     handleSharePassword() {
   
