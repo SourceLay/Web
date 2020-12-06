@@ -170,7 +170,7 @@
   </div>
 
   <el-dialog title="支付" width="30%" :visible="payVisible" @close="payVisible=false">
-    <Pay @handlePay="handlePay" :fileInfo="processingFileInfo" :shareInfo="processingShareInfo"></Pay>
+    <Pay @handlePay="handlePay" :fileInfo="processingFileInfo" :shareInfo="processingShareInfo" :orderInfo="processingOrderInfo"></Pay>
   </el-dialog>
 
   <el-dialog title="输入分享密码"
@@ -201,7 +201,7 @@ import { _throttle, _debounce } from '@/public'
 import { getPostTitle, getPostTag, getTime, dzq } from '@/public'
 import IncludedHelper from '../helpers/includedHelper'
 import Pay from "@/components/Pay";
-import {globalErrorNotify} from "@/helpers/globalNotify";
+import {globalSuccessNotify, globalErrorNotify} from "@/helpers/globalNotify";
 import store from '../store/index'
 
 export default {
@@ -238,6 +238,7 @@ export default {
 
       processingShareInfo: {id: 0},
       processingFileInfo: {id: 0},
+      processingOrderInfo: {id: 0},
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -665,10 +666,31 @@ export default {
             this.processingShareInfo = shareInfo;
             this.processingFileInfo = fileInfo;
 
-            // 创建订单
+            globalSuccessNotify(this, "正在创建订单。");
 
-            this.payPassword = '';//清空上次输入
-            this.payVisible = true;
+            axios.post(
+              dzq({
+                name: 'orders'
+              }),
+              {
+                data: {
+                  attributes: {
+                    type: "17",
+                    share_id: this.processingShareInfo.attributes.id,
+                    is_anonymous: "1",
+                  }
+                }
+              }
+
+            ).then((res) => {
+              this.processingOrderInfo = res.data.data;
+
+              this.payPassword = '';//清空上次输入
+              this.payVisible = true;
+            }).catch((err) => {
+              globalErrorNotify(this, err);
+            })
+
           } else {
             globalErrorNotify(this, "您尚未设置支付密码。");
           }

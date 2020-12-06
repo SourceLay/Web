@@ -4,6 +4,7 @@
     <span>文件名</span> : <span>{{fileInfo.attributes.name}}</span>
     <span>账户余额</span> : <span>{{userInfo.walletBalance}}</span>
     <span>价格</span> : <span>{{(shareInfo.attributes.cost / 100).toFixed(2)}}</span>
+    <span>订单号</span> : <span>{{orderInfo.attributes.order_sn}}</span>
   </div>
   <PayPassword style="position: relative;margin-top: 1em;margin-bottom: -1em;" @handleChangePassword="handleChangePassword" :reset="reset"></PayPassword>
   <div style="text-align: center">
@@ -21,7 +22,7 @@ import {globalErrorNotify} from "@/helpers/globalNotify";
 export default {
 name: "Pay",
   components: {PayPassword},
-  props: ['fileInfo', 'shareInfo'],
+  props: ['fileInfo', 'shareInfo', 'orderInfo'],
   data() {
     return {
       password: '',
