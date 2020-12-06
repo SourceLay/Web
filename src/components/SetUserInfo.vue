@@ -133,7 +133,7 @@ export default {
         oldPayPassword: '',
         payPassword: '',
         confirmPayPassword: '',
-        email: store.state.userInfo.email
+        email: store.state.userInfo.email ?? ''
       },
       rules: {
         oldPassword: [
