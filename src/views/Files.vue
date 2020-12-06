@@ -445,6 +445,7 @@ export default {
         color: white;
         background: rgba(82, 79, 79, 0.192);
         transition: all 100ms;
+        position:relative;
     }
     .iconBtn:hover{
         background: rgba(255, 255, 255, 0.199);
