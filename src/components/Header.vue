@@ -349,7 +349,7 @@ export default {
         }
       ).then((response) => {
         console.log(response.data)
-        
+
         this.setData({
           key: 'userInfo',
           value: response.data.data.attributes
@@ -375,7 +375,7 @@ export default {
   position: fixed;
   height: 4em;
   opacity: 0;
-  z-index: 1;
+  z-index: 2;
   transition: background 0.3s, opacity 0.3s, box-shadow 0.3s;
   width: 100%;
   /*border-bottom: 1px solid #ddd;*/
