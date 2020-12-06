@@ -284,7 +284,12 @@ export default {
       this.page = 1;
     },
     goSearch () {
-      this.$router.push('search/?q=' + this.search)
+      this.$router.push({
+        path: '/search',
+        query: {
+          q: this.search
+        }
+      })
     },
     // 处理设置用户信息的返回值
     handleSetUserInfo: function (ret, callback) {
