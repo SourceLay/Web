@@ -1,6 +1,6 @@
 <template>
 <div style="text-align: center">
-  <el-form label-position="right" label-width="80px" style="margin-left: 1em;">
+  <el-form label-position="right" label-width="80px" style="margin-left: 2em;">
     <el-form-item label="文件名">
       <span>:</span>
       <span class="rightText">{{fileInfo.attributes.name}}</span>
