@@ -14,8 +14,37 @@ function globalNotify(that, msg, type, duration, title) {
     });
 }
 
-function globalErrorNotify(that, data, duration) {
-    globalNotify(that, data.errors[0].detail[0], 'error', duration, '错误');
+function translateError(code) {
+    // TODO 将 code 翻译成人能看的字符串
+    return code;
+}
+
+function globalErrorNotify(that, err, duration = 4500) {
+    if (typeof(err) === "string") {
+        globalNotify(that, err, 'error', duration, '错误');
+    }
+
+    if (!err.response) {
+        console.log(err)
+    }
+    
+    let data = err.response.data;
+    console.log(data);
+    if (!data.errors) {
+        globalNotify(that, '发生了未知错误。', 'error', duration, '错误');
+    }
+
+    let errors = data.errors;
+    for (let error of errors) {
+        if (error.detail) {
+            for (let detail of error.detail) {
+                globalNotify(that, detail, 'error', duration, '错误');
+            }
+        } else {
+            let detail = translateError(error.code);
+            globalNotify(that, detail, 'error', duration, '错误');
+        }
+    }    
 }
 
 export {globalNotify, globalErrorNotify}

@@ -293,7 +293,7 @@ export default {
       //   email: ''
       // },
       console.log(ret);
-      var that = this;
+
       let data = {};
       if (ret.oldPassword !== '') data.password = ret.oldPassword;
       if (ret.newPassword !== '') data.newPassword = ret.newPassword;
@@ -320,6 +320,8 @@ export default {
           data.pay_password_token = response.data.data.attributes.sessionId;
           this.updateProfile(data, callback);
         }).catch((err) => {
+          globalErrorNotify(this, err);
+
           if (err.response) {
             console.log(err.response)
           }
@@ -354,9 +356,7 @@ export default {
         callback(response.data)
 
       }).catch((err) => {
-          if (err.response) {
-            console.log(err.response)
-          }
+          globalErrorNotify(this, err);
       })
     }
   }
