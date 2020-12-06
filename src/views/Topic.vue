@@ -208,6 +208,7 @@ export default {
   name: 'forum',
   data: function() {
     return {
+      threadId: 0,
       sharePasswordVisible: false, //分享密码框是否可见
       sharePassword: '', //分享密码
       payVisible: false,  //支付框是否可见
@@ -287,6 +288,7 @@ export default {
         })
       ).then((post) => {
         next((vm) => {
+          vm.threadId = to.params.id;
           vm.getData(topic.data, post.data, page, floor)
         })
       })
@@ -676,6 +678,7 @@ export default {
                   attributes: {
                     type: "17", // 购买文件的类型
                     share_id: this.processingShareInfo.attributes.id,
+                    thread_id: this.threadId,
                   }
                 }
               }
@@ -696,7 +699,7 @@ export default {
     attemptRequireDownloadUrl(shareInfo, fileInfo) {
       axios.get(
         dzq({
-          name: 'fileshare/' + shareInfo.attributes.id
+          name: 'sourcelay/fileshare/' + shareInfo.attributes.id
         })
       ).then((res) => {
         if (res.data.data.attributes.downloadUrl) {
