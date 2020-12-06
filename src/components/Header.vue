@@ -3,7 +3,9 @@
     <div class="content">
       <div class="search">
         <i class="iconfont icon-sousuo"></i>
-        <input placeholder="搜索" type="text">
+        <form>
+          <input placeholder="搜索" type="text" autocomplete="false">
+        </form>
       </div>
       <div class="menu">
         <ul>

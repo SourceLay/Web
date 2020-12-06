@@ -199,6 +199,7 @@ import { getPostTitle, getPostTag, getTime, dzq } from '@/public'
 import IncludedHelper from '../helpers/includedHelper'
 import Pay from "@/components/Pay";
 import {globalErrorNotify} from "@/helpers/globalNotify";
+import store from '../store/index'
 
 export default {
   name: 'forum',
@@ -657,11 +658,15 @@ export default {
 
         //付费下载
         if (shareInfo.attributes.shared_type === 2 && shareInfo.attributes.paid === false) {
-          this.processingShareInfo = shareInfo;
-          this.processingFileInfo = fileInfo;
+          if (store.state.userInfo.hasPayPassword === true) {
+            this.processingShareInfo = shareInfo;
+            this.processingFileInfo = fileInfo;
 
-          this.payPassword = '';//清空上次输入
-          this.payVisible = true;
+            this.payPassword = '';//清空上次输入
+            this.payVisible = true;
+          } else {
+            globalErrorNotify(this, "您尚未设置支付密码。");
+          }
         }
       }
     },
@@ -691,7 +696,7 @@ export default {
         }), {
         data: {
           id: this.processingShareInfo.id,
-          type: "posts",
+          type: "sourcelay-fileshare",
           attributes: {
             id: this.processingShareInfo.attributes.id,
             password: this.sharePassword,

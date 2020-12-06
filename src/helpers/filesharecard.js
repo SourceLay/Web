@@ -48,9 +48,9 @@ function render(fileInfo, shareInfo, share_id) {
     ret += '</div>';
 
     if (shareInfo.attributes.shared_type === 2 && shareInfo.attributes.paid === false) {
-        ret += '<div class="xbbcode-flieshare-block-protected">' + '购买后下载文件' + '</div>'; 
+        ret += '<div class="xbbcode-flieshare-block-protected">' + '付费分享' + '</div>'; 
     } else if (shareInfo.attributes.shared_type === 2 && shareInfo.attributes.paid === true) {
-        ret += '<div class="xbbcode-flieshare-block-protected">' + '已购买可下载文件' + '</div>'; 
+        ret += '<div class="xbbcode-flieshare-block-protected">' + '[可下载] 付费分享' + '</div>'; 
     } else if (shareInfo.attributes.shared_type === 1 && shareInfo.attributes.paid === false) {
         ret += '<div class="xbbcode-flieshare-block-protected">' + '密码保护分享' + '</div>';
     } else if (shareInfo.attributes.shared_type === 1 && shareInfo.attributes.paid === true) {
