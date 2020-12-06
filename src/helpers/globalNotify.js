@@ -49,4 +49,8 @@ function globalErrorNotify(that, err, duration = 4500) {
     }    
 }
 
-export {globalNotify, globalErrorNotify}
+function globalSuccessNotify(that, content, duration = 4500) {
+    globalNotify(that, content, 'info', duration, '提示');
+}
+
+export {globalNotify, globalSuccessNotify, globalErrorNotify}

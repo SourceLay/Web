@@ -102,7 +102,7 @@ import IncludedHelper from '../helpers/includedHelper'
 import SetUserInfo from "@/components/SetUserInfo";
 import { dzq } from '@/public'
 import store from '../store/index'
-import {globalErrorNotify} from "@/helpers/globalNotify";
+import {globalSuccessNotify, globalErrorNotify} from "@/helpers/globalNotify";
 
 export default {
   name: 'header',
@@ -299,11 +299,16 @@ export default {
       let data = {};
       if (ret.oldPassword !== '') data.password = ret.oldPassword;
       if (ret.newPassword !== '') data.newPassword = ret.newPassword;
-      if (ret.confirmPassword !== '') data.password_confirmation = ret.confirmNewPassword;
+      if (ret.confirmNewPassword !== '') data.password_confirmation = ret.confirmNewPassword;
       if (ret.email !== this.userInfo.email) data.email = ret.email;
 
       if (ret.payPassword !== '') data.payPassword = ret.payPassword;
       if (ret.confirmPayPassword !== '') data.pay_password_confirmation = ret.confirmPayPassword;
+
+      if (Object.keys(data).length === 0) {
+        globalErrorNotify(this, "表单不得为空。");
+        return;
+      }
 
       if (this.userInfo.hasPayPassword && ret.oldPayPassword !== '') {
         this.axios.post(
@@ -356,7 +361,7 @@ export default {
         })
 
         callback(response.data)
-
+        globalSuccessNotify(this, "修改成功");
       }).catch((err) => {
           globalErrorNotify(this, err);
       })
