@@ -43,6 +43,8 @@
 
         <div id="top"/>
         <h1 id="title">文件分享大厅</h1>
+        <el-button v-if="!isSelf" @click="GetSelfFile()">查看个人文件</el-button>
+        <el-button v-if="isSelf" @click="GetSelfFile()">查看全部文件</el-button>
         <div id="stream">
             <div @click="popDetail(card)" class="fileCard" v-for="card in cards" :key="card.id">
                 <svg t="1606829000232" class="icon" viewBox="0 0 1185 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="16670" width="48" height="48"><path d="M107.789474 0h319.218526A129.347368 129.347368 0 0 1 529.246316 50.176L840.757895 452.715789H0V107.789474a107.789474 107.789474 0 0 1 107.789474-107.789474z" fill="#EB9B00" p-id="16671"></path><path d="M138.186105 183.242105h909.312c48.074105 0 65.482105 5.012211 82.997895 14.389895 17.623579 9.377684 31.420632 23.174737 40.798316 40.744421 9.377684 17.569684 14.389895 35.031579 14.389895 82.997895v564.439579c0 48.074105-5.012211 65.482105-14.389895 82.997894-9.377684 17.623579-23.174737 31.420632-40.744421 40.798316-17.569684 9.377684-35.031579 14.389895-82.997895 14.389895H138.132211c-48.074105 0-65.482105-5.012211-82.997895-14.389895a97.926737 97.926737 0 0 1-40.798316-40.744421C5.012211 951.242105 0 933.834105 0 885.867789V321.374316c0-48.074105 5.012211-65.482105 14.389895-82.997895 9.377684-17.623579 23.174737-31.420632 40.744421-40.798316 17.569684-9.377684 35.031579-14.389895 82.997895-14.389894z" fill="#F8B700" p-id="16672"></path></svg>
@@ -72,68 +74,99 @@ import IncludedHelper from '../helpers/includedHelper'
 import {globalErrorNotify} from "@/helpers/globalNotify";
 export default {
   created() {
-    axios.get(
-        dzq({
-            name: 'sourcelay/fileshare',
-            include: [
-                'file', 'posts', 'threads', 'user'
-            ]
-        })
-    ).then(
-        response => {
-            console.log('response')
-            console.log(response);
-
-            let includedInfo = new IncludedHelper(response.data.included);
-            console.log('includedInfo')
-            console.log(includedInfo)
-
-            this.cards = [];
-            response.data.data.forEach(fileShare => {
-                let fileInfo = includedInfo.get('sourcelay-file.' + fileShare.attributes.file_id)
-                console.log('fileShare')
-                console.log(fileShare); // 这里拿出了分享信息
-                console.log('fileInfo')
-                console.log(fileInfo);  // 这里拿出了文件信息
-
-                let threadsList = [];
-                fileShare.relationships.threads.data.forEach(threadIndex => {
-                    threadsList.push(
-                        includedInfo.get('threads.' + threadIndex.id)
-                    )
-                })
-                console.log('threadsList')
-                console.log(threadsList);  // 这里列出了这个分享的所有的帖子信息
-
-                let postsList = [];
-                fileShare.relationships.posts.data.forEach(threadIndex => {
-                    postsList.push(
-                        includedInfo.get('posts.' + threadIndex.id)
-                    )
-                })
-                console.log('postList')
-                console.log(postsList);  // 这里列出了这个分享的所有的帖子信息
-
-                this.cards.push({
-                    id: fileShare.attributes.id,
-                    type: fileInfo.attributes.type,
-                    filename: fileInfo.attributes.name,
-                    downloadLink: fileShare.attributes.downloadUrl ?? '',
-                    isLiked: fileShare.attributes.isLiked ?? false,
-                    likedCount: fileInfo.attributes.likedCount ?? 0,
-                    Passge:[
-                        {link:"",title:"轩轩轩轩轩"},
-                        {link:"",title:"练练练练练"},
-                        {link:"",title:"源源源源源"}
-                    ]
-                })
-
-            })
-
-        }
-    )
+    // this.GetSelfFile();
+    this.GetAllFile();
   },
   methods:{
+        // 将card相关response转成card数据
+        handleResponseCard(response) {
+          //TODO post和included
+          console.log('response')
+          console.log(response);
+
+          let includedInfo = new IncludedHelper(response.data.included);
+          console.log('includedInfo')
+          console.log(includedInfo)
+
+          this.cards = [];
+          response.data.data.forEach(fileShare => {
+            let fileInfo = includedInfo.get('sourcelay-file.' + fileShare.attributes.file_id)
+            console.log('fileShare')
+            console.log(fileShare); // 这里拿出了分享信息
+            console.log('fileInfo')
+            console.log(fileInfo);  // 这里拿出了文件信息
+
+            let threadsList = [];
+            fileShare.relationships.threads.data.forEach(threadIndex => {
+              threadsList.push(
+                  includedInfo.get('threads.' + threadIndex.id)
+              )
+            })
+            console.log('threadsList')
+            console.log(threadsList);  // 这里列出了这个分享的所有的帖子信息
+
+            let postsList = [];
+            fileShare.relationships.posts.data.forEach(threadIndex => {
+              postsList.push(
+                  includedInfo.get('posts.' + threadIndex.id)
+              )
+            })
+            console.log('postList')
+            console.log(postsList);  // 这里列出了这个分享的所有的帖子信息
+
+            this.cards.push({
+              id: fileShare.attributes.id,
+              type: fileInfo.attributes.type,
+              filename: fileInfo.attributes.name,
+              downloadLink: fileShare.attributes.downloadUrl ?? '',
+              isLiked: fileShare.attributes.isLiked ?? false,
+              likedCount: fileInfo.attributes.likedCount ?? 0,
+              Passge:[
+                {link:"",title:"轩轩轩轩轩"},
+                {link:"",title:"练练练练练"},
+                {link:"",title:"源源源源源"}
+              ]
+            })
+
+          })
+
+        },
+        // 获取属于自己的文件
+        GetSelfFile: function () {
+          var that = this;
+          if (!that.isSelf) {
+            this.cards = [];
+            axios.get(
+                dzq({
+                  name: 'sourcelay/fileshare',
+                  include: [
+                    'file', 'posts', 'threads', 'user'
+                  ],
+                  filter: {
+                    self: true,
+                  }
+                })
+            ).then(response => that.handleResponseCard(response));
+          } else {
+            that.GetAllFile();
+          }
+          that.isSelf = !that.isSelf;
+        },
+        // 获取所有文件
+        GetAllFile: function () {
+          var that = this;
+          this.cards = [];
+          axios.get(
+              dzq({
+                name: 'sourcelay/fileshare',
+                include: [
+                  'file', 'posts', 'threads', 'user'
+                ]
+              })
+          ).then(
+              response => that.handleResponseCard(response)
+          )
+        },
         downloadFile:function (detail) {
             axios.get(detail.downloadLink, { responseType: 'blob' })
                 .then(response => {
@@ -199,6 +232,7 @@ export default {
     },
     data(){
         return{
+            isSelf: false,
             showDetail:false,
             fadeInStyle:{
                 background: 'rgba(0, 0, 0, 0.4)'
