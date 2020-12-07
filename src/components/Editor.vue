@@ -112,9 +112,7 @@ export default {
         {
           name: 'mokuai',
           optionType: 'list',
-          action: 'mod',
-          option: ['音乐', '视频'],
-          actionValue: ['music', 'video']
+          action: 'fileshare'
         },
       ],
       preview: '',
@@ -169,11 +167,18 @@ export default {
         bbcodeL = '[' + action + ']'
       }else if(typeof actionValue != 'undefined'){
         console.log('选择了带属性项目' + action + '属性为' + actionValue)
+
         if(action === 'img' && actionValue === 'local'){
           this.$refs.load_pic.files = null
           this.$refs.load_pic.click()
           return
         }
+
+        if (action === 'fileshare') {
+          // 弹窗
+          return
+        }
+
         bbcodeL = '[' + action + '=' + actionValue + ']'
       }else{
         return
