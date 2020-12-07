@@ -1,8 +1,8 @@
 <template>
   <ul class="posts">
     <h2 class="part-title">{{title}}</h2>
-    <post v-for="post in posts" :post="post" :key="post.id" :included="included"/>
     <slot></slot>
+    <post v-for="post in posts" :post="post" :key="post.id" :included="included"/>
     <img v-if="posts === 0" class="empty" src="@/assets/empty.png" alt="">
   </ul>
 </template>
@@ -46,5 +46,13 @@ export default {
   width: 15em;
   opacity: 0.5;
   margin: 0 auto;
+}
+.post-btn{
+  background: var(--main-color);
+  color: #fff;
+  float: right;
+}
+.post-btn:hover{
+  background: var(--main-color-active);
 }
 </style>
