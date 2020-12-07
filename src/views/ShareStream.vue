@@ -47,7 +47,7 @@
 
         <div id="top"/>
         <h1 id="title">文件分享大厅
-          <el-checkbox v-model="isSelf" @click="GetSelfFile" size="medium" style="margin-left: 1em;">只显示个人文件</el-checkbox>
+          <el-checkbox v-model="isSelf" @click="GetSelfFile" size="medium" style="margin-left: 1em; z-index: 0;">只显示个人文件</el-checkbox>
         </h1>
         <div id="stream">
             <div @click="popDetail(card)" class="fileCard" v-for="card in cards" :key="card.id">
