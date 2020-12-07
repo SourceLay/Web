@@ -159,7 +159,7 @@ var XBBCODE = (function() {
               url = "";
             }
 
-            return '<img alt="' + alt + '" src="' + url + '" />';
+            return '<img class="xbbcode-img" alt="' + alt + '" src="' + url + '" />';
         },
         closeTag: function(params,content) {
             return '';
