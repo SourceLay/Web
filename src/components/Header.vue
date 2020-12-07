@@ -267,6 +267,11 @@ export default {
         }
       })
     }
+  },
+  watch: {
+    $route() {
+      this.search = ''
+    }
   }
 }
 </script>
