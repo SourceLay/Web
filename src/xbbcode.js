@@ -161,7 +161,7 @@ var XBBCODE = function() {
               url = "";
             }
 
-            return '<img alt="' + alt + '" src="' + url + '" />';
+            return '<img class="xbbcode-img" alt="' + alt + '" src="' + url + '" />';
         },
         closeTag: function(params,content) {
             return '';
@@ -412,15 +412,6 @@ var XBBCODE = function() {
               return '</ol>';
           },
           restrictChildrenTo: ["*", "li"]
-      },
-      "php": {
-          openTag: function(params,content) {
-              return '<span class="xbbcode-code">';
-          },
-          closeTag: function(params,content) {
-              return '</span>';
-          },
-          noParse: true
       },
       "quote": {
           openTag: function(params,content) {
