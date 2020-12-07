@@ -32,10 +32,7 @@
                     </div>
                 </div>
                 <div id="pop-passages">
-                    <div id="pop-passages-item" v-for="item in detail.Passge" :key="item.id">
-                        {{item.title}}
-                    </div>
-                    <post></post>
+                    <post v-for="post in detail.Passge"  :post="post" :key="post.id" :included="included"></post>
                 </div>
             </div>
             <div v-on:click="showDetail=false" id="pop-close">
@@ -76,6 +73,8 @@ import axios from "axios";
 import {dzq} from "@/public";
 import IncludedHelper from '../helpers/includedHelper'
 import {globalErrorNotify} from "@/helpers/globalNotify";
+import post from '@/components/Forum/post.vue'
+
 export default {
   created() {
     // this.GetSelfFile();
@@ -136,14 +135,21 @@ export default {
             console.log('threadsList')
             console.log(threadsList);  // 这里列出了这个分享的所有的帖子信息
 
-            let postsList = [];
-            fileShare.relationships.posts.data.forEach(threadIndex => {
-              postsList.push(
-                  includedInfo.get('posts.' + threadIndex.id)
-              )
+            // let postsList = [];
+            // fileShare.relationships.posts.data.forEach(threadIndex => {
+            //   postsList.push(
+            //       includedInfo.get('posts.' + threadIndex.id)
+            //   )
+            // })
+            // console.log('postList')
+            // console.log(postsList);  // 这里列出了这个分享的所有的帖子信息
+
+            let passge = [];
+            threadsList.forEach((s) => {
+                passge.push(s);
             })
-            console.log('postList')
-            console.log(postsList);  // 这里列出了这个分享的所有的帖子信息
+
+            this.included = includedInfo.data;
 
             this.cards.push({
               id: fileShare.attributes.id,
@@ -152,11 +158,7 @@ export default {
               downloadLink: fileShare.attributes.downloadUrl ?? '',
               isLiked: fileInfo.attributes.is_liked ?? false,
               likedCount: fileInfo.attributes.likedCount ?? 0,
-              Passge:[
-                {link:"",title:"轩轩轩轩轩"},
-                {link:"",title:"练练练练练"},
-                {link:"",title:"源源源源源"}
-              ]
+              Passge: passge,
             })
 
           })
@@ -170,7 +172,7 @@ export default {
                 dzq({
                   name: 'sourcelay/fileshare',
                   include: [
-                    'file', 'posts', 'threads', 'user'
+                    'file', 'threads', 'user', 'threads.user', 'threads.firstPost', 'threads.lastPostedUser', 'threads.user.groups'
                   ],
                   filter: {
                     self: true,
@@ -186,7 +188,7 @@ export default {
               dzq({
                 name: 'sourcelay/fileshare',
                 include: [
-                  'file', 'posts', 'threads', 'user'
+                  'file', 'threads', 'user', 'threads.user', 'threads.firstPost', 'threads.lastPostedUser', 'threads.user.groups'
                 ]
               })
           ).then(
@@ -264,126 +266,12 @@ export default {
                 background: 'rgba(0, 0, 0, 0.4)'
             },
             detail:{},
-            cards:[
-                {id:0,type:"rar",filename:"hyt搞黄色",downloadLink:"",isLiked:true,likedCount:114514,
-                    Passge:[
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"}
-                    ]
-                },
-                {id:1,type:"rar",filename:"hyt搞黄色",downloadLink:"",isLiked:false,likedCount:114514,
-                    Passge:[
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"}
-                    ]
-                },
-                {id:2,type:"rar",filename:"hyt搞黄色",downloadLink:"",isLiked:false,likedCount:114514,
-                    Passge:[
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"}
-                    ]
-                },
-                {id:3,type:"rar",filename:"hyt搞黄色asdfsdafasdfasd发射点发射点发手动阀手动阀",downloadLink:"",isLiked:false,likedCount:114514,
-                    Passge:[
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"}
-                    ]
-                },
-                {id:4,type:"rar",filename:"hyt搞黄色",downloadLink:"",isLiked:false,likedCount:114514,
-                    Passge:[
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"}
-                    ]
-                },
-                {id:5,type:"rar",filename:"hyt搞黄色",downloadLink:"",isLiked:false,likedCount:114514,
-                    Passge:[
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"}
-                    ]
-                },
-                {id:6,type:"rar",filename:"hyt搞黄色",downloadLink:"",isLiked:false,likedCount:114514,
-                    Passge:[
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"}
-                    ]
-                },
-                {id:7,type:"rar",filename:"hyt搞黄色",downloadLink:"",isLiked:false,likedCount:114514,
-                    Passge:[
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"}
-                    ]
-                },
-                {id:8,type:"rar",filename:"hyt搞黄色",downloadLink:"",isLiked:false,likedCount:114514,
-                    Passge:[
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"}
-                    ]
-                },
-                {id:9,type:"rar",filename:"hyt搞黄色",downloadLink:"",isLiked:false,likedCount:114514,
-                    Passge:[
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"}
-                    ]
-                },
-                {id:10,type:"rar",filename:"hyt搞黄色",downloadLink:"",isLiked:false,likedCount:114514,
-                    Passge:[
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"}
-                    ]
-                },
-                {id:11,type:"rar",filename:"hyt搞黄色",downloadLink:"",isLiked:false,likedCount:114514,
-                    Passge:[
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"}
-                    ]
-                },
-                {id:12,type:"rar",filename:"hyt搞黄色",downloadLink:"",isLiked:false,likedCount:114514,
-                    Passge:[
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"},
-                        {link:"",title:"hyt干好事，加冰现场说法"},
-                        {link:"",title:"震惊，hyt干好事视频泄露"}
-                    ]
-                }
-            ]
+            cards:[],
+            included: [],
         }
+    },
+    components: {
+        post
     }
 }
 </script>
