@@ -411,15 +411,6 @@ var XBBCODE = (function() {
           },
           restrictChildrenTo: ["*", "li"]
       },
-      "php": {
-          openTag: function(params,content) {
-              return '<span class="xbbcode-code">';
-          },
-          closeTag: function(params,content) {
-              return '</span>';
-          },
-          noParse: true
-      },
       "quote": {
           openTag: function(params,content) {
               return '<blockquote class="xbbcode-blockquote">';
