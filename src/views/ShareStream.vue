@@ -150,7 +150,7 @@ export default {
               type: fileInfo.attributes.type,
               filename: fileInfo.attributes.name,
               downloadLink: fileShare.attributes.downloadUrl ?? '',
-              isLiked: fileShare.attributes.isLiked ?? false,
+              isLiked: fileInfo.attributes.is_liked ?? false,
               likedCount: fileInfo.attributes.likedCount ?? 0,
               Passge:[
                 {link:"",title:"轩轩轩轩轩"},
