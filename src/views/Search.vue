@@ -47,6 +47,8 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
+    document.title = "搜索";
+
     let user
     let post
     let search = to.query.q
