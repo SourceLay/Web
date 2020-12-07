@@ -44,15 +44,15 @@ const routes = [
     component: Search
   },
   {
-    path:'/files/:path*',
-    name:'Files',
-    component:Files
+    path: '/files/:path*',
+    name: 'Files',
+    component: Files
   },
   {
-    path:'/stream',
-    name:'ShareStream',
-    component:ShareStream
-  }
+    path: '/stream',
+    name: 'ShareStream',
+    component: ShareStream
+  },
 ]
 
 const router = new VueRouter({

@@ -50,6 +50,23 @@ export default {
     let user
     let post
     let search = to.query.q
+
+    let regexp = new RegExp(/tag:[^\s]+/g);
+    let topics = '';
+    let matches = search.matchAll(regexp)
+    if (matches) {
+      for (let match of matches) {
+        console.log(match);
+        topics = match[0].substr(4);
+        break; // 指吃一个
+      }
+    }
+    let searchStr = search.replace(regexp, ''); // 吃所有
+    searchStr = searchStr.trim();
+
+    console.log(topics);
+    console.log(searchStr);
+
     axios.get(
       dzq({
         name: 'users',
@@ -60,21 +77,25 @@ export default {
         },
         filter: {
           status: 'normal',
-          username: `*${search}*`
+          username: `*${searchStr}*`
         }
       })
     ).then(response => {
       user = response.data
+      let filter = {
+            isApproved: 1,
+            isDeleted: 'no',
+            categoryId: 0,
+            q: searchStr
+          };
+      if (topics !== '') {
+        filter.topicId = topics;
+      }
       axios.get(
         dzq({
           name: 'threads',
           include: ['user', 'user.groups', 'firstPost', 'lastPostedUser'],
-          filter: {
-            isApproved: 1,
-            isDeleted: 'no',
-            categoryId: 0,
-            q: search
-          },
+          filter: filter,
           page: {
             number: 1,
             limit: 10
@@ -85,13 +106,34 @@ export default {
         next(vm => {
           vm.getSearch(user, post, search)
         })
-      })
+      }).catch(() => {
+        next(vm => {
+            vm.getSearch(user, post, search)
+          })
+      });
     })
   },
   beforeRouteUpdate(to, from, next){
     let user
     let post
     let search = to.query.q
+
+    let regexp = new RegExp(/tag:[^\s]+/g);
+    let topics = '';
+    let matches = search.matchAll(regexp)
+    if (matches) {
+      for (let match of matches) {
+        console.log(match);
+        topics = match[0].substr(4);
+        break; // 指吃一个
+      }
+    }
+    let searchStr = search.replace(regexp, ''); // 吃所有
+    searchStr = searchStr.trim();
+
+    console.log(topics);
+    console.log(searchStr);
+
     axios.get(
       dzq({
         name: 'users',
@@ -102,21 +144,25 @@ export default {
         },
         filter: {
           status: 'normal',
-          username: `*${search}*`
+          username: `*${searchStr}*`
         }
       })
     ).then(response => {
       user = response.data
+      let filter = {
+            isApproved: 1,
+            isDeleted: 'no',
+            categoryId: 0,
+            q: searchStr
+          };
+      if (topics !== '') {
+        filter.topicId = topics;
+      }
       axios.get(
         dzq({
           name: 'threads',
           include: ['user', 'user.groups', 'firstPost', 'lastPostedUser'],
-          filter: {
-            isApproved: 1,
-            isDeleted: 'no',
-            categoryId: 0,
-            q: search
-          },
+          filter: filter,
           page: {
             number: 1,
             limit: 10
@@ -124,6 +170,9 @@ export default {
         })
       ).then(response => {
         post = response.data
+        this.getSearch(user, post, search)
+        next()
+      }).error(() => {
         this.getSearch(user, post, search)
         next()
       })
