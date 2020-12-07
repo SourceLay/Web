@@ -193,6 +193,7 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     next((vm) => {
+      document.title = "首页";
       vm.homePageRecommended();
     })
   },

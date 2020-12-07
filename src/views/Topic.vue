@@ -267,6 +267,8 @@ export default {
           )
           console.log(vm.category);
           vm.getData(topic.data, post.data, page, floor)
+
+          document.title = topic.data.data.attributes.title;
         })
       })
     })

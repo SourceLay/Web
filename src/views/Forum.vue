@@ -143,6 +143,7 @@ export default {
           vm.getPost(top, post, page);
           vm.id = to.params.id;
           vm.getBoardName();
+          document.title = "板块详情 - " + vm.boardName[vm.boardName.length - 1].name;
         })
       })
     })
