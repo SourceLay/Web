@@ -2,7 +2,8 @@
 <div v-if="topic" class="para-content">
   <!-- 头部 -->
   <div :class="['banner', loadPage[0] === 1 ? '' : 'hide']">
-    <img src="../assets/mc.jpg" alt="">
+    <img v-if="category.attributes.banner === ''" src="../assets/mc.jpg" alt="">
+    <img v-if="category.attributes.banner !== ''" :src="category.attributes.banner" alt="">
     <div v-once :class="['banner-cover','tag', getPostTag(topic.relationships.user.data.id, topic.attributes.title, topic.attributes.isEssence)]"></div>
     <!-- 帖子信息 -->
     <div class="intro">
@@ -208,6 +209,11 @@ export default {
   name: 'forum',
   data: function() {
     return {
+      category: {
+        attributes: {
+          banner: ''
+        }
+      },
       threadId: 0,
       sharePasswordVisible: false, //分享密码框是否可见
       sharePassword: '', //分享密码
@@ -288,6 +294,11 @@ export default {
         })
       ).then((post) => {
         next((vm) => {
+          
+          let included = new IncludedHelper(topic.data.included);
+          vm.category = included.get(
+            'categories.' + topic.data.data.relationships.category.data.id
+          )
           vm.threadId = to.params.id;
           vm.getData(topic.data, post.data, page, floor)
         })
