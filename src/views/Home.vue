@@ -549,6 +549,7 @@ export default {
   transition: background 0.3s;
   cursor: pointer;
   margin-right: 0.6em;
+  margin-top: 0.6em;
 }
 .board a{
   width: 100%;
