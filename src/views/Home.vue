@@ -95,12 +95,12 @@
     <ul>
       <li @click="setUserInfoVisible=true">隐私和Cookies</li>
       <li @click="payVisible=true">使用条款</li>
-      <li @click="testNotify">关于我们</li>
+      <li @click="shareInfoVisible=true">关于我们</li>
       <li @click="shareListVisible=true">© 2019 派瑞派对</li>
     </ul>
   </div>
-  <el-dialog width="80%" title="分享列表" :visible="shareListVisible" @close="shareListVisible=false">
-    <ShareFileList></ShareFileList>
+  <el-dialog width="60%" title="分享文件" :visible="shareInfoVisible" @close="shareInfoVisible=false">
+    <ShareInfo @handleShareInfoReturn="handleShareInfoReturn"></ShareInfo>
   </el-dialog>
 </div>
 </template>
@@ -111,14 +111,15 @@ import SetUserInfo from "@/components/SetUserInfo";
 import axios from 'axios'
 import { dzq } from '@/public'
 import IncludedHelper from '../helpers/includedHelper'
-import ShareFileList from "@/components/ShareFileList";
 import globalNotify from "@/helpers/globalNotify";
+import ShareInfo from "@/components/ShareInfo";
 
 export default {
   name: 'Home',
-  components: {ShareFileList, SetUserInfo},
+  components: {ShareInfo, SetUserInfo},
   data() {
     return {
+      shareInfoVisible:false,
       shareListVisible: false,
       setUserInfoVisible:false,
       payVisible: false,
@@ -208,6 +209,11 @@ export default {
     })
   },
   methods: {
+    // 处理确认分享文件后的返回值
+    handleShareInfoReturn(selections) {
+      this.shareInfoVisible = false;
+      console.log(selections);
+    },
     testNotify() {
       // this.$notify({
       //   title: '提示',
