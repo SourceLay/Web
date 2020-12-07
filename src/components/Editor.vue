@@ -70,7 +70,7 @@ export default {
   ],
   data: function() {
     return {
-      shareInfoVisible: true, // 分享弹窗可见
+      shareInfoVisible: false, // 分享弹窗可见
       shareInfoReset: false, // 刷新分享弹窗
       inTopic: 0,
       title: '',
@@ -131,6 +131,8 @@ export default {
       sendLoad: 0,
       isError: 0,
       error: '',
+      XBBCodeParser: XBBCODE(),
+      included: [],
     }
   },
   computed: {
@@ -145,6 +147,11 @@ export default {
     // 处理分享弹窗的回调函数
     handleShareInfoReturn: function (selections) {
       console.log(selections);
+      selections.forEach(s => {
+        this.insertBBCodeSegment(`[fileshare]${s.shareInfo.id}[/fileshare]`)
+        this.included[`sourcelay-fileshare.${s.shareInfo.id}`] = s.shareInfo;
+        this.included[`sourcelay-file.${s.fileInfo.id}`] = s.fileInfo;
+      });
       this.shareInfoVisible = false;
     },
     closeEditor: function() {
@@ -166,7 +173,8 @@ export default {
       this.toolIndex = -1
     },
     showPreview: function() {
-      let parser = XBBCODE();
+      let parser = this.XBBCodeParser;
+      parser.setIncluded(this.included);
       this.preview = parser.process({
         text: this.content,
         removeMisalignedTags: false,
@@ -190,20 +198,21 @@ export default {
           this.$refs.load_pic.click()
           return
         }
-
-        if (action === 'fileshare') {
+        bbcodeL = '[' + action + '=' + actionValue + ']'
+      }else if (action === 'fileshare') {
           // 弹窗
           this.shareInfoReset = !this.shareInfoReset; // 重置弹窗
           this.shareInfoVisible = true;
           return
-        }
-
-        bbcodeL = '[' + action + '=' + actionValue + ']'
       }else{
         return
       }
       bbcodeR = '[/' + action + ']'
 
+      this.insertBBCodeSegment(bbcodeL, bbcodeR);
+
+    },
+    insertBBCodeSegment(bbcodeL, bbcodeR = '') {
       var content = this.$refs.content
       if(content.selectionStart === content.selectionEnd){
         var oldSelection = content.selectionStart
@@ -221,7 +230,6 @@ export default {
           content.setSelectionRange(oldSelectionStart, oldSelectionEnd + bbcodeL.length + bbcodeR.length)
         })
       }
-
     },
     send() {
       this.sendLoad = 1

@@ -157,7 +157,7 @@ export default {
               filename: fileInfo.attributes.name,
               downloadLink: fileShare.attributes.downloadUrl ?? '',
               isLiked: fileInfo.attributes.is_liked ?? false,
-              likedCount: fileInfo.attributes.likedCount ?? 0,
+              likedCount: fileInfo.attributes.like_count ?? 0,
               Passge: passge,
             })
 
