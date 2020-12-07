@@ -26,6 +26,7 @@
                             <p>{{detail.likedCount}}</p>
                         </div>
                       <div v-if="isSelf" class="pop-button" @click="deleteFile(detail)">
+                        <svg t="1607323035300" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1812" width="200" height="200"><path d="M970.24 256h-301.44L592.64 160H431.36L355.2 256H53.76V192h270.72l76.16-96h222.72L699.52 192h270.72v64zM803.84 928H220.16L144 356.48l64-8.96 67.84 516.48h472.32l67.84-516.48 64 8.96-76.16 571.52z" fill="#2c2c2c" p-id="1813"></path><path d="M376.96 412.16h64v371.84h-64zM583.04 412.16h64v371.84h-64z" fill="#2c2c2c" p-id="1814"></path></svg>
                         <p>删除</p>
                       </div>
                     </div>
@@ -45,9 +46,9 @@
 
 
         <div id="top"/>
-        <h1 id="title">文件分享大厅</h1>
-        <el-button v-if="!isSelf" @click="GetSelfFile()">查看个人文件</el-button>
-        <el-button v-if="isSelf" @click="GetSelfFile()">查看全部文件</el-button>
+        <h1 id="title">文件分享大厅
+          <el-checkbox v-model="isSelf" @click="GetSelfFile" size="medium" style="margin-left: 1em;">只显示个人文件</el-checkbox>
+        </h1>
         <div id="stream">
             <div @click="popDetail(card)" class="fileCard" v-for="card in cards" :key="card.id">
                 <svg t="1606829000232" class="icon" viewBox="0 0 1185 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="16670" width="48" height="48"><path d="M107.789474 0h319.218526A129.347368 129.347368 0 0 1 529.246316 50.176L840.757895 452.715789H0V107.789474a107.789474 107.789474 0 0 1 107.789474-107.789474z" fill="#EB9B00" p-id="16671"></path><path d="M138.186105 183.242105h909.312c48.074105 0 65.482105 5.012211 82.997895 14.389895 17.623579 9.377684 31.420632 23.174737 40.798316 40.744421 9.377684 17.569684 14.389895 35.031579 14.389895 82.997895v564.439579c0 48.074105-5.012211 65.482105-14.389895 82.997894-9.377684 17.623579-23.174737 31.420632-40.744421 40.798316-17.569684 9.377684-35.031579 14.389895-82.997895 14.389895H138.132211c-48.074105 0-65.482105-5.012211-82.997895-14.389895a97.926737 97.926737 0 0 1-40.798316-40.744421C5.012211 951.242105 0 933.834105 0 885.867789V321.374316c0-48.074105 5.012211-65.482105 14.389895-82.997895 9.377684-17.623579 23.174737-31.420632 40.744421-40.798316 17.569684-9.377684 35.031579-14.389895 82.997895-14.389894z" fill="#F8B700" p-id="16672"></path></svg>
@@ -79,6 +80,15 @@ export default {
   created() {
     // this.GetSelfFile();
     this.GetAllFile();
+  },
+  watch: {
+    isSelf(newVal) {
+      if (newVal) {
+        this.GetSelfFile();
+      } else {
+        this.GetAllFile();
+      }
+    }
   },
   methods:{
         deleteFile(detail) {
@@ -152,10 +162,9 @@ export default {
           })
 
         },
-        // 获取属于自己的文件
+        // 获取属于自己的文件或全部文件
         GetSelfFile: function () {
           var that = this;
-          if (!that.isSelf) {
             this.cards = [];
             axios.get(
                 dzq({
@@ -168,10 +177,6 @@ export default {
                   }
                 })
             ).then(response => that.handleResponseCard(response));
-          } else {
-            that.GetAllFile();
-          }
-          that.isSelf = !that.isSelf;
         },
         // 获取所有文件
         GetAllFile: function () {
