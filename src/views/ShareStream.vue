@@ -99,7 +99,7 @@ export default {
               })
           ).then(response => {
             console.log(response)
-          })
+          }).catch(err=>globalErrorNotify(this,err))
           // 更新界面
           for(let i = 0; i < this.cards.length; i++) {
             if (this.cards[i].id == detail.id) {
@@ -176,7 +176,7 @@ export default {
                     self: true,
                   }
                 })
-            ).then(response => that.handleResponseCard(response));
+            ).then(response => that.handleResponseCard(response)).catch(err=>globalErrorNotify(that,err))
         },
         // 获取所有文件
         GetAllFile: function () {
@@ -191,7 +191,7 @@ export default {
               })
           ).then(
               response => that.handleResponseCard(response)
-          )
+          ).catch(err=>globalErrorNotify(this,err))
         },
         downloadFile:function (detail) {
             axios.get(detail.downloadLink, { responseType: 'blob' })
