@@ -9,7 +9,7 @@
                     <svg t="1606829000232" class="icon" viewBox="0 0 1185 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="16670" width="48" height="48"><path d="M107.789474 0h319.218526A129.347368 129.347368 0 0 1 529.246316 50.176L840.757895 452.715789H0V107.789474a107.789474 107.789474 0 0 1 107.789474-107.789474z" fill="#EB9B00" p-id="16671"></path><path d="M138.186105 183.242105h909.312c48.074105 0 65.482105 5.012211 82.997895 14.389895 17.623579 9.377684 31.420632 23.174737 40.798316 40.744421 9.377684 17.569684 14.389895 35.031579 14.389895 82.997895v564.439579c0 48.074105-5.012211 65.482105-14.389895 82.997894-9.377684 17.623579-23.174737 31.420632-40.744421 40.798316-17.569684 9.377684-35.031579 14.389895-82.997895 14.389895H138.132211c-48.074105 0-65.482105-5.012211-82.997895-14.389895a97.926737 97.926737 0 0 1-40.798316-40.744421C5.012211 951.242105 0 933.834105 0 885.867789V321.374316c0-48.074105 5.012211-65.482105 14.389895-82.997895 9.377684-17.623579 23.174737-31.420632 40.744421-40.798316 17.569684-9.377684 35.031579-14.389895 82.997895-14.389894z" fill="#F8B700" p-id="16672"></path></svg>
                     <h1>{{detail.filename}}</h1>
                     <div id="pop-bottomBar">
-                        <div class="pop-button">
+                        <div class="pop-button" @click="downloadFile(detail)">
                             <svg t="1607153907088" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4181" width="200" height="200"><path d="M236.615854 752.86913h-0.484162A241.500139 241.500139 0 0 1 0.538332 527.733676a238.78883 238.78883 0 0 1 64.684079-180.011531 242.081134 242.081134 0 0 1 149.025146-74.367324 298.534454 298.534454 0 0 1 596.003751 25.951097V300.95207a221.262156 221.262156 0 0 1 213.031398 233.075715 222.714643 222.714643 0 0 1-221.262156 209.1581h-3.098639a27.500417 27.500417 0 0 1 0-54.904001h2.711309A167.520145 167.520145 0 0 0 968.378705 531.219644a166.261323 166.261323 0 0 0-166.16449-175.363573 151.058627 151.058627 0 0 0-18.204502 1.065157 27.500417 27.500417 0 0 1-30.211725-30.308558 240.822312 240.822312 0 0 0 1.549319-27.306752 243.727285 243.727285 0 0 0-487.357738 0 27.500417 27.500417 0 0 1-27.403584 27.500417 185.627813 185.627813 0 0 0-185.240484 197.538205A186.30564 186.30564 0 0 0 237.100016 697.965129a27.500417 27.500417 0 0 1-0.484162 54.904001z" p-id="4182"></path><path d="M513.266174 1021.869686a27.500417 27.500417 0 0 1-27.500417-27.403584v-484.162268a27.500417 27.500417 0 1 1 54.904001 0v484.162268a27.403584 27.403584 0 0 1-27.403584 27.403584z" p-id="4183"></path><path d="M513.266174 1024a27.500417 27.500417 0 0 1-19.366491-8.037094L342.260061 864.129619a27.500417 27.500417 0 1 1 38.732981-38.732981L513.266174 957.766602l130.530147-130.336483a27.500417 27.500417 0 0 1 38.732981 38.732982L532.632664 1015.962906a27.403584 27.403584 0 0 1-19.36649 8.037094z" p-id="4184"></path></svg>
                             <p>下载</p>
                         </div>
@@ -68,7 +68,7 @@
 import axios from "axios";
 import {dzq} from "@/public";
 import IncludedHelper from '../helpers/includedHelper'
-
+import {globalErrorNotify} from "@/helpers/globalNotify";
 export default {
   created() {
     axios.get(
@@ -80,15 +80,19 @@ export default {
         })
     ).then(
         response => {
+            console.log('response')
             console.log(response);
 
             let includedInfo = new IncludedHelper(response.data.included);
+            console.log('includedInfo')
             console.log(includedInfo)
 
             this.cards = [];
             response.data.data.forEach(fileShare => {
                 let fileInfo = includedInfo.get('sourcelay-file.' + fileShare.attributes.file_id)
+                console.log('fileShare')
                 console.log(fileShare); // 这里拿出了分享信息
+                console.log('fileInfo')
                 console.log(fileInfo);  // 这里拿出了文件信息
 
                 let threadsList = [];
@@ -97,6 +101,7 @@ export default {
                         includedInfo.get('threads.' + threadIndex.id)
                     )
                 })
+                console.log('threadsList')
                 console.log(threadsList);  // 这里列出了这个分享的所有的帖子信息
 
                 let postsList = [];
@@ -105,6 +110,7 @@ export default {
                         includedInfo.get('posts.' + threadIndex.id)
                     )
                 })
+                console.log('postList')
                 console.log(postsList);  // 这里列出了这个分享的所有的帖子信息
 
                 this.cards.push({
@@ -127,6 +133,19 @@ export default {
     )
   },
   methods:{
+        downloadFile:function (detail) {
+            axios.get(detail.downloadLink, { responseType: 'blob' })
+                .then(response => {
+                  const blob = new Blob([response.data], { type: detail.type ?? 'application/octet-stream' })
+                  const link = document.createElement('a')
+                  link.href = URL.createObjectURL(blob)
+                  link.download = detail.filename
+                  link.click()
+                  URL.revokeObjectURL(link.href)
+                }).catch((err) => {
+              globalErrorNotify(this, err);
+            });
+        },
         popDetail:function(item){
             this.detail=item;
             this.showDetail=true;
