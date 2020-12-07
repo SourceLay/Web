@@ -98,13 +98,6 @@ export default {
           option: ['删除线']
         },
         {
-          name: 'tupian',
-          optionType: 'list',
-          action: 'img',
-          option: ['网络图片', '本地上传'],
-          actionValue: ['net', 'local']
-        },
-        {
           name: 'lianjie',
           optionType: 'tip',
           action: 'url',

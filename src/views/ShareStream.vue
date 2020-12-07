@@ -67,29 +67,62 @@
 <script>
 import axios from "axios";
 import {dzq} from "@/public";
+import IncludedHelper from '../helpers/includedHelper'
 
 export default {
   created() {
-    axios.get(dzq({name: 'sourcelay/fileshare'})).then(
+    axios.get(
+        dzq({
+            name: 'sourcelay/fileshare',
+            include: [
+                'file', 'posts', 'threads', 'user'
+            ]
+        })
+    ).then(
         response => {
-          console.log(response);
-          this.cards = [];
-          response.data.data.forEach(file => {
-            this.cards.push(
-                {
-                  id: file.attributes.id,
-                  type: file.attributes.id.type,
-                  filename:"测试",
-                  downloadLink:"",
-                  isLiked:true,
-                  likedCount:114514,
-              Passge:[
-                {link:"",title:"轩轩轩轩轩"},
-                {link:"",title:"练练练练练"},
-                {link:"",title:"源源源源源"}
-              ]
+            console.log(response);
+
+            let includedInfo = new IncludedHelper(response.data.included);
+            console.log(includedInfo)
+
+            this.cards = [];
+            response.data.data.forEach(fileShare => {
+                let fileInfo = includedInfo.get('sourcelay-file.' + fileShare.attributes.file_id)
+                console.log(fileShare); // 这里拿出了分享信息
+                console.log(fileInfo);  // 这里拿出了文件信息
+
+                let threadsList = [];
+                fileShare.relationships.threads.data.forEach(threadIndex => {
+                    threadsList.push(
+                        includedInfo.get('threads.' + threadIndex.id)
+                    )
+                })
+                console.log(threadsList);  // 这里列出了这个分享的所有的帖子信息
+
+                let postsList = [];
+                fileShare.relationships.posts.data.forEach(threadIndex => {
+                    postsList.push(
+                        includedInfo.get('posts.' + threadIndex.id)
+                    )
+                })
+                console.log(postsList);  // 这里列出了这个分享的所有的帖子信息
+
+                this.cards.push({
+                    id: fileShare.attributes.id,
+                    type: fileInfo.attributes.type,
+                    filename: fileInfo.attributes.name,
+                    downloadLink: fileShare.attributes.downloadUrl ?? '',
+                    isLiked: fileShare.attributes.isLiked ?? false,
+                    likedCount: fileInfo.attributes.likedCount ?? 0,
+                    Passge:[
+                        {link:"",title:"轩轩轩轩轩"},
+                        {link:"",title:"练练练练练"},
+                        {link:"",title:"源源源源源"}
+                    ]
+                })
+
             })
-          })
+
         }
     )
   },
