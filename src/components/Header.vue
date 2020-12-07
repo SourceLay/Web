@@ -376,6 +376,11 @@ export default {
           globalErrorNotify(this, err);
       })
     }
+  },
+  watch: {
+    $route() {
+      this.search = ''
+    }
   }
 }
 </script>
