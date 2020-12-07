@@ -100,27 +100,23 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    let top = null
-    let post = null
-    let page = 1
-    if(to.params.page){
-      page = to.params.page
-    }
-    //获取置顶
-    axios.get(
-      dzq({
-        name: 'threads',
-        include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
-        filter: {
-          type: 1,
-          isDeleted: 'no',
-          isSticky: 'yes',
-          categoryId: to.params.id
-        }
-      })
-    ).then((response) => {
-      top = response.data
-      //获取帖子
+    next((vm) => {
+      vm.id = to.params.id;
+      vm.getPostList(to.params.page);
+    })
+    
+  },
+  beforeRouteUpdate(to, from, next) {
+
+    if (to.params.id === from.params.id) {
+      console.log('同页面跳转')
+      let top = null
+      let post = null
+      let page = 1
+      if(to.params.page){
+        page = to.params.page
+      }
+      this.id = to.params.id;
       axios.get(
         dzq({
           name: 'threads',
@@ -139,45 +135,15 @@ export default {
         })
       ).then((response) => {
         post = response.data
-        next((vm) => {
-          vm.getPost(top, post, page);
-          vm.id = to.params.id;
-          vm.getBoardName();
-          document.title = "板块详情 - " + vm.boardName[vm.boardName.length - 1].name;
-        })
+        this.getPost(top, post, page)
+        next()
       })
-    })
-  },
-  beforeRouteUpdate(to, from, next) {
-    console.log('同页面跳转')
-    let top = null
-    let post = null
-    let page = 1
-    if(to.params.page){
-      page = to.params.page
+    } else {
+      this.id = to.params.id
+      this.getPostList(to.params.page);
+      next();
     }
-    this.id = to.params.id;
-    axios.get(
-      dzq({
-        name: 'threads',
-        include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
-        filter: {
-          type: 1,
-          isDeleted: 'no',
-          isSticky: 'no',
-          categoryId: to.params.id
-        },
-        page: {
-          number: page,
-          limit: 20
-        },
-        sort: '-updatedAt'
-      })
-    ).then((response) => {
-      post = response.data
-      this.getPost(top, post, page)
-      next()
-    })
+
   },
   computed: {
     ...mapState([
@@ -199,28 +165,79 @@ export default {
         value: 1
       })
     },
+    getPostList(toParamsPage) {
+
+      let top = null
+      let post = null
+      let page = toParamsPage ?? 1
+
+      //获取置顶
+      axios.get(
+        dzq({
+          name: 'threads',
+          include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
+          filter: {
+            type: 1,
+            isDeleted: 'no',
+            isSticky: 'yes',
+            categoryId: this.id
+          }
+        })
+      ).then((response) => {
+        top = response.data
+        this.getPost(top, null, page);
+      })
+
+      //获取帖子
+      axios.get(
+        dzq({
+          name: 'threads',
+          include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
+          filter: {
+            type: 1,
+            isDeleted: 'no',
+            isSticky: 'no',
+            categoryId: this.id
+          },
+          page: {
+            number: page,
+            limit: 20
+          },
+          sort: '-updatedAt'
+        })
+      ).then((response) => {
+        post = response.data
+        this.getPost(null, post, page);
+      })
+
+      this.getBoardName();
+      document.title = "板块详情 - " + this.boardName[this.boardName.length - 1].name;
+
+    },
     getPost(top, post, page) {
       if(top){
         this.topPost = top.data
       }
-      this.post = post.data
-      this.page = page
-      page = Number(page)
+      if(post){
+        this.post = post.data
+        this.page = page
+        page = Number(page)
 
-      this.allPage = post.meta.pageCount
-      if(this.allPage === 0){
-        this.allPage = 1
-      }
-      if(this.allPage === 1){
-        this.pageList = []
-      }else if(this.allPage <= 10){
-        this.pageList = Array.from(new Array(this.allPage - 2), (x,i) => i + 2)
-      }else if(page < 4){
-        this.pageList = Array.from(new Array(page + 1), (x,i) => i + 2)
-      }else if((this.allPage - page) < 3){
-        this.pageList = Array.from(new Array(this.allPage - page + 2), (x,i) => i + (page - 2))
-      }else{
-        this.pageList = Array.from(new Array(5), (x,i) => i + page - 2)
+        this.allPage = post.meta.pageCount
+        if(this.allPage === 0){
+          this.allPage = 1
+        }
+        if(this.allPage === 1){
+          this.pageList = []
+        }else if(this.allPage <= 10){
+          this.pageList = Array.from(new Array(this.allPage - 2), (x,i) => i + 2)
+        }else if(page < 4){
+          this.pageList = Array.from(new Array(page + 1), (x,i) => i + 2)
+        }else if((this.allPage - page) < 3){
+          this.pageList = Array.from(new Array(this.allPage - page + 2), (x,i) => i + (page - 2))
+        }else{
+          this.pageList = Array.from(new Array(5), (x,i) => i + page - 2)
+        }
       }
 
       if(top && typeof top.included != 'undefined'){
