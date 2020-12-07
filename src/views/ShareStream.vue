@@ -25,6 +25,10 @@
                             <svg t="1607154189066" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7011" width="200" height="200"><path d="M566.686 455.5c-19.882 0-36-16.118-36-36a36 36 0 0 1 5.188-18.617c30.044-49.725 45.067-104.52 45.067-164.383 0-27.257-1.565-53.723-7.941-79-3.85-25-19.643-43-43.5-43s-43.23 19.206-43.497 43c-0.003 0.167-0.003 0.333-0.003 0.5 0 115-58.333 214.8-175 299.402V879.5c0 8.837 7.163 16 16 16h485.496a16 16 0 0 0 15.773-13.312l66.36-389.311c2.97-17.422-8.746-33.952-26.168-36.922a32 32 0 0 0-5.377-0.455H566.686z m392.31 39.133l-71.9 411.873c-5.348 30.637-31.946 52.994-63.046 52.994H97c-17.673 0-32-14.327-32-32v-504c0-17.673 14.327-32 32-32h178.43a64 64 0 0 0 39.35-13.527C385.03 323.203 420.77 249.88 422 158c0.004-0.167 0-0.333 0-0.5C422 98.13 470.13 50 529.5 50S626.532 94.692 637 157.5c2 12 7.94 51.925 7.94 79 0 55.13-11.556 107.56-32.38 155h259.747c48.601 0 88 39.399 88 88a88 88 0 0 1-1.31 15.133zM231 455.5h-87c-8.837 0-16 7.163-16 16v408c0 8.837 7.163 16 16 16h87c8.837 0 16-7.163 16-16v-408c0-8.837-7.163-16-16-16z" p-id="7012"></path></svg>
                             <p>{{detail.likedCount}}</p>
                         </div>
+                      <div v-if="isSelf" class="pop-button" @click="deleteFile(detail)">
+                        <svg t="1607323035300" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1812" width="200" height="200"><path d="M970.24 256h-301.44L592.64 160H431.36L355.2 256H53.76V192h270.72l76.16-96h222.72L699.52 192h270.72v64zM803.84 928H220.16L144 356.48l64-8.96 67.84 516.48h472.32l67.84-516.48 64 8.96-76.16 571.52z" fill="#2c2c2c" p-id="1813"></path><path d="M376.96 412.16h64v371.84h-64zM583.04 412.16h64v371.84h-64z" fill="#2c2c2c" p-id="1814"></path></svg>
+                        <p>删除</p>
+                      </div>
                     </div>
                 </div>
                 <div id="pop-passages">
@@ -42,9 +46,9 @@
 
 
         <div id="top"/>
-        <h1 id="title">文件分享大厅</h1>
-        <el-button v-if="!isSelf" @click="GetSelfFile()">查看个人文件</el-button>
-        <el-button v-if="isSelf" @click="GetSelfFile()">查看全部文件</el-button>
+        <h1 id="title">文件分享大厅
+          <el-checkbox v-model="isSelf" @click="GetSelfFile" size="medium" style="margin-left: 1em;">只显示个人文件</el-checkbox>
+        </h1>
         <div id="stream">
             <div @click="popDetail(card)" class="fileCard" v-for="card in cards" :key="card.id">
                 <svg t="1606829000232" class="icon" viewBox="0 0 1185 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="16670" width="48" height="48"><path d="M107.789474 0h319.218526A129.347368 129.347368 0 0 1 529.246316 50.176L840.757895 452.715789H0V107.789474a107.789474 107.789474 0 0 1 107.789474-107.789474z" fill="#EB9B00" p-id="16671"></path><path d="M138.186105 183.242105h909.312c48.074105 0 65.482105 5.012211 82.997895 14.389895 17.623579 9.377684 31.420632 23.174737 40.798316 40.744421 9.377684 17.569684 14.389895 35.031579 14.389895 82.997895v564.439579c0 48.074105-5.012211 65.482105-14.389895 82.997894-9.377684 17.623579-23.174737 31.420632-40.744421 40.798316-17.569684 9.377684-35.031579 14.389895-82.997895 14.389895H138.132211c-48.074105 0-65.482105-5.012211-82.997895-14.389895a97.926737 97.926737 0 0 1-40.798316-40.744421C5.012211 951.242105 0 933.834105 0 885.867789V321.374316c0-48.074105 5.012211-65.482105 14.389895-82.997895 9.377684-17.623579 23.174737-31.420632 40.744421-40.798316 17.569684-9.377684 35.031579-14.389895 82.997895-14.389894z" fill="#F8B700" p-id="16672"></path></svg>
@@ -77,7 +81,34 @@ export default {
     // this.GetSelfFile();
     this.GetAllFile();
   },
+  watch: {
+    isSelf(newVal) {
+      if (newVal) {
+        this.GetSelfFile();
+      } else {
+        this.GetAllFile();
+      }
+    }
+  },
   methods:{
+        deleteFile(detail) {
+          // TODO 所有文件的删除
+          this.showDetail = false;
+          axios.delete(dzq({
+                name: 'sourcelay/fileshare/' + detail.id
+              })
+          ).then(response => {
+            console.log(response)
+          })
+          // 更新界面
+          for(let i = 0; i < this.cards.length; i++) {
+            if (this.cards[i].id == detail.id) {
+              this.cards.splice(i,1);
+              break;
+            }
+          }
+          this.detail = {}
+        },
         // 将card相关response转成card数据
         handleResponseCard(response) {
           //TODO post和included
@@ -131,10 +162,9 @@ export default {
           })
 
         },
-        // 获取属于自己的文件
+        // 获取属于自己的文件或全部文件
         GetSelfFile: function () {
           var that = this;
-          if (!that.isSelf) {
             this.cards = [];
             axios.get(
                 dzq({
@@ -147,10 +177,6 @@ export default {
                   }
                 })
             ).then(response => that.handleResponseCard(response));
-          } else {
-            that.GetAllFile();
-          }
-          that.isSelf = !that.isSelf;
         },
         // 获取所有文件
         GetAllFile: function () {
