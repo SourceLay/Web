@@ -7,6 +7,7 @@
         tooltip-effect="dark"
         style="width: 100%"
         @selection-change="handleSelectionChange"
+        v-loading="loading"
         >
       <el-table-column
           type="selection"
@@ -54,6 +55,7 @@ name: "ShareInfo",
   },
   data() {
     return {
+      loading: true,
       cards: [],
       selections: []
     }
@@ -73,7 +75,11 @@ name: "ShareInfo",
               self: true,
             }
           })
-      ).then(response => that.handleResponseCard(response)).catch(err=>globalErrorNotify(that,err))
+      ).then(response => {
+        this.loading=false;
+        that.handleResponseCard(response);
+        }
+        ).catch(err=>globalErrorNotify(that,err))
     },
     // 将card相关response转成card数据
     handleResponseCard(response) {
