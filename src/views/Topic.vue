@@ -301,6 +301,8 @@ export default {
           )
           vm.threadId = to.params.id;
           vm.getData(topic.data, post.data, page, floor)
+
+          document.title = topic.data.data.attributes.title;
         })
       })
     })
