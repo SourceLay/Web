@@ -1,9 +1,6 @@
 <template>
 <div class="para-content">
   <!-- 首页-banner -->
-  <el-dialog title="修改信息" :visible="setUserInfoVisible" @close="setUserInfoVisible=false">
-    <SetUserInfo></SetUserInfo>
-  </el-dialog>
   <div class="index-banner">
     <ul class="banner">
       <li v-for="(banner, index) in indexBanner" :key="index" :style="{'background': banner.background}" :class="[indexBannerActive === index ? 'banner-active' : '']">
@@ -94,36 +91,25 @@
   <!-- 首页-底部 -->
   <div class="index-bottom">
     <ul>
-      <li @click="setUserInfoVisible=true">隐私和Cookies</li>
-      <li @click="payVisible=true">使用条款</li>
-      <li @click="shareInfoVisible=true">关于我们</li>
-      <li @click="shareListVisible=true">© 2019 派瑞派对</li>
+      <li>隐私和Cookies</li>
+      <li>使用条款</li>
+      <li>关于我们</li>
+      <li>© 2019 派瑞派对</li>
     </ul>
   </div>
-  <el-dialog width="60%" title="分享文件" :visible="shareInfoVisible" @close="shareInfoVisible=false">
-    <ShareInfo @handleShareInfoReturn="handleShareInfoReturn"></ShareInfo>
-  </el-dialog>
 </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-import SetUserInfo from "@/components/SetUserInfo";
 import axios from 'axios'
 import { dzq } from '@/public'
 import IncludedHelper from '../helpers/includedHelper'
-import globalNotify from "@/helpers/globalNotify";
-import ShareInfo from "@/components/ShareInfo";
 
 export default {
   name: 'Home',
-  components: {ShareInfo, SetUserInfo},
   data() {
     return {
-      shareInfoVisible:false,
-      shareListVisible: false,
-      setUserInfoVisible:false,
-      payVisible: false,
       //当前banner
       indexBannerActive: 0,
       //当前轮播
@@ -210,19 +196,6 @@ export default {
     })
   },
   methods: {
-    // 处理确认分享文件后的返回值
-    handleShareInfoReturn(selections) {
-      this.shareInfoVisible = false;
-      console.log(selections);
-    },
-    testNotify() {
-      // this.$notify({
-      //   title: '提示',
-      //   message: '这是一条不会自动关闭的消息',
-      //   duration: 0
-      // });
-      globalNotify(this);
-    },
     showIndexBanner(index) {
       this.indexBannerActive = index
     },
