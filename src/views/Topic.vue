@@ -646,6 +646,13 @@ export default {
   letter-spacing: 0;
   margin-right: 0.2em;
 }
+.title >>>a{
+  color: inherit;
+  text-decoration: none;
+}
+.title >>>a:hover{
+  text-decoration: underline;
+}
 /* 论坛-主题Tag */
 .tag::before{
   color: #fff;
