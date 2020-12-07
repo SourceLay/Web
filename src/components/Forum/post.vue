@@ -136,14 +136,6 @@ export default {
 .time{
   display: inline-block;
 }
-.post-btn{
-  background: var(--main-color);
-  color: #fff;
-  float: right;
-}
-.post-btn:hover{
-  background: var(--main-color-active);
-}
 /* 论坛-主题Tag */
 .tag::before{
   display: inline-block;

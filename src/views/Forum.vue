@@ -32,7 +32,9 @@
       </li>
     </ul>
     <board title="置顶主题" :posts="topPost" :included="included"/>
-    <board title="主题" :posts="post" :included="included"/>
+    <board title="主题" :posts="post" :included="included">
+      <span @click="openEditor" class="post-btn btn">发表新主题</span>
+    </board>
     <ul class="pages">
       <li :style="{pointerEvents: page === 1 ? 'none' : ''}" class="pages-btn">
         <router-link :to="{params: {page : Number(page) - 1}}">上一页</router-link>
