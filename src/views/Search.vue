@@ -255,13 +255,14 @@ export default {
 
 .users{
   display: flex;
+  flex-wrap: wrap;
 }
 .users li{
   display: flex;
   background: #ddd;
   padding: 0.5em;
   height: fit-content;
-  width: 13em;
+  width: calc(100% / 5 - 1em);
   border-radius: 0.2em;
   margin: 0.5em;
 }
