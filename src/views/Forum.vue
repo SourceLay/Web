@@ -9,7 +9,8 @@
     <Editor v-if="showEditor"/>
   </transition>
   <div class="banner">
-    <img src="../assets/mc.jpg" alt="">
+    <img v-if="boardInfo.original[$route.params.id].translated.banner === ''" src="../assets/mc.jpg" alt="">
+    <img v-if="boardInfo.original[$route.params.id].translated.banner !== ''" :src="boardInfo.original[$route.params.id].translated.banner" alt="">
     <div class="banner-cover"></div>
     <div class="intro boardName">
       <h1>
@@ -183,6 +184,7 @@ export default {
     ]),
     
     boardDescription: function () {
+      console.log(this.boardInfo);
       return this.boardInfo.original[this.id]?.translated.slogan;
     },
   },

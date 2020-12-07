@@ -77,7 +77,8 @@ class CategoriesTranslator {
             dir.fullname = a_categories.attributes.name;
             dir.slogan = a_categories.attributes.description;
             dir.activitiesDaily = a_categories.attributes.activities_daily;
-
+            dir.banner = a_categories.attributes.banner;
+            
             // 原始信息映射
             dir.original = a_categories;
             this.original[a_categories.id].translated = dir;
