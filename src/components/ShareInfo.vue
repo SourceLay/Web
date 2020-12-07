@@ -102,27 +102,30 @@ name: "ShareInfo",
         console.log('threadsList')
         console.log(threadsList);  // 这里列出了这个分享的所有的帖子信息
 
-        let postsList = [];
-        fileShare.relationships.posts.data.forEach(threadIndex => {
-          postsList.push(
-              includedInfo.get('posts.' + threadIndex.id)
-          )
+        // let postsList = [];
+        // fileShare.relationships.posts.data.forEach(threadIndex => {
+        //   postsList.push(
+        //       includedInfo.get('posts.' + threadIndex.id)
+        //   )
+        // })
+        // console.log('postList')
+        // console.log(postsList);  // 这里列出了这个分享的所有的帖子信息
+
+        let passge = [];
+        threadsList.forEach((s) => {
+          passge.push(s);
         })
-        console.log('postList')
-        console.log(postsList);  // 这里列出了这个分享的所有的帖子信息
+
+        this.included = includedInfo.data;
 
         this.cards.push({
           id: fileShare.attributes.id,
           type: fileInfo.attributes.type,
           filename: fileInfo.attributes.name,
           downloadLink: fileShare.attributes.downloadUrl ?? '',
-          isLiked: fileShare.attributes.isLiked ?? false,
+          isLiked: fileInfo.attributes.is_liked ?? false,
           likedCount: fileInfo.attributes.likedCount ?? 0,
-          Passge:[
-            {link:"",title:"轩轩轩轩轩"},
-            {link:"",title:"练练练练练"},
-            {link:"",title:"源源源源源"}
-          ]
+          Passge: passge,
         })
 
       })

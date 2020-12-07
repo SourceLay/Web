@@ -47,19 +47,31 @@
         </ul>
       </div>
     </div>
+    <el-dialog
+        title="分享文件"
+        :visible="shareInfoVisible"
+        :modal-append-to-body='false'
+        width="60%"
+        @close="shareInfoVisible=false">
+      <share-info :reset="shareInfoReset" @handleShareInfoReturn="handleShareInfoReturn"></share-info>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { mapState, mapMutations } from 'vuex'
 import XBBCODE from '.././xbbcode'
+import ShareInfo from "@/components/ShareInfo";
 export default {
   name: 'editor',
+  components: {ShareInfo},
   props: [
     'replyData'
   ],
   data: function() {
     return {
+      shareInfoVisible: true, // 分享弹窗可见
+      shareInfoReset: false, // 刷新分享弹窗
       inTopic: 0,
       title: '',
       content: '',
@@ -130,6 +142,11 @@ export default {
     ...mapMutations([
       'setData'
     ]),
+    // 处理分享弹窗的回调函数
+    handleShareInfoReturn: function (selections) {
+      console.log(selections);
+      this.shareInfoVisible = false;
+    },
     closeEditor: function() {
       this.setData({
         key: 'showEditor',
@@ -176,6 +193,8 @@ export default {
 
         if (action === 'fileshare') {
           // 弹窗
+          this.shareInfoReset = !this.shareInfoReset; // 重置弹窗
+          this.shareInfoVisible = true;
           return
         }
 
