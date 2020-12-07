@@ -269,7 +269,8 @@ export default {
   width: 3.5em;
   height: 3.5em;
   border-radius: 50%;
-  border: 2px solid #fff;
+  border: 0.1em solid #fff;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
 .user-info{
   margin-left: 0.5em;
