@@ -112,7 +112,7 @@ export function getPostTitle(title) {
     }
     let final = ''
     tags.forEach(tag => {
-      final += "<span>" + tag + "</span>"
+      final += "<a href=\"/search?q=tag:" + tag.replace(/\[|\]/g, '') + "\"><span>" + tag + "</span></a>"
     })
     return '<div>' + final + '</div>' + s.substring(last_valid).trim();
   }
