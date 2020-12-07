@@ -505,13 +505,11 @@ export default {
 .post{
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   height: calc(100% + 0.5em);
   margin-top: 1.2em;
 }
 .post li{
-  line-height: 1.65em;
-  margin: 0.1em 0;
+  line-height: calc(15.5rem / 8);
   padding: 0 0.5em;
   list-style: none;
   color: var(--text-color);

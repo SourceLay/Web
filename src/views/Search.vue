@@ -255,13 +255,14 @@ export default {
 
 .users{
   display: flex;
+  flex-wrap: wrap;
 }
 .users li{
   display: flex;
   background: #ddd;
   padding: 0.5em;
   height: fit-content;
-  width: 13em;
+  width: calc(100% / 5 - 1em);
   border-radius: 0.2em;
   margin: 0.5em;
 }
@@ -269,7 +270,8 @@ export default {
   width: 3.5em;
   height: 3.5em;
   border-radius: 50%;
-  border: 2px solid #fff;
+  border: 0.1em solid #fff;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
 .user-info{
   margin-left: 0.5em;
