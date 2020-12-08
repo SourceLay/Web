@@ -30,16 +30,16 @@
         <router-link to="/forums/minecraft" :class="[$route.params.id === 'minecraft' ? 'menu-item-choose noise' : '', 'menu-dbitem']">
           <li>
             <img src="../assets/mc.jpeg" alt="">
-            <p>我的世界</p>
+            <p>常用指南</p>
           </li>
         </router-link>
         <li class="menu-dbitem">
           <img src="../assets/oustus.jpg" alt="">
-          <p>Oustus</p>
+          <p>我的文件</p>
         </li>
         <li class="menu-dbitem">
           <img src="../assets/rayark.jpg" alt="">
-          <p>雷亚</p>
+          <p>分享大厅</p>
         </li>
       </ul>
     </div>
@@ -66,7 +66,7 @@ export default {
 }
 .header{
   position: relative;
-  width: 4em; 
+  width: 4em;
   height: 100vh;
   float: left;
   background: var(--bg-color);
