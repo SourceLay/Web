@@ -708,11 +708,14 @@ export default {
 
         if (typeof(shareInfo) == 'undefined' || shareInfo === null || typeof(fileInfo) == 'undefined' || fileInfo === null) {
           globalErrorNotify(this, "请刷新页面后重试。");
+          return;
         }
 
         // 如果已经可以下载了
         if (shareInfo.attributes.downloadUrl) {
           this.downloadShareFile(shareInfo, fileInfo);
+          globalSuccessNotify(this, "正在下载，请稍候。");
+          return;
         }
 
         // 密码下载
@@ -722,6 +725,7 @@ export default {
 
           this.sharePassword = '';//清空上次输入
           this.sharePasswordVisible = true;
+          return;
         }
 
         //付费下载
@@ -756,7 +760,10 @@ export default {
           } else {
             globalErrorNotify(this, "您尚未设置支付密码。");
           }
+          return;
         }
+
+        globalErrorNotify(this, "请刷新页面后重试，若多次出现本错误请联系管理员。");
       }
     },
     attemptRequireDownloadUrl(shareInfo, fileInfo) {
