@@ -7,7 +7,7 @@
         <div class="banner-content">
           <p>{{banner.subTitle}}</p>
           <h1>{{banner.title}}</h1>
-          <a :href="banner.url">{{banner.btnText}}</a>
+          <a v-bind:href="indexBanner[indexBannerActive].url">{{banner.btnText}}</a>
           <img :src="banner.image" alt="">
         </div>
       </li>
