@@ -27,20 +27,6 @@
         </router-link>
       </ul>
       <ul class="menu-dblist">
-        <router-link to="/forums/minecraft" :class="[$route.params.id === 'minecraft' ? 'menu-item-choose noise' : '', 'menu-dbitem']">
-          <li>
-            <img src="../assets/mc.jpeg" alt="">
-            <p>常用指南</p>
-          </li>
-        </router-link>
-        <li class="menu-dbitem">
-          <img src="../assets/oustus.jpg" alt="">
-          <p>我的文件</p>
-        </li>
-        <li class="menu-dbitem">
-          <img src="../assets/rayark.jpg" alt="">
-          <p>分享大厅</p>
-        </li>
       </ul>
     </div>
   </div>
