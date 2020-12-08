@@ -527,6 +527,7 @@ export default {
   color: var(--text-color);
   transition: background 0.3s;
   cursor: pointer;
+  margin: 0.25em 0;
   margin-right: 0.6em;
   margin-top: 0.6em;
 }
