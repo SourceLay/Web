@@ -681,13 +681,14 @@ const typeDictory = {"application/vnd.hzn-3d-crossword": {"desc": "3D Crossword 
     "application/vnd.zul": {"desc": "Z.U.L. Geometry", "ext": ".zir"},
     "application/zip": {"desc": "Zip Archive", "ext": ".zip"},
     "application/vnd.handheld-entertainment+xml": {"desc": "ZVUE Media Manager", "ext": ".zmm"},
-    "application/vnd.zzazz.deck+xml": {"desc": "Zzazz Deck", "ext": ".zaz"}
+    "application/vnd.zzazz.deck+xml": {"desc": "Zzazz Deck", "ext": ".zaz"},
+    "text/directory": {"desc": "目录", "ext": "folder"}
 }
 
-function typeTranslator(type) {
-    if (typeDictory[type] != undefined)
-        return typeDictory[type]['desc'];
-    return undefined;
+function typeTranslator(type , defaultReturn = 'undefined') {
+        return type === undefined ? defaultReturn :
+            typeDictory[type] === undefined ? defaultReturn :
+                typeDictory[type]['desc'] ?? defaultReturn;
 }
 
 export default typeTranslator;

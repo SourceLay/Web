@@ -285,7 +285,7 @@ export default {
         if (e.target.files.length <= 0) {
             return;
         }
-        
+
         let step = this.paths[this.paths.length - 1].path;
         if (step[0] !== '/') {
             step = '/' + step;
@@ -395,7 +395,7 @@ export default {
         data.shared_type = ret.type;
         data.password = ret.password;
         data.cost = ret.cost * 100;
-        
+
         console.log(ret);
         console.log(data);
 
@@ -422,6 +422,10 @@ export default {
 </script>
 
 <style scoped>
+*, *::after, *::before {
+  box-sizing: border-box;
+  position: relative;
+}
     .topheader.fixTop{
         position: fixed;
         padding:10px;
@@ -511,6 +515,7 @@ export default {
     .fileCheck{
         top: 50%;
         transform: translate(0,-50%);
+        margin-left: -1em;
     }
 
     .fileIcon{
