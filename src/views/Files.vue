@@ -326,7 +326,7 @@ export default {
 
             axios.put(uploadUrl, file, config)
             .then(()=>{
-                
+
                 axios.put(
                     dzq({
                         name: 'sourcelay/file',
@@ -341,7 +341,7 @@ export default {
             }).catch(() => {
                 globalErrorNotify(this, "请刷新页面后重试。");
             });
-            
+
             globalSuccessNotify(this, "正在上传，请稍候。");
         }).catch((err) => {
             globalErrorNotify(this, err);
@@ -625,5 +625,8 @@ export default {
         width: 100%;
         height: 100%;
         font-size: 100vh;
+    }
+    .el-dialog__wrapper {
+      position: fixed;
     }
 </style>
