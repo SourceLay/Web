@@ -36,9 +36,11 @@ function tex2svg(texContent,
     inline = true, em = 16, ex = 8, width = 80*16,
     packages = AllPackages, /*css = true,*/) {
 
-    texContent = texContent.replace("&lt;", "<"); // escape HTML tag brackets
-    texContent = texContent.replace("&gt;", ">"); // escape HTML tag brackets
-    
+    texContent = texContent.replace(/&lt;/g, "<"); // escape HTML tag brackets
+    texContent = texContent.replace(/&gt;/g, ">"); // escape HTML tag brackets
+    texContent = texContent.replace(/&#91;/g, "["); // escape BBCode tag brackets
+    texContent = texContent.replace(/&#93;/g, "]"); // escape BBCode tag brackets
+
     //
     //  Create DOM adaptor and register it for HTML documents
     //

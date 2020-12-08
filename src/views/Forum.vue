@@ -92,8 +92,8 @@ export default {
   data() {
     return {
       test: '666',
-      topPost: null,
-      post: null,
+      topPost: [],
+      post: [],
       id: 0,      // 板块 ID
       page: 1,
       allPage: 0,

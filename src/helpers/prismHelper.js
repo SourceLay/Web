@@ -85,6 +85,9 @@ import '@wenyan/highlight/prism'
 function prismHighLight(language, originalContent) {
     let content = originalContent.replace(/&lt;/g, "<"); // escape HTML tag brackets
     content = content.replace(/&gt;/g, ">"); // escape HTML tag brackets
+    content = content.replace(/&#91;/g, "["); // escape BBCode tag brackets
+    content = content.replace(/&#93;/g, "]"); // escape BBCode tag brackets
+
 
     //if (typeof(Prism.languages[language]) == "undefined") {
     //    try {
