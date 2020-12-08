@@ -18,12 +18,14 @@
         <!-- 预览区 -->
         <div @click="closePreview" v-if="preview" v-html="preview" class="preview bbcode"></div>
         <!-- 提示 -->
-        <div v-if="isError === 1" :class="['error', isError ? 'error-open' : '']">
+        <div :class="['error', isError ? 'error-open' : '']">
           <p>{{error}}</p>
         </div>
         <!-- 输入框 -->
         <input v-if="!preview" v-model="title" placeholder="标题…" type="text">
-        <prism-editor :highlight="highlighter" v-if="!preview" v-model="content" ref="content" :placeholder="replyData ? '回复#' + replyData.floor : '正文…'"></prism-editor>
+        <div class="input-container">
+          <prism-editor :highlight="highlighter" v-if="!preview" v-model="content" ref="content" :placeholder="replyData ? '回复#' + replyData.floor : '正文…'"></prism-editor>
+        </div>
       </div>
       <!-- 底部工具 -->
       <div class="btns">
@@ -403,7 +405,8 @@ export default {
   background: none;
   outline: none;
 }
-.input >>> div, .input >>> textarea{
+
+.input .input-container, .input-container >>> div, .input-container >>> textarea{
   width: 100%;
   height: 12.5em;
   line-height: 1.5em;
@@ -413,6 +416,7 @@ export default {
   background: none;
   outline: none;
 }
+
 /* 编辑器按钮 */
 .btns{
   position: relative;
