@@ -337,12 +337,12 @@ export default {
                 }).catch((err) => {
                     globalErrorNotify(this, err);
                 });
-                globalSuccessNotify(this, "正在上传，请稍候。");
 
             }).catch(() => {
                 globalErrorNotify(this, "请刷新页面后重试。");
             });
-
+            
+            globalSuccessNotify(this, "正在上传，请稍候。");
         }).catch((err) => {
             globalErrorNotify(this, err);
         });
