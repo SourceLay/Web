@@ -45,11 +45,9 @@
       </li>
     </ul>
     <board title="置顶主题" :posts="topPost" :included="included"/>
-    <el-table v-if="loading" v-loading="topLoading" style="height: 50px;width: 100%;"></el-table>
     <board title="主题" :posts="post" :included="included">
       <span @click="openEditor" class="post-btn btn">发表新主题</span>
     </board>
-    <el-table v-if="loading" v-loading="loading" style="height: 50px;width: 100%;"></el-table>
     <ul class="pages">
       <li :style="{pointerEvents: page === 1 ? 'none' : ''}" class="pages-btn">
         <router-link :to="{params: {page : Number(page) - 1}}">上一页</router-link>
@@ -58,9 +56,9 @@
       <li :class="page === 1 ? 'pages-active' : ''">
         <router-link :to="{params: {page : 1}}">1</router-link>
       </li>
-
+      
       <li v-if="pageList !== undefined && pageList.length > 0 && pageList[0] !== 2">…</li>
-
+      
       <li v-for="p in pageList" :key="p" :class="page === p ? 'pages-active' : ''">
         <router-link :to="{params: {page : p}}">{{p}}</router-link>
       </li>
@@ -93,8 +91,6 @@ export default {
   },
   data() {
     return {
-      topLoading:true,
-      loading: true,
       test: '666',
       topPost: null,
       post: null,
@@ -239,7 +235,7 @@ export default {
     ...mapState([
       'showEditor', 'boardInfo'
     ]),
-
+    
     boardDescription: function () {
       console.log(this.boardInfo);
       return this.boardInfo.original[this.id]?.translated.slogan;
@@ -305,7 +301,7 @@ export default {
         }
         pboard = pboard.parent;
       }
-
+      
       this.boardName = tmpBoardName.reverse();
       console.log(this.boardName);
     }
