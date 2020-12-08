@@ -528,7 +528,12 @@ export default {
       })
     },
     sendPost(data) {
+      //存放关联数据
       this.included['posts.' + data.data.id] = data.data
+      data.included.forEach((item) => {
+        this.included[item.type + '.' + item.id] = item
+      })
+
       if (this.editData) {
         let tmp = {
           time : this.getTime(this.included[`posts.${data.data.id}`].attributes.createdAt),
