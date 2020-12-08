@@ -10,11 +10,22 @@
       </div>
       <div class="menu">
         <ul>
-          <li>商城</li>
-          <li>会员</li>
-          <li>移动端</li>
-          <li>游戏</li>
-          <li>帮助</li>
+          <li
+              :class="$route.name == 'Home' ? 'currentMenuItem' : 'normalMenuItem'"
+              @click="$router.push('/')">
+            首页</li>
+          <li
+              :class="$route.name == 'help' ? 'currentMenuItem' : 'normalMenuItem'"
+              @click="$router.push('/help')">
+            指南</li>
+          <li
+              :class="$route.name == 'Files' ? 'currentMenuItem' : 'normalMenuItem'"
+              @click="$router.push('/files')">
+            我的文件</li>
+          <li
+              :class="$route.name == 'ShareStream' ? 'currentMenuItem' : 'normalMenuItem'"
+              @click="$router.push('/stream')">
+            分享大厅</li>
         </ul>
       </div>
       <div @mouseenter="showLoginBox" class="avatar">
@@ -592,5 +603,11 @@ export default {
 .user-menu p{
   color: var(--text-color);
   margin-top: 0.2em;
+}
+.normalMenuItem {
+  cursor: pointer;
+}
+.currentMenuItem {
+  color: red;
 }
 </style>
