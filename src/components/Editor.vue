@@ -7,7 +7,7 @@
       <div @click="closeEditor" class="header-btn close">
         <i class="iconfont icon-guanbi"></i>
       </div>
-      <div v-if="$route.name === 'Topic'" @click="changeFixed" :style="{opacity: fixedEditor ? '1' : '0.5'}" class="header-btn fixed">
+      <div v-if="$route.name === 'Topic'" @click="changeFixed()" :style="{opacity: fixedEditor ? '1' : '0.5'}" class="header-btn fixed">
         <i class="iconfont icon-guding"></i>
       </div>
     </div>
