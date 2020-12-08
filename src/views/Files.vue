@@ -428,8 +428,8 @@ export default {
 
 <style scoped>
 *, *::after, *::before {
-  box-sizing: border-box;
-  position: relative;
+  /*box-sizing: border-box;*/
+  /*position: relative;*/
 }
     .topheader.fixTop{
         position: fixed;
@@ -518,6 +518,7 @@ export default {
     }
 
     .fileCheck{
+      position:relative;
         top: 50%;
         transform: translate(0,-50%);
         margin-left: -1em;
@@ -525,7 +526,7 @@ export default {
 
     .fileIcon{
         margin-top:0.125em;
-
+      position:relative;
         font-size:2em;
         text-align: center;
         display:inline-block;
@@ -553,10 +554,12 @@ export default {
     }
 
     #title-fileSize{
+      position: relative;
         padding:15px;
     }
 
     #title-fileDate{
+      position: relative;
         padding:15px;
     }
 
@@ -612,6 +615,7 @@ export default {
     }
 
     .vertical-middle-align {
+      position:relative;
         top: 50%;
         transform: translate(0,-50%);
     }
@@ -625,8 +629,5 @@ export default {
         width: 100%;
         height: 100%;
         font-size: 100vh;
-    }
-    .el-dialog__wrapper {
-      position: fixed;
     }
 </style>
