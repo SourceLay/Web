@@ -15,11 +15,14 @@
     <div class="intro boardName">
       <h1>
         <span v-for="(info, index) in boardName" :key="info.id">
-          <span v-if="index < boardName.length - 1">
-            <router-link :to="{path: '/forums/' + info.id}">{{info.name}}</router-link> /
+          <span v-if="(index < boardName.length - 1) && (index > 0)"> 
+            <router-link :to="{path: '/forums/' + info.id}">{{info.name}}</router-link>
           </span>
-          <span v-if="index === boardName.length - 1">
+          <span v-if="(index === boardName.length - 1) || (index === 0)">
             {{info.name}}
+          </span>
+          <span v-if="index < boardName.length - 1"> 
+            /
           </span>
         </span>
       </h1>
@@ -104,11 +107,53 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      vm.id = to.params.id;
-      vm.getPostList(to.params.page);
-    })
+    let top = null
+    let post = null
+    let page = to.params.page ?? 1
 
+    //获取置顶
+    axios.get(
+      dzq({
+        name: 'threads',
+        include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
+        filter: {
+          type: 1,
+          isDeleted: 'no',
+          isSticky: 'yes',
+          categoryId: to.params.id
+        }
+      })
+    ).then((response) => {
+      top = response.data
+
+      //获取帖子
+      axios.get(
+        dzq({
+          name: 'threads',
+          include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
+          filter: {
+            type: 1,
+            isDeleted: 'no',
+            isSticky: 'no',
+            categoryId: to.params.id
+          },
+          page: {
+            number: page,
+            limit: 20
+          },
+          sort: '-updatedAt'
+        })
+      ).then((response) => {
+        next((vm) => {
+          vm.id = to.params.id;
+          vm.getBoardName();
+          document.title = "板块详情 - " + vm.boardName[vm.boardName.length - 1].name;
+
+          post = response.data
+          vm.getPost(top, post, page);
+        })
+      })
+    })
   },
   beforeRouteUpdate(to, from, next) {
 
@@ -143,11 +188,52 @@ export default {
         next()
       })
     } else {
-      this.id = to.params.id
-      this.getPostList(to.params.page);
-      next();
-    }
+      let top = null
+      let post = null
+      let page = to.params.page ?? 1
 
+      //获取置顶
+      axios.get(
+        dzq({
+          name: 'threads',
+          include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
+          filter: {
+            type: 1,
+            isDeleted: 'no',
+            isSticky: 'yes',
+            categoryId: to.params.id
+          }
+        })
+      ).then((response) => {
+        top = response.data
+
+        //获取帖子
+        axios.get(
+          dzq({
+            name: 'threads',
+            include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
+            filter: {
+              type: 1,
+              isDeleted: 'no',
+              isSticky: 'no',
+              categoryId: to.params.id
+            },
+            page: {
+              number: page,
+              limit: 20
+            },
+            sort: '-updatedAt'
+          })
+        ).then((response) => {
+          this.id = to.params.id;
+          this.getBoardName();
+          document.title = "板块详情 - " + this.boardName[this.boardName.length - 1].name;
+          post = response.data
+          this.getPost(top, post, page);
+          next();
+        })
+      })  
+    }
   },
   computed: {
     ...mapState([
@@ -168,57 +254,6 @@ export default {
         key: 'showEditor',
         value: 1
       })
-    },
-    getPostList(toParamsPage) {
-
-      let top = null
-      let post = null
-      let page = toParamsPage ?? 1
-
-      //获取置顶
-      axios.get(
-        dzq({
-          name: 'threads',
-          include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
-          filter: {
-            type: 1,
-            isDeleted: 'no',
-            isSticky: 'yes',
-            categoryId: this.id
-          }
-        })
-      ).then((response) => {
-        top = response.data
-        this.getPost(top, null, page);
-        this.topLoading = false;
-      })
-
-      //获取帖子
-      axios.get(
-        dzq({
-          name: 'threads',
-          include: ['user', 'firstPost', 'lastPostedUser', 'user.groups'],
-          filter: {
-            type: 1,
-            isDeleted: 'no',
-            isSticky: 'no',
-            categoryId: this.id
-          },
-          page: {
-            number: page,
-            limit: 20
-          },
-          sort: '-updatedAt'
-        })
-      ).then((response) => {
-        post = response.data
-        this.getPost(null, post, page);
-        this.loading = false;
-      })
-
-      this.getBoardName();
-      document.title = "板块详情 - " + this.boardName[this.boardName.length - 1].name;
-
     },
     getPost(top, post, page) {
       if(top){
@@ -259,7 +294,7 @@ export default {
     },
     getBoardName: function () {
       let board = this.boardInfo.original[this.id]?.translated;
-      if (board === undefined) return;
+      if (typeof (board) === "undefined") return;
 
       let tmpBoardName = [];
       let pboard = board;
