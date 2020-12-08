@@ -44,8 +44,10 @@
         </ul>
         <!-- 按钮 -->
         <ul class="btns-right">
-          <li @click="send" :class="['btn', 'btn-send', sendLoad ? 'btn-load' : '']">发送</li>
+          <li v-if="editData === null" @click="send" :class="['btn', 'btn-send', sendLoad ? 'btn-load' : '']">发送</li>
+          <li v-if="editData !== null" @click="send" :class="['btn', 'btn-send', sendLoad ? 'btn-load' : '']">编辑</li>
           <li @click="showPreview" class="btn btn-preview">预览</li>
+          <li v-if="editData !== null" @click="cancelEdit" class="btn btn-preview">放弃编辑</li>
         </ul>
       </div>
     </div>
@@ -63,6 +65,7 @@
 <script>
 import { mapState, mapMutations } from 'vuex'
 import XBBCODE from '.././xbbcode'
+import { dzq } from '@/public'
 import ShareInfo from "@/components/ShareInfo";
 
 // import Prism Editor
@@ -78,7 +81,8 @@ export default {
   name: 'editor',
   components: {ShareInfo, PrismEditor},
   props: [
-    'replyData'
+    'replyData',
+    'editData'
   ],
   data: function() {
     return {
@@ -172,10 +176,10 @@ export default {
         value: 0
       })
     },
-    changeFixed: function() {
+    changeFixed: function(status = null) {
       this.setData({
         key: 'fixedEditor',
-        value: !this.fixedEditor
+        value: status ?? !this.fixedEditor
       })
     },
     opentool: function(e) {
@@ -277,7 +281,33 @@ export default {
         if(!this.content){
           this.isError = 1
           this.error = '正文为空！'
-        }else{
+
+        }else if (this.editData){
+          // 编辑
+
+          let post_id = this.editData.id;
+          let attr = {}
+          attr.content = this.content
+
+          this.axios.patch(dzq({
+              name: 'posts/' + post_id
+            }), {
+            data: {
+                id: post_id,
+                type: "posts",
+                attributes: attr
+            }
+          }).then(response => {
+            this.content = null
+            this.$emit('sendPost', response.data)
+          }).catch(error => {
+            this.isError = 1
+            this.error = error.response.data.errors[0].detail[0]
+          })
+
+        }else {
+          // 回帖
+
           let attr = {}
           attr.content = this.content
           if(this.replyData){
@@ -302,6 +332,7 @@ export default {
             this.isError = 1
             this.error = error.response.data.errors[0].detail[0]
           })
+
         }
       }
       setTimeout(() => {
@@ -326,6 +357,10 @@ export default {
           this.error = error.response.data.errors[0].detail[0]
         })
       })
+    },
+    cancelEdit() {
+      this.content = "";
+      this.$emit('cancelEditing')
     },
     highlighter(code) {
       return highlight(code, languages.bbcode); // languages.<insert language> to return html with markup
