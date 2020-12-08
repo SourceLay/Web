@@ -262,6 +262,7 @@ export default {
 
         this.loginLoad = 0
 
+        location.reload();//登录成功时刷新
       }).catch((error) => {
         console.log(error)
         this.loginErrorText= '你的用户名或密码有问题'
