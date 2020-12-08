@@ -57,7 +57,7 @@ export default {
       })
     },
     getContent(content) {
-      return XBBCODE.process({
+      return XBBCODE().process({
         text: content,
         removeMisalignedTags: false,
         addInLineBreaks: true,

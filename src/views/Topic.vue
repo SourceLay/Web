@@ -617,7 +617,7 @@ export default {
       }
       if(this.included['posts.' + id]){
         data.user = this.included['users.' + user].attributes.username
-        data.content = XBBCODE.process({
+        data.content = XBBCODE().process({
           text: this.included['posts.' + id].attributes.content,
           removeMisalignedTags: false,
           addInLineBreaks: true,
@@ -647,7 +647,7 @@ export default {
           let userInfo = includedInfo.get('users.' + res.data.data.relationships.user.data.id);
           data.user = userInfo.attributes.username
           data.floor = res.data.data.attributes.floor
-          data.content = XBBCODE.process({
+          data.content = XBBCODE().process({
             text: res.data.data.attributes.content,
             removeMisalignedTags: false,
             addInLineBreaks: true,
