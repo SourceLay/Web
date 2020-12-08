@@ -23,7 +23,7 @@
     <h2>
       <svg class="icon icon-hot" aria-hidden="true">
         <use xlink:href="#icon-hot"></use>
-      </svg>社区动态<span class="title-tip">SourceLay社区正式运营！</span>
+      </svg>社区动态<span class="title-tip">SourceLay 社区正式运营！</span>
     </h2>
     <div class="block-content">
       <!-- 轮播 -->
@@ -49,11 +49,9 @@
           <li @mouseover="showPost(index)" v-for="(item, index) in postInfo" :key="index" :class="[postInfoActive === index ? 'option-active' : '']">{{item}}</li>
         </ul>
         <ul class="post postList">
-          <li v-for="(item, index) in postInfoList" :key="index">
+          <li v-for="(item, index) in postInfoList" :key="index" @click="$router.push('/forums/topics/' + item.tid)">
               <span class="post-num">{{index + 1}}</span>
-              <router-link v-if="item.tid > 0" :to="{path: '/forums/topics/' + item.tid}">
                 <span>{{item.title}}</span>
-              </router-link>
               <div v-if="item.tid === 0">
                 <span>{{item.title}}</span>
               </div>
@@ -61,7 +59,7 @@
                 <span class="post-writer">{{item.author}}</span>
               </router-link> -->
               <!-- <div v-if="item.tid === 0"> -->
-                <span class="post-writer">{{item.author}}</span>
+                <span class="post-writer" @click.stop="console.log('打开用户')">{{item.author}}</span>
               <!-- </div> -->
           </li>
         </ul>
