@@ -3,7 +3,7 @@
     <h2 class="part-title">{{title}}</h2>
     <slot></slot>
     <post v-for="post in posts" :post="post" :key="post.id" :included="included"/>
-    <img v-if="posts === 0" class="empty" src="@/assets/empty.png" alt="">
+    <img v-if="posts.length === 0" class="empty" src="@/assets/empty.png" alt="">
   </ul>
 </template>
 
