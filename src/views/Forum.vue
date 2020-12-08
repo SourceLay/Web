@@ -245,7 +245,7 @@ export default {
           this.included[item.type + '.' + item.id] = item
         })
       }
-      if(typeof post.included != 'undefined'){
+      if(post && typeof post.included != 'undefined'){
         post.included.forEach((item) => {
           this.included[item.type + '.' + item.id] = item
         })
