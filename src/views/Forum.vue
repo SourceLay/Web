@@ -6,7 +6,7 @@
 -->
 <div class="para-content">
   <transition name="up">
-    <Editor v-if="showEditor"/>
+    <Editor v-if="showEditor" :replyData="null" :editData="null"/>
   </transition>
   <div class="banner">
     <img v-if="boardInfo.original[$route.params.id].translated.banner === ''" src="../assets/mc.jpg" alt="">

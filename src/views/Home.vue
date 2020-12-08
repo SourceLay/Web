@@ -123,8 +123,8 @@ export default {
       //banner内容
       indexBanner: [
         {
-          subTitle: "这个寒假，一起哈啤！",
-          title: "Server 鸽子号 is now online.",
+          subTitle: "",
+          title: "",
           btnText: "立即前往 ▶",
           url: "",
           image: require('../assets/banner.png'),
@@ -240,7 +240,7 @@ export default {
       });
     },homePageRecommendedFormat(index, data, includedInfo){
         data = data.data;
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < Math.min(data.length, 8); i++) {
           let thread = includedInfo.get(data[i].type + '.' + data[i].id);
           this.postInfoListPending[index][i].title = thread.attributes.title;
           this.postInfoListPending[index][i].tid = thread.id;
