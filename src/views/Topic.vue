@@ -512,8 +512,7 @@ export default {
       })
     },
     setEdit(id) {
-      // 这个防误触逻辑可以再优化一下
-      if (this.fixedEditor === 1) {
+      if (this.editData !== null) {
         return;
       }
 
@@ -573,7 +572,6 @@ export default {
     cancelEditing(){
       this.editData = null
       this.replyData = null
-      this.$refs.editor.closeEditor();
       this.$refs.editor.changeFixed(false);
     },
     getReplyData(id, user) {
