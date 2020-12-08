@@ -12,19 +12,19 @@
         <ul>
           <li
               :class="$route.name == 'Home' ? 'currentMenuItem' : 'normalMenuItem'"
-              @click="$router.push('/')">
+              @click="$route.name == 'Home' ? '' : $router.push('/')">
             首页</li>
           <li
               :class="$route.name == 'help' ? 'currentMenuItem' : 'normalMenuItem'"
-              @click="$router.push('/help')">
+              @click="$route.name == 'help' ? '' : $router.push('/help')">
             指南</li>
           <li
               :class="$route.name == 'Files' ? 'currentMenuItem' : 'normalMenuItem'"
-              @click="$router.push('/files')">
+              @click="$route.name == 'Files' ? '' : $router.push('/files')">
             我的文件</li>
           <li
               :class="$route.name == 'ShareStream' ? 'currentMenuItem' : 'normalMenuItem'"
-              @click="$router.push('/stream')">
+              @click="$route.name == 'ShareStream' ? '' : $router.push('/stream')">
             分享大厅</li>
         </ul>
       </div>
