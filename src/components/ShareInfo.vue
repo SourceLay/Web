@@ -19,7 +19,7 @@
           >
       </el-table-column>
       <el-table-column
-          prop="fileInfo.attributes.type"
+          prop="fileInfo.attributes.showType"
           label="类型"
           >
       </el-table-column>
@@ -41,7 +41,7 @@ import IncludedHelper from "@/helpers/includedHelper";
 import axios from "axios";
 import {dzq} from "@/public";
 import {globalErrorNotify} from "@/helpers/globalNotify";
-
+import typeTranslator from "@/helpers/typeTranslator";
 export default {
 name: "ShareInfo",
   props: ['reset'],
@@ -98,14 +98,14 @@ name: "ShareInfo",
         console.log(fileShare); // 这里拿出了分享信息
         console.log('fileInfo')
         console.log(fileInfo);  // 这里拿出了文件信息
-        
-        this.included = includedInfo.data;
 
+        this.included = includedInfo.data;
+        // 转换显示类型
+        fileInfo.attributes['showType'] = typeTranslator(fileInfo.attributes.type);
         this.cards.push({
           fileInfo: fileInfo,
           shareInfo: fileShare,
         })
-
       })
 
     },
