@@ -123,8 +123,8 @@ export default {
       //banner内容
       indexBanner: [
         {
-          subTitle: "这个寒假，一起哈啤！",
-          title: "Server 鸽子号 is now online.",
+          subTitle: "",
+          title: "",
           btnText: "立即前往 ▶",
           url: "",
           image: require('../assets/banner.png'),
