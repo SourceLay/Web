@@ -15,11 +15,14 @@
     <div class="intro boardName">
       <h1>
         <span v-for="(info, index) in boardName" :key="info.id">
-          <span v-if="index < boardName.length - 1"> 
-            <router-link :to="{path: '/forums/' + info.id}">{{info.name}}</router-link> /
+          <span v-if="(index < boardName.length - 1) && (index > 0)"> 
+            <router-link :to="{path: '/forums/' + info.id}">{{info.name}}</router-link>
           </span>
-          <span v-if="index === boardName.length - 1">
+          <span v-if="(index === boardName.length - 1) || (index === 0)">
             {{info.name}}
+          </span>
+          <span v-if="index < boardName.length - 1"> 
+            /
           </span>
         </span>
       </h1>
