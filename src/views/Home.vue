@@ -510,6 +510,9 @@ export default {
   float: right;
   opacity: 0.6;
 }
+.post-writer:hover{
+  color: red;
+}
 /* 论坛-板块 */
 .boards{
   display: flex;
