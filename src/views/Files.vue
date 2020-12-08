@@ -45,6 +45,7 @@
                 <div id="title-fileSize">大小</div>
                 <div id="title-fileDate">修改日期</div>
             </div>
+          <el-table v-if="loading" v-loading="loading" style="height: 200px;width: 100%;"></el-table>
             <form action="" method="get">
             <ul>
                 <li v-for="item in files" :key="item.attributes.id">
@@ -121,6 +122,7 @@ export default {
   components: {SetShareInfo},
   data(){
       return {
+        loading: true,
         newFolderVisible:false,
         newFolderName: '',
         setShareInfoVisible:false,
@@ -206,6 +208,8 @@ export default {
             }
             this.files = tmpFiles;
             console.log(this.data);
+
+            this.loading = false;
         });
 
     },
