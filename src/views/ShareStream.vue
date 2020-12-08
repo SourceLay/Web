@@ -391,8 +391,10 @@ export default {
     padding-top:4em;
 }
 #top{
-    height:330px;
-    background-image: url('../assets/shareStream.jpg');
+    height: 16em;
+    width: 100%;
+    object-fit: cover;
+    background-image: url('https://res.cloudinary.com/paracraft/image/upload/v1607435281/sourcelay/Banner/%E5%88%86%E4%BA%AB%E4%B8%AD%E5%BF%83.png');
 }
 #title{
     padding-left:100px;
