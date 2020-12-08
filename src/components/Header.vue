@@ -15,8 +15,8 @@
               @click="$route.name == 'Home' ? '' : $router.push('/')">
             首页</li>
           <li
-              :class="$route.name == 'help' ? 'currentMenuItem' : 'normalMenuItem'"
-              @click="$route.name == 'help' ? '' : $router.push('/help')">
+              :class="$route.path == '/forums/topics/9' ? 'currentMenuItem' : 'normalMenuItem'"
+              @click="$route.path == '/forums/topics/9' ? '' : $router.push('/forums/topics/9')">
             指南</li>
           <li
               :class="$route.name == 'Files' ? 'currentMenuItem' : 'normalMenuItem'"
