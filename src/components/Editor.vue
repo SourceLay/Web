@@ -441,10 +441,16 @@ export default {
   outline: none;
 }
 
-.input .input-container, .input-container >>> div, .input-container >>> textarea{
+.input .input-container
+{
   width: 100%;
   height: 12.5em;
-  line-height: 1.5em;
+  border: none;
+}
+
+.input-container >>> div, .input-container >>> textarea{
+  width: 100%;
+  min-height: 12.5em;
   color: var(--text-color);
   resize: none;
   border: none;
