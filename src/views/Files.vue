@@ -116,7 +116,7 @@ import axios from 'axios'
 import { dzq } from '@/public'
 import SetShareInfo from "@/components/SetShareInfo";
 // import IncludedHelper from '../helpers/includedHelper'
-import {globalErrorNotify} from "@/helpers/globalNotify";
+import {globalSuccessNotify, globalErrorNotify} from "@/helpers/globalNotify";
 
 export default {
   components: {SetShareInfo},
@@ -326,8 +326,8 @@ export default {
 
             axios.put(uploadUrl, file, config)
             .then(()=>{
-
-                 axios.put(
+                
+                axios.put(
                     dzq({
                         name: 'sourcelay/file',
                     }),
@@ -337,6 +337,7 @@ export default {
                 }).catch((err) => {
                     globalErrorNotify(this, err);
                 });
+                globalSuccessNotify(this, "正在上传，请稍候。");
 
             }).catch(() => {
                 globalErrorNotify(this, "请刷新页面后重试。");
