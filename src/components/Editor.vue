@@ -23,7 +23,7 @@
         </div>
         <!-- 输入框 -->
         <input v-if="!preview" v-model="title" placeholder="标题…" type="text">
-        <textarea v-if="!preview" v-model="content" ref="content" :placeholder="[replyData ? '回复#' + replyData.floor : '正文…']"></textarea>
+        <prism-editor :highlight="highlighter" v-if="!preview" v-model="content" ref="content" :placeholder="replyData ? '回复#' + replyData.floor : '正文…'"></prism-editor>
       </div>
       <!-- 底部工具 -->
       <div class="btns">
@@ -62,9 +62,19 @@
 import { mapState, mapMutations } from 'vuex'
 import XBBCODE from '.././xbbcode'
 import ShareInfo from "@/components/ShareInfo";
+
+// import Prism Editor
+import { PrismEditor } from 'vue-prism-editor';
+import 'vue-prism-editor/dist/prismeditor.min.css'; // import the styles somewhere
+
+// import highlighting library (you can use any library you want just return html string)
+import { highlight, languages } from 'prismjs/components/prism-core';
+import 'prismjs/components/prism-bbcode';
+import 'prismjs/themes/prism-tomorrow.css'; // import syntax highlighting styles
+
 export default {
   name: 'editor',
-  components: {ShareInfo},
+  components: {ShareInfo, PrismEditor},
   props: [
     'replyData'
   ],
@@ -213,19 +223,19 @@ export default {
 
     },
     insertBBCodeSegment(bbcodeL, bbcodeR = '') {
-      var content = this.$refs.content
+      let content = this.$refs.content.$el.childNodes[0].childNodes[0];
       if(content.selectionStart === content.selectionEnd){
-        var oldSelection = content.selectionStart
+        let oldSelection = content.selectionStart
         this.content = this.content.slice(0, content.selectionStart) + bbcodeL + bbcodeR + this.content.slice(content.selectionStart)
-        this.$refs.content.focus()
+        content.focus()
         this.$nextTick(function(){
           content.setSelectionRange(oldSelection + bbcodeL.length, oldSelection + bbcodeL.length)
         })
       }else{
-        var oldSelectionStart = content.selectionStart
-        var oldSelectionEnd = content.selectionEnd
+        let oldSelectionStart = content.selectionStart
+        let oldSelectionEnd = content.selectionEnd
         this.content = this.content.slice(0, content.selectionStart) + bbcodeL + this.content.slice(content.selectionStart, content.selectionEnd) + bbcodeR + this.content.slice(content.selectionEnd)
-        this.$refs.content.focus()
+        content.focus()
         this.$nextTick(function(){
           content.setSelectionRange(oldSelectionStart, oldSelectionEnd + bbcodeL.length + bbcodeR.length)
         })
@@ -299,7 +309,7 @@ export default {
     },
     changeImage() {
       let files = this.$refs.load_pic.files
-      let content = this.$refs.content
+      let content = this.$refs.content.$el.childNodes[0].childNodes[0];
       files.forEach(e => {
         let data = new FormData()
         this.content = this.content.slice(0, content.selectionStart) + '[img=' + e.name +']上传中[/img]\n' + this.content.slice(content.selectionStart)
@@ -314,7 +324,10 @@ export default {
           this.error = error.response.data.errors[0].detail[0]
         })
       })
-    }
+    },
+    highlighter(code) {
+      return highlight(code, languages.bbcode); // languages.<insert language> to return html with markup
+    },
   }
 }
 </script>
@@ -390,7 +403,7 @@ export default {
   background: none;
   outline: none;
 }
-.input textarea{
+.input >>> div, .input >>> textarea{
   width: 100%;
   height: 12.5em;
   line-height: 1.5em;
