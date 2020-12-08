@@ -241,7 +241,7 @@ export default {
       });
     },homePageRecommendedFormat(index, data, includedInfo){
         data = data.data;
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < Math.min(data.length, 8); i++) {
           let thread = includedInfo.get(data[i].type + '.' + data[i].id);
           this.postInfoListPending[index][i].title = thread.attributes.title;
           this.postInfoListPending[index][i].tid = thread.id;
