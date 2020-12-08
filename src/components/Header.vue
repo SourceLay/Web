@@ -38,7 +38,7 @@
         <!-- 登录框-游客 -->
         <div v-if="status === 'guest' && page === 1" class="guest">
           <div class="login">
-            <h2>登录派瑞派对</h2>
+            <h2>登录SourceLay</h2>
             <div class="login-form">
               <input v-model="loginForm.username" placeholder="用户名" type="text">
               <input v-model="loginForm.password" placeholder="密码" type="password">
@@ -62,7 +62,7 @@
 
         <div v-if="status === 'guest'  && page === 2" class="guest">
           <div class="login">
-            <h2>注册派瑞派对</h2>
+            <h2>注册SourceLay</h2>
             <div class="login-form">
               <input v-model="loginForm.username" placeholder="用户名" type="text">
               <input v-model="loginForm.password" placeholder="密码" type="password">

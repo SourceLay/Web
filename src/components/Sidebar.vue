@@ -16,7 +16,7 @@
     </div>
     <div class="menu noise">
       <div class="menu-title title-text">
-        <p>派瑞派对</p>
+        <p>SourceLay</p>
       </div>
       <ul class="menu-list">
         <router-link to="/">

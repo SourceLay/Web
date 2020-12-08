@@ -23,7 +23,7 @@
     <h2>
       <svg class="icon icon-hot" aria-hidden="true">
         <use xlink:href="#icon-hot"></use>
-      </svg>社区动态<span class="title-tip">派瑞派对社区正式运营活动开启！</span>
+      </svg>社区动态<span class="title-tip">SourceLay社区正式运营！</span>
     </h2>
     <div class="block-content">
       <!-- 轮播 -->
@@ -94,7 +94,7 @@
       <li>隐私和Cookies</li>
       <li>使用条款</li>
       <li>关于我们</li>
-      <li>© 2019 派瑞派对</li>
+      <li>© 2020 SourceLay</li>
     </ul>
   </div>
 </div>
