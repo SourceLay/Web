@@ -14,17 +14,17 @@
           >
       </el-table-column>
       <el-table-column
-          prop="filename"
+          prop="fileInfo.attributes.name"
           label="文件名"
           >
       </el-table-column>
       <el-table-column
-          prop="type"
+          prop="fileInfo.attributes.type"
           label="类型"
           >
       </el-table-column>
       <el-table-column
-          prop="likedCount"
+          prop="fileInfo.attributes.like_count"
           label="点赞数"
           >
       </el-table-column>
@@ -69,7 +69,7 @@ name: "ShareInfo",
           dzq({
             name: 'sourcelay/fileshare',
             include: [
-              'file', 'posts', 'threads', 'user'
+              'file'
             ],
             filter: {
               self: true,
@@ -98,40 +98,12 @@ name: "ShareInfo",
         console.log(fileShare); // 这里拿出了分享信息
         console.log('fileInfo')
         console.log(fileInfo);  // 这里拿出了文件信息
-
-        let threadsList = [];
-        fileShare.relationships.threads.data.forEach(threadIndex => {
-          threadsList.push(
-              includedInfo.get('threads.' + threadIndex.id)
-          )
-        })
-        console.log('threadsList')
-        console.log(threadsList);  // 这里列出了这个分享的所有的帖子信息
-
-        // let postsList = [];
-        // fileShare.relationships.posts.data.forEach(threadIndex => {
-        //   postsList.push(
-        //       includedInfo.get('posts.' + threadIndex.id)
-        //   )
-        // })
-        // console.log('postList')
-        // console.log(postsList);  // 这里列出了这个分享的所有的帖子信息
-
-        let passge = [];
-        threadsList.forEach((s) => {
-          passge.push(s);
-        })
-
+        
         this.included = includedInfo.data;
 
         this.cards.push({
-          id: fileShare.attributes.id,
-          type: fileInfo.attributes.type,
-          filename: fileInfo.attributes.name,
-          downloadLink: fileShare.attributes.downloadUrl ?? '',
-          isLiked: fileInfo.attributes.is_liked ?? false,
-          likedCount: fileInfo.attributes.likedCount ?? 0,
-          Passge: passge,
+          fileInfo: fileInfo,
+          shareInfo: fileShare,
         })
 
       })
