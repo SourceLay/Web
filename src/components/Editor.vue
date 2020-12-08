@@ -150,10 +150,10 @@ export default {
         value: 0
       })
     },
-    changeFixed: function() {
+    changeFixed: function(status = null) {
       this.setData({
         key: 'fixedEditor',
-        value: !this.fixedEditor
+        value: status ?? !this.fixedEditor
       })
     },
     opentool: function(e) {
@@ -322,7 +322,8 @@ export default {
       })
     },
     cancelEdit() {
-      this.content = null;
+      this.content = "";
+      this.$emit('cancelEditing')
     }
   }
 }

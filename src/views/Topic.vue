@@ -151,7 +151,7 @@
         </div>
       </li>
       <li :class="[fixedEditor ? 'fixed-editor' : '']">
-        <Editor ref="editor" :editData="editData" :replyData="replyData" @sendPost="sendPost" />
+        <Editor ref="editor" :editData="editData" :replyData="replyData" @sendPost="sendPost" @cancelEditing="cancelEditing"/>
       </li>
     </ul>
     <!-- 侧边进度条 -->
@@ -569,6 +569,12 @@ export default {
       this.editData = null
       this.replyData = null
 
+    },
+    cancelEditing(){
+      this.editData = null
+      this.replyData = null
+      this.$refs.editor.closeEditor();
+      this.$refs.editor.changeFixed(false);
     },
     getReplyData(id, user) {
       //加载数据中已有该贴
