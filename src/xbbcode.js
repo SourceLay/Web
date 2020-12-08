@@ -237,11 +237,16 @@ var XBBCODE = (function() {
               }
 
               ////////
+              let ret = ""
+              try {
+                let render = require('./helpers/prismHelper').default;
+                ret = render(language, content);
+              } catch (e) {
+                console.log(e);
+                ret = "渲染出错";
+              }
 
-              let render = require('./helpers/prismHelper').default;
-              let ret = render(language, content);
               let pre = "";
-
               if (!inline) {
                 pre = '<div class="xbbcode-code xbbcode-code-block"><pre><code>'
               } else {
@@ -577,8 +582,16 @@ var XBBCODE = (function() {
       
       "latex": {
         openTag: function(params,content) {
-          let render = require('./helpers/tex2svg').default;
-          let result = render(content);
+          let result = "";
+          try {
+            let render = require('./helpers/tex2svg').default;
+            result = render(content);
+          }
+          catch (e) {
+            console.log(e);
+            result.html = "渲染出错";
+          }
+          
           return "<div style=\"display: inline-block;\">" + result.html;
         },
         closeTag: function(params,content) {
