@@ -6,7 +6,7 @@
     </div>
     <div class="post-title">
       <h2 v-html="getPostTitle(post.attributes.title)"></h2>
-      <p>{{included['posts.' + post.relationships.firstPost.data.id].attributes.content}}</p>
+      <p>{{getContent(included['posts.' + post.relationships.firstPost.data.id].attributes.content)}}</p>
     </div>
     <div class="post-other">
       <div class="post-info">
@@ -36,7 +36,9 @@ import UserCard from '@/components/UserCard.vue'
 import { mapMutations } from 'vuex'
 import { getPostTitle, getPostTag, getTime } from '@/public'
 import tippy from 'tippy.js';
+import XBBCODE from '../../xbbcode'
 import 'tippy.js/dist/tippy.css'; // optional for styling
+
 export default {
   props: ['post', 'included'],
   components: {
@@ -53,6 +55,14 @@ export default {
       this.$router.push({
         path: '/forums/topics/' + id
       })
+    },
+    getContent(content) {
+      return XBBCODE.process({
+        text: content,
+        removeMisalignedTags: false,
+        addInLineBreaks: true,
+        clean: true
+      }).clean;
     }
   },
   mounted () {
