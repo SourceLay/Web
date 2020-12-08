@@ -140,7 +140,8 @@ export default {
         {
           name: 'mokuai',
           optionType: 'list',
-          action: 'fileshare'
+          action: 'fileshare',
+          option: ['添加文件']
         },
       ],
       preview: '',

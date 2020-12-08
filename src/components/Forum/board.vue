@@ -3,14 +3,21 @@
     <h2 class="part-title">{{title}}</h2>
     <slot></slot>
     <post v-for="post in posts" :post="post" :key="post.id" :included="included"/>
-    <img v-if="posts.length === 0" class="empty" src="@/assets/empty.png" alt="">
+    <img v-if="withNoContent && (posts.length === 0)" class="empty" src="@/assets/empty.png" alt="">
   </ul>
 </template>
 
 <script>
 import post from '@/components/Forum/post.vue'
 export default {
-  props: ['title', 'posts', 'included'],
+  props: {
+    title: {},
+    posts: {},
+    included: {},
+    withNoContent: {
+      default: true
+    },
+  },
   components: {
     post
   }
