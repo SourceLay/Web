@@ -18,7 +18,7 @@
         <!-- 预览区 -->
         <div @click="closePreview" v-if="preview" v-html="preview" class="preview bbcode"></div>
         <!-- 提示 -->
-        <div :class="['error', isError ? 'error-open' : '']">
+        <div v-if="isError === 1" :class="['error', isError ? 'error-open' : '']">
           <p>{{error}}</p>
         </div>
         <!-- 输入框 -->
