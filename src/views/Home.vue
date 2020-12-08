@@ -23,7 +23,7 @@
     <h2>
       <svg class="icon icon-hot" aria-hidden="true">
         <use xlink:href="#icon-hot"></use>
-      </svg>社区动态<span class="title-tip">SourceLay社区正式运营！</span>
+      </svg>社区动态<span class="title-tip">SourceLay 社区正式运营！</span>
     </h2>
     <div class="block-content">
       <!-- 轮播 -->
