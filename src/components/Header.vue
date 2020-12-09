@@ -41,8 +41,8 @@
           <div class="login">
             <h2>登录SourceLay</h2>
             <div class="login-form">
-              <input v-model="loginForm.username" placeholder="用户名" type="text">
-              <input v-model="loginForm.password" placeholder="密码" type="password">
+              <input v-model="loginForm.username" placeholder="用户名" @keydown.enter="login" type="text">
+              <input v-model="loginForm.password" placeholder="密码" @keydown.enter="login" type="password">
             </div>
             <div class="login-btn">
               <span class="forget">忘记密码</span>
@@ -298,6 +298,7 @@ export default {
       })
       this.loginForm.username = ''
       this.loginForm.password = ''
+      location.reload();//注銷刷新
     },
     getAvatar: function() {
       return this.userInfo?.avatar ?? '../assets/avatar.png';
