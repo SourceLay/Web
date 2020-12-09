@@ -2,8 +2,11 @@
   <div @mouseleave="closeBox" :class="[headerAbove ? 'header-above' : '', $route.name === 'Home' ? '' : 'fourm-header', 'header']">
     <div class="content">
       <div v-if="$route.name !== 'Search'" class="search">
-        <i class="iconfont icon-sousuo"></i>
-        <input @keyup.enter="goSearch" v-model="search" placeholder="搜索" type="text">
+        <form>
+          <input type="text" style="display: none;">
+          <input @keyup.enter="goSearch" v-model="search" placeholder="搜索" type="text">
+          <i class="iconfont icon-sousuo" @click="goSearch"></i>
+        </form>
       </div>
       <div class="menu">
         <ul>
@@ -343,6 +346,9 @@ export default {
   right: 5px;
   font-size: 1.25em !important;
   color: var(--text-color);
+}
+.icon-sousuo:hover{
+  cursor: pointer;
 }
 .center{
   position: absolute;
