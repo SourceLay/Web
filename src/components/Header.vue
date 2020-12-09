@@ -90,10 +90,21 @@
         <div v-if="status === 'login'" class="user">
           <h2>欢迎回来，{{userInfo.username}}</h2>
           <ul class="user-menu">
-            <li><div></div><p>空间</p></li>
-            <li @click="setUserInfoVisible=true"><div></div><p>设置</p></li>
-            <li><div></div><p>徽章</p></li>
-            <li @click="exit"><div></div><p>注销</p></li>
+            <li>
+              <div><img src="https://res.cloudinary.com/paracraft/image/upload/v1607411735/sourcelay/Menultem/%E7%A9%BA%E9%97%B4.png"></div>
+              <p>空间</p>
+            </li>
+            <li @click="setUserInfoVisible=true">
+              <div><img src="https://res.cloudinary.com/paracraft/image/upload/v1607411735/sourcelay/Menultem/%E8%AE%BE%E7%BD%AE.png"></div>
+              <p>设置</p>
+            </li>
+            <li>
+              <div><img src="https://res.cloudinary.com/paracraft/image/upload/v1607411735/sourcelay/Menultem/%E5%BE%BD%E7%AB%A0.png"></div>
+              <p>徽章</p>
+            </li>
+            <li @click="exit">
+              <div><img src="https://res.cloudinary.com/paracraft/image/upload/v1607411735/sourcelay/Menultem/%E6%B3%A8%E9%94%80.png"></div>
+              <p>注销</p></li>
           </ul>
         </div>
       </div>
@@ -611,5 +622,8 @@ export default {
 }
 .currentMenuItem {
   color: red;
+}
+ul>li>div>img{
+  width: 100%;
 }
 </style>
