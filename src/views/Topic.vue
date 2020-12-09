@@ -362,9 +362,11 @@ export default {
             this.threadId = to.params.id;
             this.formatData = {};
             this.selfPostFloor = [];
-            this.$forceUpdate();
+            this.selfPost = [];
+            this.showPost = []
 
             this.getData(topic.data, post.data, page, floor)
+            this.$forceUpdate();
             document.title = topic.data.data.attributes.title;
         })
       })
@@ -515,6 +517,9 @@ export default {
           delay: 100
         })
       })
+
+      console.log(this.firstPost)
+      console.log(this.formatData)
     },
     getContent(content) {
       if (content === undefined || content == null || content === '') return;
