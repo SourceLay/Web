@@ -74,7 +74,7 @@ export function getPostTag(id, title, star) {
   }
 }
 //获取帖子标题
-export function getPostTitle(title) {
+export function getPostTitle(title, category = null) {
   if(['[公告]', '[活动]', '[版规]'].includes(title.slice(0, 4))){
     return title.slice(4)
   }else{
@@ -114,6 +114,15 @@ export function getPostTitle(title) {
     tags.forEach(tag => {
       final += "<a href=\"/search?q=tag:" + tag.replace(/\[|\]/g, '') + "\"><span>" + tag + "</span></a>"
     })
+
+    if (category !== null) {
+      let names = category.attributes.name.split('.');
+      let id = category.id;
+      let name = names[names.length - 1];
+
+      final =  `<a href="/forums/${id}"><span>[${name}]</span></name>` + final;
+    }
+
     return '<div>' + final + '</div>' + s.substring(last_valid).trim();
   }
 }
