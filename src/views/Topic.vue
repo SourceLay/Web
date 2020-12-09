@@ -4,13 +4,13 @@
   <div :class="['banner', loadPage[0] === 1 ? '' : 'hide']">
     <img v-if="category.attributes.banner === ''" src="../assets/mc.jpg" alt="">
     <img v-if="category.attributes.banner !== ''" :src="category.attributes.banner" alt="">
-    <div v-once :class="['banner-cover','tag', getPostTag(topic.relationships.user.data.id, topic.attributes.title, topic.attributes.isEssence)]"></div>
+    <div :class="['banner-cover','tag', getPostTag(topic.relationships.user.data.id, topic.attributes.title, topic.attributes.isEssence)]"></div>
     <!-- 帖子信息 -->
     <div class="intro">
-      <h1 v-once class="title" v-html="getPostTitle(topic.attributes.title)"></h1>
+      <h1 class="title" v-html="getPostTitle(topic.attributes.title)"></h1>
       <p :data-tippy-content="new Date(topic.attributes.createdAt).toLocaleString()">
         发表于
-        <span v-once v-html="getTime(topic.attributes.createdAt)"></span>
+        <span v-html="getTime(topic.attributes.createdAt)"></span>
       </p>
     </div>
   </div>
