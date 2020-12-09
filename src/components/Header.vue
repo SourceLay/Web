@@ -91,19 +91,19 @@
           <h2>欢迎回来，{{userInfo.username}}</h2>
           <ul class="user-menu">
             <li>
-              <div><img :src="require('../assets/空间.svg')"></div>
+              <div class="home-btn-block"><img :src="require('../assets/home.svg')" class="home-btn"></div>
               <p>空间</p>
             </li>
-            <li @click="setUserInfoVisible=true">
-              <div><img :src="require('../assets/设置.svg')"></div>
+            <li @click="setUserInfoVisible=true" class="home-btn-block">
+              <div><img :src="require('../assets/setting.svg')" class="home-btn"></div>
               <p>设置</p>
             </li>
-            <li>
-              <div><img :src="require('../assets/徽章.svg')"></div>
+            <li class="home-btn-block">
+              <div><img :src="require('../assets/gallery.svg')" class="home-btn"></div>
               <p>徽章</p>
             </li>
-            <li @click="exit">
-              <div><img :src="require('../assets/注销.svg')"></div>
+            <li @click="exit" class="home-btn-block">
+              <div><img :src="require('../assets/logout.svg')" class="home-btn"></div>
               <p>注销</p></li>
           </ul>
         </div>
@@ -629,5 +629,12 @@ export default {
 }
 ul>li>div>img{
   width: 100%;
+}
+.home-btn {
+  margin-top: 10%;
+  width: 80%;
+}
+.home-btn-block {
+
 }
 </style>
