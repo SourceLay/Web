@@ -253,7 +253,11 @@ export default {
           attr.content = this.content
 
           this.axios.patch(dzq({
-              name: 'posts/' + post_id
+              name: 'posts/' + post_id,
+              include: [
+                'user',
+                'user.groups',
+              ],
             }), {
             data: {
                 id: post_id,
