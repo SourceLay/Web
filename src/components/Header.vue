@@ -1,6 +1,7 @@
 <template>
   <div @mouseleave="maybeHideLoginBox" :class="[headerAbove ? 'header-above' : '', $route.name === 'Home' ? '' : 'fourm-header', 'header']">
     <div class="content">
+      <img style="width: 5%;margin-left: -5.5%;margin-right: 1em;" src="https://res.cloudinary.com/paracraft/image/upload/v1607424052/sourcelay/SourceLayLogo/SourceLayLOGO4.png">
       <div v-if="$route.name !== 'Search'" class="search">
         <i class="iconfont icon-sousuo"></i>
         <form>
@@ -10,11 +11,22 @@
       </div>
       <div class="menu">
         <ul>
-          <li>商城</li>
-          <li>会员</li>
-          <li>移动端</li>
-          <li>游戏</li>
-          <li>帮助</li>
+          <li
+              :class="$route.name == 'Home' ? 'currentMenuItem' : 'normalMenuItem'"
+              @click="$route.name == 'Home' ? '' : $router.push('/')">
+            首页</li>
+          <li
+              :class="$route.path == '/forums/topics/9' ? 'currentMenuItem' : 'normalMenuItem'"
+              @click="$route.path == '/forums/topics/9' ? '' : $router.push('/forums/topics/9')">
+            指南</li>
+          <li
+              :class="$route.name == 'Files' ? 'currentMenuItem' : 'normalMenuItem'"
+              @click="$route.name == 'Files' ? '' : $router.push('/files')">
+            我的文件</li>
+          <li
+              :class="$route.name == 'ShareStream' ? 'currentMenuItem' : 'normalMenuItem'"
+              @click="$route.name == 'ShareStream' ? '' : $router.push('/stream')">
+            分享大厅</li>
         </ul>
       </div>
       <div @mouseenter="showLoginBox" class="avatar">
@@ -27,7 +39,7 @@
         <!-- 登录框-游客 -->
         <div v-if="status === 'guest' && page === 1" class="guest">
           <div class="login">
-            <h2>登录派瑞派对</h2>
+            <h2>登录SourceLay</h2>
             <div class="login-form">
               <input v-model="loginForm.username" placeholder="用户名" type="text">
               <input v-model="loginForm.password" placeholder="密码" type="password">
@@ -51,7 +63,7 @@
 
         <div v-if="status === 'guest'  && page === 2" class="guest">
           <div class="login">
-            <h2>注册派瑞派对</h2>
+            <h2>注册SourceLay</h2>
             <div class="login-form">
               <input v-model="loginForm.username" placeholder="用户名" type="text">
               <input v-model="loginForm.password" placeholder="密码" type="password">
@@ -251,6 +263,7 @@ export default {
 
         this.loginLoad = 0
 
+        location.reload();//登录成功时刷新
       }).catch((error) => {
         console.log(error)
         this.loginErrorText= '你的用户名或密码有问题'
@@ -592,5 +605,11 @@ export default {
 .user-menu p{
   color: var(--text-color);
   margin-top: 0.2em;
+}
+.normalMenuItem {
+  cursor: pointer;
+}
+.currentMenuItem {
+  color: red;
 }
 </style>

@@ -47,7 +47,7 @@
             <!-- 功能 -->
             <ul class="post-func">
               <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canHide">删除</li>
-              <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canEdit">编辑</li>
+              <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canEdit" @click="setEdit(topic.relationships.firstPost.data.id)">编辑</li>
               <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canLike && included['posts.' + topic.relationships.firstPost.data.id].attributes.isLiked === false" @click="setLike($event, topic.relationships.firstPost.data.id, true)">点赞</li>
               <li v-if="included['posts.' + topic.relationships.firstPost.data.id].attributes.canLike && included['posts.' + topic.relationships.firstPost.data.id].attributes.isLiked === true" @click="setLike($event, topic.relationships.firstPost.data.id, false)">取赞</li>
               <li @click="setReply(1, topic.relationships.firstPost.data.id)">回复#1</li>
@@ -96,7 +96,7 @@
             <!-- 功能 -->
             <ul class="post-func">
               <li v-if="included['posts.' + id].attributes.canHide">删除</li>
-              <li v-if="included['posts.' + id].attributes.canEdit">编辑</li>
+              <li v-if="included['posts.' + id].attributes.canEdit" @click="setEdit(id)">编辑</li>
               <li v-if="included['posts.' + id].attributes.canLike && included['posts.' + id].attributes.isLiked === false" @click="setLike($event, id, true)">点赞</li>
               <li v-if="included['posts.' + id].attributes.canLike && included['posts.' + id].attributes.isLiked === true" @click="setLike($event, id, false)">取赞</li>
               <li @click="setReply(startFloor + index, id)">回复#{{startFloor + index}}</li>
@@ -142,7 +142,7 @@
             <!-- 功能 -->
             <ul class="post-func">
               <li v-if="included['posts.' + id].attributes.canHide">删除</li>
-              <li v-if="included['posts.' + id].attributes.canEdit">编辑</li>
+              <li v-if="included['posts.' + id].attributes.canEdit" @click="setEdit(id)">编辑</li>
               <li v-if="included['posts.' + id].attributes.canLike && included['posts.' + id].attributes.isLiked === false" @click="setLike($event, id, true)">点赞</li>
               <li v-if="included['posts.' + id].attributes.canLike && included['posts.' + id].attributes.isLiked === true" @click="setLike($event, id, false)">取赞</li>
               <li @click="setReply(selfPostFloor[index], id)">回复#{{selfPostFloor[index]}}</li>
@@ -151,7 +151,7 @@
         </div>
       </li>
       <li :class="[fixedEditor ? 'fixed-editor' : '']">
-        <Editor :replyData="replyData" @sendPost="sendPost" />
+        <Editor ref="editor" :editData="editData" :replyData="replyData" @sendPost="sendPost" @cancelEditing="cancelEditing"/>
       </li>
     </ul>
     <!-- 侧边进度条 -->
@@ -214,6 +214,7 @@ export default {
           banner: ''
         }
       },
+
       threadId: 0,
       sharePasswordVisible: false, //分享密码框是否可见
       sharePassword: '', //分享密码
@@ -222,19 +223,20 @@ export default {
       showPost: [],       //当前展示的帖子ID
       jumpUrl: {},
       replyData: null,    //预备回复信息
-      replyId: [],      //存放引用回复信息
+      editData: null,     //预备编辑信息
+      replyId: [],        //存放引用回复信息
 
       inBar: 0,           //进度条激活状态
-      allFloor: null,       //获取所有楼层数
+      allFloor: null,     //获取所有楼层数
       allPage: null,      //获取所有页数
       seekbarPercent: 0,  //进度条百分比
       seekbarY: 0,        //进度条Y轴
       seekbarFloor: 1,    //进度条当前楼层
 
-      firstPost: {},    //存放楼主数据
+      firstPost: {},      //存放楼主数据
 
-      selfPost: [],      //存放自我回复楼层id
-      selfPostFloor: [], //存放自我回复楼层数
+      selfPost: [],       //存放自我回复楼层id
+      selfPostFloor: [],  //存放自我回复楼层数
       included: {},       //存放关联数据
       startFloor: 0,      //起始楼层
       loadPage: [1, 1],   //加载页面
@@ -307,6 +309,68 @@ export default {
       })
     })
   },
+  beforeRouteUpdate(to, from, next) {
+    if (from.params.id !== to.params.id) {
+      axios.get(
+        dzq({
+          name: 'threads/' + to.params.id,
+          include: [
+            'firstPost',
+            'category',
+            'user.groups',
+            'firstPost.likedUsers',
+            'firstPost.file',
+            'firstPost.fileShare',
+          ]
+        })
+      ).then((topic) => {
+        //获取楼层数据
+        let floor = 1, page = 1
+        if(location.search.substr(0, 3) === '?n='){
+          floor = parseInt(location.search.substr(3))
+          page = Math.ceil((floor - 1) / 20)
+        }
+        if(floor >= topic.data.data.attributes.postCount || floor < 0 || !floor){
+          floor = 1
+          page = 1
+        }
+        //获取回复
+        axios.get(
+          dzq({
+            name: 'posts',
+            filter: {
+              // isDeleted: 'no',
+              thread: to.params.id
+            },
+            include: [
+              'user',
+              'user.groups',
+              'likedUsers',
+              'file',
+              'fileShare',
+            ],
+            page: {
+              number: page,
+              limit: 20
+            }
+          })
+        ).then((post) => {
+            let included = new IncludedHelper(topic.data.included);
+            this.category = included.get(
+              'categories.' + topic.data.data.relationships.category.data.id
+            )
+            this.threadId = to.params.id;
+            this.formatData = {};
+            this.selfPostFloor = [];
+            this.$forceUpdate();
+
+            this.getData(topic.data, post.data, page, floor)
+            document.title = topic.data.data.attributes.title;
+        })
+      })
+    }
+    next();
+  },
   components: {
     Editor, Pay
   },
@@ -375,6 +439,7 @@ export default {
     },
     showEditor: function() {
       this.replyData = null
+      this.editData = null;
       this.setData({
         key: 'fixedEditor',
         value: 1
@@ -534,36 +599,83 @@ export default {
       }
     }),
     setReply(floor, id) {
-      this.setData({
-        key: 'fixedEditor',
-        value: 1
-      })
+      this.editData = null;
       this.replyData = {
         floor: floor,
         id: id
       }
+      this.setData({
+        key: 'fixedEditor',
+        value: 1
+      })
+    },
+    setEdit(id) {
+      if (this.editData !== null) {
+        return;
+      }
+
+      this.replyData = null;
+      this.editData = {
+        id: id
+      }
+      console.log(this.included[`posts.${id}`]);
+      this.$refs.editor.content = this.included[`posts.${id}`]?.attributes?.content ?? '';
+      this.setData({
+        key: 'fixedEditor',
+        value: 1
+      })
     },
     sendPost(data) {
+      //存放关联数据
       this.included['posts.' + data.data.id] = data.data
-      if(data.data.attributes.replyPostId){
-        this.replyId.push({
-          id: data.data.attributes.replyPostId,
-          user: data.data.attributes.replyUserId
-        })
+      data.included.forEach((item) => {
+        this.included[item.type + '.' + item.id] = item
+      })
+
+      if (this.editData) {
+        let tmp = {
+          time : this.getTime(this.included[`posts.${data.data.id}`].attributes.createdAt),
+          content : this.getContent(this.included[`posts.${data.data.id}`].attributes.content),
+          likedUser : this.getLikedUser(this.included[`posts.${data.data.id}`].relationships?.likedUsers?.data)
+        }
+
+        if(this.topic.relationships.firstPost.data.id === data.data.id){
+          this.firstPost = tmp;
+        }else{
+          this.formatData[`posts.${data.data.id}`] = tmp
+        }
+        
+        this.$forceUpdate()
       }
-      this.selfPost.push(data.data.id)
+      else
+      {
+        if(data.data.attributes.replyPostId){
+          this.replyId.push({
+            id: data.data.attributes.replyPostId,
+            user: data.data.attributes.replyUserId
+          })
+        }
+        this.selfPost.push(data.data.id)
 
-      let includedInfo = new IncludedHelper(data.included);
-      let threadInfo = includedInfo.get('threads.' + data.data.relationships.thread.data.id);
+        let includedInfo = new IncludedHelper(data.included);
+        let threadInfo = includedInfo.get('threads.' + data.data.relationships.thread.data.id);
 
-      this.selfPostFloor.push(data.data.attributes.floor)
-      this.allFloor = threadInfo.attributes.postCount
+        this.selfPostFloor.push(data.data.attributes.floor)
+        this.allFloor = threadInfo.attributes.postCount
+      }
 
       this.setData({
         key: 'fixedEditor',
         value: 0
       })
+      this.editData = null
       this.replyData = null
+
+    },
+    cancelEditing(){
+      this.editData = null
+      this.replyData = null
+      this.$refs.editor.changeFixed(false);
     },
     getReplyData(id, user) {
       //加载数据中已有该贴
@@ -572,7 +684,7 @@ export default {
       }
       if(this.included['posts.' + id]){
         data.user = this.included['users.' + user].attributes.username
-        data.content = XBBCODE.process({
+        data.content = XBBCODE().process({
           text: this.included['posts.' + id].attributes.content,
           removeMisalignedTags: false,
           addInLineBreaks: true,
@@ -602,7 +714,7 @@ export default {
           let userInfo = includedInfo.get('users.' + res.data.data.relationships.user.data.id);
           data.user = userInfo.attributes.username
           data.floor = res.data.data.attributes.floor
-          data.content = XBBCODE.process({
+          data.content = XBBCODE().process({
             text: res.data.data.attributes.content,
             removeMisalignedTags: false,
             addInLineBreaks: true,
@@ -658,11 +770,14 @@ export default {
 
         if (typeof(shareInfo) == 'undefined' || shareInfo === null || typeof(fileInfo) == 'undefined' || fileInfo === null) {
           globalErrorNotify(this, "请刷新页面后重试。");
+          return;
         }
 
         // 如果已经可以下载了
         if (shareInfo.attributes.downloadUrl) {
           this.downloadShareFile(shareInfo, fileInfo);
+          globalSuccessNotify(this, "正在下载，请稍候。");
+          return;
         }
 
         // 密码下载
@@ -672,6 +787,7 @@ export default {
 
           this.sharePassword = '';//清空上次输入
           this.sharePasswordVisible = true;
+          return;
         }
 
         //付费下载
@@ -706,7 +822,10 @@ export default {
           } else {
             globalErrorNotify(this, "您尚未设置支付密码。");
           }
+          return;
         }
+
+        globalErrorNotify(this, "请刷新页面后重试，若多次出现本错误请联系管理员。");
       }
     },
     attemptRequireDownloadUrl(shareInfo, fileInfo) {

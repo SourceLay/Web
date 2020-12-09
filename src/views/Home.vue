@@ -7,7 +7,7 @@
         <div class="banner-content">
           <p>{{banner.subTitle}}</p>
           <h1>{{banner.title}}</h1>
-          <a :href="banner.url">{{banner.btnText}}</a>
+          <a v-bind:href="indexBanner[indexBannerActive].url">{{banner.btnText}}</a>
           <img :src="banner.image" alt="">
         </div>
       </li>
@@ -23,7 +23,7 @@
     <h2>
       <svg class="icon icon-hot" aria-hidden="true">
         <use xlink:href="#icon-hot"></use>
-      </svg>社区动态<span class="title-tip">派瑞派对社区正式运营活动开启！</span>
+      </svg>社区动态<span class="title-tip">SourceLay 社区正式运营！</span>
     </h2>
     <div class="block-content">
       <!-- 轮播 -->
@@ -49,11 +49,9 @@
           <li @mouseover="showPost(index)" v-for="(item, index) in postInfo" :key="index" :class="[postInfoActive === index ? 'option-active' : '']">{{item}}</li>
         </ul>
         <ul class="post postList">
-          <li v-for="(item, index) in postInfoList" :key="index">
+          <li v-for="(item, index) in postInfoList" :key="index" @click="$router.push('/forums/topics/' + item.tid)">
               <span class="post-num">{{index + 1}}</span>
-              <router-link v-if="item.tid > 0" :to="{path: '/forums/topics/' + item.tid}">
                 <span>{{item.title}}</span>
-              </router-link>
               <div v-if="item.tid === 0">
                 <span>{{item.title}}</span>
               </div>
@@ -61,7 +59,7 @@
                 <span class="post-writer">{{item.author}}</span>
               </router-link> -->
               <!-- <div v-if="item.tid === 0"> -->
-                <span class="post-writer">{{item.author}}</span>
+                <span class="post-writer" @click.stop="console.log('打开用户')">{{item.author}}</span>
               <!-- </div> -->
           </li>
         </ul>
@@ -94,7 +92,7 @@
       <li>隐私和Cookies</li>
       <li>使用条款</li>
       <li>关于我们</li>
-      <li>© 2019 派瑞派对</li>
+      <li>© 2020 SourceLay</li>
     </ul>
   </div>
 </div>
@@ -123,8 +121,8 @@ export default {
       //banner内容
       indexBanner: [
         {
-          subTitle: "这个寒假，一起哈啤！",
-          title: "Server 鸽子号 is now online.",
+          subTitle: "",
+          title: "",
           btnText: "立即前往 ▶",
           url: "",
           image: require('../assets/banner.png'),
@@ -240,7 +238,7 @@ export default {
       });
     },homePageRecommendedFormat(index, data, includedInfo){
         data = data.data;
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < Math.min(data.length, 8); i++) {
           let thread = includedInfo.get(data[i].type + '.' + data[i].id);
           this.postInfoListPending[index][i].title = thread.attributes.title;
           this.postInfoListPending[index][i].tid = thread.id;
@@ -512,6 +510,9 @@ export default {
   float: right;
   opacity: 0.6;
 }
+.post-writer:hover{
+  color: red;
+}
 /* 论坛-板块 */
 .boards{
   display: flex;
@@ -527,6 +528,7 @@ export default {
   color: var(--text-color);
   transition: background 0.3s;
   cursor: pointer;
+  margin: 0.25em 0;
   margin-right: 0.6em;
   margin-top: 0.6em;
 }

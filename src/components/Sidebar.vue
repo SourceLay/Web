@@ -16,7 +16,7 @@
     </div>
     <div class="menu noise">
       <div class="menu-title title-text">
-        <p>派瑞派对</p>
+        <p>SourceLay</p>
       </div>
       <ul class="menu-list">
         <router-link to="/">
@@ -27,20 +27,6 @@
         </router-link>
       </ul>
       <ul class="menu-dblist">
-        <router-link to="/forums/minecraft" :class="[$route.params.id === 'minecraft' ? 'menu-item-choose noise' : '', 'menu-dbitem']">
-          <li>
-            <img src="../assets/mc.jpeg" alt="">
-            <p>我的世界</p>
-          </li>
-        </router-link>
-        <li class="menu-dbitem">
-          <img src="../assets/oustus.jpg" alt="">
-          <p>Oustus</p>
-        </li>
-        <li class="menu-dbitem">
-          <img src="../assets/rayark.jpg" alt="">
-          <p>雷亚</p>
-        </li>
       </ul>
     </div>
   </div>
@@ -66,7 +52,7 @@ export default {
 }
 .header{
   position: relative;
-  width: 4em; 
+  width: 4em;
   height: 100vh;
   float: left;
   background: var(--bg-color);

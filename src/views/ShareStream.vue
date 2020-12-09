@@ -47,6 +47,7 @@
           <el-checkbox v-model="isSelf" @click="GetSelfFile" size="medium" style="margin-left: 1em; z-index: 0;">只显示个人文件</el-checkbox>
         </h1>
         <div id="stream">
+            <el-table v-if="loading" v-loading="loading" style="height: 200px;width: 100%;"></el-table>
             <div @click="popDetail(card)" class="fileCard" v-for="card in cards" :key="card.id">
                 <svg t="1606829000232" class="icon" viewBox="0 0 1185 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="16670" width="48" height="48"><path d="M107.789474 0h319.218526A129.347368 129.347368 0 0 1 529.246316 50.176L840.757895 452.715789H0V107.789474a107.789474 107.789474 0 0 1 107.789474-107.789474z" fill="#EB9B00" p-id="16671"></path><path d="M138.186105 183.242105h909.312c48.074105 0 65.482105 5.012211 82.997895 14.389895 17.623579 9.377684 31.420632 23.174737 40.798316 40.744421 9.377684 17.569684 14.389895 35.031579 14.389895 82.997895v564.439579c0 48.074105-5.012211 65.482105-14.389895 82.997894-9.377684 17.623579-23.174737 31.420632-40.744421 40.798316-17.569684 9.377684-35.031579 14.389895-82.997895 14.389895H138.132211c-48.074105 0-65.482105-5.012211-82.997895-14.389895a97.926737 97.926737 0 0 1-40.798316-40.744421C5.012211 951.242105 0 933.834105 0 885.867789V321.374316c0-48.074105 5.012211-65.482105 14.389895-82.997895 9.377684-17.623579 23.174737-31.420632 40.744421-40.798316 17.569684-9.377684 35.031579-14.389895 82.997895-14.389894z" fill="#F8B700" p-id="16672"></path></svg>
                 <h1>{{card.filename}}</h1>
@@ -72,16 +73,19 @@
 import axios from "axios";
 import {dzq} from "@/public";
 import IncludedHelper from '../helpers/includedHelper'
-import {globalErrorNotify} from "@/helpers/globalNotify";
+import {globalSuccessNotify, globalErrorNotify} from "@/helpers/globalNotify";
 import post from '@/components/Forum/post.vue'
 
 export default {
   created() {
     // this.GetSelfFile();
+    this.loading = true;
     this.GetAllFile();
+    document.title = "分享大厅";
   },
   watch: {
     isSelf(newVal) {
+      this.loading = true;
       if (newVal) {
         this.GetSelfFile();
       } else {
@@ -178,7 +182,11 @@ export default {
                     self: true,
                   }
                 })
-            ).then(response => that.handleResponseCard(response)).catch(err=>globalErrorNotify(that,err))
+            ).then(
+                response => {
+                  that.handleResponseCard(response)
+                  that.loading = false;
+                }).catch(err=>globalErrorNotify(that,err))
         },
         // 获取所有文件
         GetAllFile: function () {
@@ -192,7 +200,10 @@ export default {
                 ]
               })
           ).then(
-              response => that.handleResponseCard(response)
+              response => {
+                that.handleResponseCard(response);
+                that.loading = false;
+              }
           ).catch(err=>globalErrorNotify(this,err))
         },
         downloadFile:function (detail) {
@@ -207,6 +218,7 @@ export default {
                 }).catch((err) => {
               globalErrorNotify(this, err);
             });
+            globalSuccessNotify(this, "正在下载，请稍候。");
         },
         popDetail:function(item){
             this.detail=item;
@@ -260,6 +272,7 @@ export default {
     },
     data(){
         return{
+            loading: true,
             isSelf: false,
             showDetail:false,
             fadeInStyle:{
@@ -380,8 +393,10 @@ export default {
     padding-top:4em;
 }
 #top{
-    height:330px;
-    background-image: url('../assets/shareStream.jpg');
+    height: 16em;
+    width: 100%;
+    object-fit: cover;
+    background-image: url('https://res.cloudinary.com/paracraft/image/upload/v1607435281/sourcelay/Banner/%E5%88%86%E4%BA%AB%E4%B8%AD%E5%BF%83.png');
 }
 #title{
     padding-left:100px;

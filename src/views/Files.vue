@@ -3,9 +3,9 @@
         <div class="topheader" v-bind:class="[needFixed ? 'fixTop' : 'unfixed' ,'']">
             <div id="opeartionBar">
                 <div class="iconBtn">
-                    <input class="file-upload-input" id="file-upload-button" type="file" accept="*" @change="uploadFile"/>
                     <svg t="1606891653726" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3988" width="128" height="128"><path d="M274.432 377.855999q-27.648 0-35.328-14.848t10.752-38.4q19.456-24.576 45.056-59.392t53.248-72.192 53.76-72.704 46.592-60.928q18.432-23.552 35.328-24.576t36.352 21.504q19.456 23.552 44.544 56.832t51.712 69.632 52.736 71.168 46.592 60.416q22.528 27.648 17.408 46.08t-33.792 17.408q-17.408 0-45.056 1.024t-46.08 1.024q-20.48 1.024-25.088 12.8t-4.608 32.256l0 50.176q0 27.648 0.512 56.32t0.512 56.32l0 51.2q0 10.24-1.536 21.504t-7.168 20.48-16.384 15.36-29.184 6.144q-21.504 0-39.424 0.512t-42.496 0.512q-33.792 0-45.568-15.872t-11.776-50.688l0-39.936q0-23.552-0.512-50.176t-0.512-53.248l0-48.128q0-30.72-6.144-48.64t-27.648-16.896q-15.36 0-37.376-1.024t-39.424-1.024zM961.535999 901.119998q6.144 24.576-2.56 47.104t-27.136 39.424-45.056 26.624-57.344 9.728l-694.271999 0q-36.864 0-65.024-13.312t-45.056-32.768-22.528-42.496 1.536-41.472q6.144-14.336 12.288-29.696 5.12-13.312 12.288-30.208t15.36-34.304l38.912-94.208 116.736 0-44.032 129.024 659.455999 0-44.032-129.024 111.616 0q21.504 52.224 38.912 94.208 7.168 18.432 14.336 35.84t12.8 31.232 9.216 23.552 3.584 10.752z" p-id="3989" fill="#ffffff"></path></svg>
                     <p>上传</p>
+                    <input class="file-upload-input" id="file-upload-button" type="file" accept="*" @change="uploadFile"/>
                 </div>
 
                 <div class="iconBtn" @click="newFolderVisible=true">
@@ -45,6 +45,7 @@
                 <div id="title-fileSize">大小</div>
                 <div id="title-fileDate">修改日期</div>
             </div>
+          <el-table v-if="loading" v-loading="loading" style="height: 200px;width: 100%;"></el-table>
             <form action="" method="get">
             <ul>
                 <li v-for="item in files" :key="item.attributes.id">
@@ -115,12 +116,13 @@ import axios from 'axios'
 import { dzq } from '@/public'
 import SetShareInfo from "@/components/SetShareInfo";
 // import IncludedHelper from '../helpers/includedHelper'
-import {globalErrorNotify} from "@/helpers/globalNotify";
+import {globalSuccessNotify, globalErrorNotify} from "@/helpers/globalNotify";
 
 export default {
   components: {SetShareInfo},
   data(){
       return {
+        loading: true,
         newFolderVisible:false,
         newFolderName: '',
         setShareInfoVisible:false,
@@ -141,6 +143,7 @@ export default {
     next((vm) => {
           vm.getData(path);
     })
+    document.title = "我的文件";
   },
   beforeRouteUpdate(to, from, next){
     let path = to.params.path;
@@ -206,6 +209,8 @@ export default {
             }
             this.files = tmpFiles;
             console.log(this.data);
+
+            this.loading = false;
         });
 
     },
@@ -323,7 +328,7 @@ export default {
             axios.put(uploadUrl, file, config)
             .then(()=>{
 
-                 axios.put(
+                axios.put(
                     dzq({
                         name: 'sourcelay/file',
                     }),
@@ -338,6 +343,7 @@ export default {
                 globalErrorNotify(this, "请刷新页面后重试。");
             });
 
+            globalSuccessNotify(this, "正在上传，请稍候。");
         }).catch((err) => {
             globalErrorNotify(this, err);
         });
@@ -423,8 +429,8 @@ export default {
 
 <style scoped>
 *, *::after, *::before {
-  box-sizing: border-box;
-  position: relative;
+  /*box-sizing: border-box;*/
+  /*position: relative;*/
 }
     .topheader.fixTop{
         position: fixed;
@@ -513,6 +519,7 @@ export default {
     }
 
     .fileCheck{
+      position:relative;
         top: 50%;
         transform: translate(0,-50%);
         margin-left: -1em;
@@ -520,7 +527,7 @@ export default {
 
     .fileIcon{
         margin-top:0.125em;
-
+      position:relative;
         font-size:2em;
         text-align: center;
         display:inline-block;
@@ -548,10 +555,12 @@ export default {
     }
 
     #title-fileSize{
+      position: relative;
         padding:15px;
     }
 
     #title-fileDate{
+      position: relative;
         padding:15px;
     }
 
@@ -607,6 +616,7 @@ export default {
     }
 
     .vertical-middle-align {
+      position:relative;
         top: 50%;
         transform: translate(0,-50%);
     }
@@ -619,5 +629,6 @@ export default {
         opacity: 0;
         width: 100%;
         height: 100%;
+        font-size: 100vh;
     }
 </style>

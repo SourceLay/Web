@@ -12,7 +12,7 @@
         <li>用户</li>
         <li>帖子</li>
       </ul>
-      <board :title="'相关用户' + userNum + '位'">
+      <board :title="'相关用户' + userNum + '位'" :withNoContent="false">
         <ul class="users">
           <li v-for="user in user" :key="user.id">
             <img :src="user.attributes.avatarUrl" alt="">

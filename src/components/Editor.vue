@@ -7,7 +7,7 @@
       <div @click="closeEditor" class="header-btn close">
         <i class="iconfont icon-guanbi"></i>
       </div>
-      <div v-if="$route.name === 'Topic'" @click="changeFixed" :style="{opacity: fixedEditor ? '1' : '0.5'}" class="header-btn fixed">
+      <div v-if="$route.name === 'Topic'" @click="changeFixed()" :style="{opacity: fixedEditor ? '1' : '0.5'}" class="header-btn fixed">
         <i class="iconfont icon-guding"></i>
       </div>
     </div>
@@ -23,7 +23,9 @@
         </div>
         <!-- 输入框 -->
         <input v-if="!preview" v-model="title" placeholder="标题…" type="text">
-        <textarea v-if="!preview" v-model="content" ref="content" :placeholder="[replyData ? '回复#' + replyData.floor : '正文…']"></textarea>
+        <div class="input-container">
+          <prism-editor :highlight="highlighter" v-if="!preview" v-model="content" ref="content" :placeholder="replyData ? '回复#' + replyData.floor : '正文…'"></prism-editor>
+        </div>
       </div>
       <!-- 底部工具 -->
       <div class="btns">
@@ -42,8 +44,10 @@
         </ul>
         <!-- 按钮 -->
         <ul class="btns-right">
-          <li @click="send" :class="['btn', 'btn-send', sendLoad ? 'btn-load' : '']">发送</li>
+          <li v-if="editData === null" @click="send" :class="['btn', 'btn-send', sendLoad ? 'btn-load' : '']">发送</li>
+          <li v-if="editData !== null" @click="send" :class="['btn', 'btn-send', sendLoad ? 'btn-load' : '']">编辑</li>
           <li @click="showPreview" class="btn btn-preview">预览</li>
+          <li v-if="editData !== null" @click="cancelEdit" class="btn btn-preview">放弃编辑</li>
         </ul>
       </div>
     </div>
@@ -61,12 +65,24 @@
 <script>
 import { mapState, mapMutations } from 'vuex'
 import XBBCODE from '.././xbbcode'
+import { dzq } from '@/public'
 import ShareInfo from "@/components/ShareInfo";
+
+// import Prism Editor
+import { PrismEditor } from 'vue-prism-editor';
+import 'vue-prism-editor/dist/prismeditor.min.css'; // import the styles somewhere
+
+// import highlighting library (you can use any library you want just return html string)
+import { highlight, languages } from 'prismjs/components/prism-core';
+import 'prismjs/components/prism-bbcode';
+import 'prismjs/themes/prism-tomorrow.css'; // import syntax highlighting styles
+
 export default {
   name: 'editor',
-  components: {ShareInfo},
+  components: {ShareInfo, PrismEditor},
   props: [
-    'replyData'
+    'replyData',
+    'editData'
   ],
   data: function() {
     return {
@@ -124,7 +140,8 @@ export default {
         {
           name: 'mokuai',
           optionType: 'list',
-          action: 'fileshare'
+          action: 'fileshare',
+          option: ['添加文件']
         },
       ],
       preview: '',
@@ -160,10 +177,10 @@ export default {
         value: 0
       })
     },
-    changeFixed: function() {
+    changeFixed: function(status = null) {
       this.setData({
         key: 'fixedEditor',
-        value: !this.fixedEditor
+        value: status ?? !this.fixedEditor
       })
     },
     opentool: function(e) {
@@ -213,19 +230,19 @@ export default {
 
     },
     insertBBCodeSegment(bbcodeL, bbcodeR = '') {
-      var content = this.$refs.content
+      let content = this.$refs.content.$el.childNodes[0].childNodes[0];
       if(content.selectionStart === content.selectionEnd){
-        var oldSelection = content.selectionStart
+        let oldSelection = content.selectionStart
         this.content = this.content.slice(0, content.selectionStart) + bbcodeL + bbcodeR + this.content.slice(content.selectionStart)
-        this.$refs.content.focus()
+        content.focus()
         this.$nextTick(function(){
           content.setSelectionRange(oldSelection + bbcodeL.length, oldSelection + bbcodeL.length)
         })
       }else{
-        var oldSelectionStart = content.selectionStart
-        var oldSelectionEnd = content.selectionEnd
+        let oldSelectionStart = content.selectionStart
+        let oldSelectionEnd = content.selectionEnd
         this.content = this.content.slice(0, content.selectionStart) + bbcodeL + this.content.slice(content.selectionStart, content.selectionEnd) + bbcodeR + this.content.slice(content.selectionEnd)
-        this.$refs.content.focus()
+        content.focus()
         this.$nextTick(function(){
           content.setSelectionRange(oldSelectionStart, oldSelectionEnd + bbcodeL.length + bbcodeR.length)
         })
@@ -265,7 +282,33 @@ export default {
         if(!this.content){
           this.isError = 1
           this.error = '正文为空！'
-        }else{
+
+        }else if (this.editData){
+          // 编辑
+
+          let post_id = this.editData.id;
+          let attr = {}
+          attr.content = this.content
+
+          this.axios.patch(dzq({
+              name: 'posts/' + post_id
+            }), {
+            data: {
+                id: post_id,
+                type: "posts",
+                attributes: attr
+            }
+          }).then(response => {
+            this.content = null
+            this.$emit('sendPost', response.data)
+          }).catch(error => {
+            this.isError = 1
+            this.error = error.response.data.errors[0].detail[0]
+          })
+
+        }else {
+          // 回帖
+
           let attr = {}
           attr.content = this.content
           if(this.replyData){
@@ -290,6 +333,7 @@ export default {
             this.isError = 1
             this.error = error.response.data.errors[0].detail[0]
           })
+
         }
       }
       setTimeout(() => {
@@ -299,7 +343,7 @@ export default {
     },
     changeImage() {
       let files = this.$refs.load_pic.files
-      let content = this.$refs.content
+      let content = this.$refs.content.$el.childNodes[0].childNodes[0];
       files.forEach(e => {
         let data = new FormData()
         this.content = this.content.slice(0, content.selectionStart) + '[img=' + e.name +']上传中[/img]\n' + this.content.slice(content.selectionStart)
@@ -314,7 +358,14 @@ export default {
           this.error = error.response.data.errors[0].detail[0]
         })
       })
-    }
+    },
+    cancelEdit() {
+      this.content = "";
+      this.$emit('cancelEditing')
+    },
+    highlighter(code) {
+      return highlight(code, languages.bbcode); // languages.<insert language> to return html with markup
+    },
   }
 }
 </script>
@@ -390,16 +441,24 @@ export default {
   background: none;
   outline: none;
 }
-.input textarea{
+
+.input .input-container
+{
   width: 100%;
   height: 12.5em;
-  line-height: 1.5em;
+  border: none;
+}
+
+.input-container >>> div, .input-container >>> textarea{
+  width: 100%;
+  min-height: 12.5em;
   color: var(--text-color);
   resize: none;
   border: none;
   background: none;
   outline: none;
 }
+
 /* 编辑器按钮 */
 .btns{
   position: relative;
