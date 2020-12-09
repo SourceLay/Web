@@ -3,7 +3,7 @@
     <div class="content">
       <img style="width: 5%;margin-left: -5.5%;margin-right: 1em;" src="https://res.cloudinary.com/paracraft/image/upload/v1607424052/sourcelay/SourceLayLogo/SourceLayLOGO4.png">
       <div v-if="$route.name !== 'Search'" class="search">
-        <i class="iconfont icon-sousuo"></i>
+        <i class="iconfont icon-sousuo" @click="goSearch"></i>
         <form>
           <input type="text" style="display: none;">
           <input @keyup.enter="goSearch" v-model="search" placeholder="搜索" type="text">
@@ -476,6 +476,9 @@ export default {
   right: 5px;
   font-size: 1.25em !important;
   color: var(--text-color);
+}
+.icon-sousuo:hover{
+  cursor: pointer;
 }
 .center{
   position: absolute;
