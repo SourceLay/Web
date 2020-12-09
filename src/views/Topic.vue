@@ -7,7 +7,7 @@
     <div :class="['banner-cover','tag', getPostTag(topic.relationships.user.data.id, topic.attributes.title, topic.attributes.isEssence)]"></div>
     <!-- 帖子信息 -->
     <div class="intro">
-      <h1 class="title" v-html="getPostTitle(topic.attributes.title)"></h1>
+      <h1 class="title" v-html="getPostTitle(topic.attributes.title, category)"></h1>
       <p :data-tippy-content="new Date(topic.attributes.createdAt).toLocaleString()">
         发表于
         <span v-html="getTime(topic.attributes.createdAt)"></span>
