@@ -73,6 +73,8 @@
   padding: 1em;
   background-color: #F5F2F0;
   border-radius: 5px;
+  max-width: 100%;
+  overflow:auto
 }
 
 .xbbcode-code-inline {
