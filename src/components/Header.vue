@@ -39,7 +39,7 @@
         <!-- 登录框-游客 -->
         <div v-if="status === 'guest' && page === 1" class="guest">
           <div class="login">
-            <h2>登录SourceLay</h2>
+            <h2>登录 SourceLay</h2>
             <div class="login-form">
               <input v-model="loginForm.username" placeholder="用户名" @keydown.enter="login" type="text">
               <input v-model="loginForm.password" placeholder="密码" @keydown.enter="login" type="password">
