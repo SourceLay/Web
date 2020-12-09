@@ -73,7 +73,7 @@
 import axios from "axios";
 import {dzq} from "@/public";
 import IncludedHelper from '../helpers/includedHelper'
-import {globalErrorNotify} from "@/helpers/globalNotify";
+import {globalSuccessNotify, globalErrorNotify} from "@/helpers/globalNotify";
 import post from '@/components/Forum/post.vue'
 
 export default {
@@ -218,6 +218,7 @@ export default {
                 }).catch((err) => {
               globalErrorNotify(this, err);
             });
+            globalSuccessNotify(this, "正在下载，请稍候。");
         },
         popDetail:function(item){
             this.detail=item;
