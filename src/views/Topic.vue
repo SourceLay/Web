@@ -296,7 +296,7 @@ export default {
         })
       ).then((post) => {
         next((vm) => {
-          
+
           let included = new IncludedHelper(topic.data.included);
           vm.category = included.get(
             'categories.' + topic.data.data.relationships.category.data.id
@@ -644,7 +644,7 @@ export default {
         }else{
           this.formatData[`posts.${data.data.id}`] = tmp
         }
-        
+
         this.$forceUpdate()
       }
       else
@@ -839,7 +839,7 @@ export default {
 
           this.downloadShareFile(res.data.data, fileInfo);
         } else {
-          globalErrorNotify(this, "请刷新页面后重试。");  
+          globalErrorNotify(this, "请刷新页面后重试。");
         }
       }).catch((err) => {
         globalErrorNotify(this, err);
@@ -892,7 +892,7 @@ export default {
       })
     },
     handleSharePassword() {
-  
+
       axios.post(dzq({
           name: 'sourcelay/fileshare/' + this.processingShareInfo.attributes.id
         }), {
@@ -907,7 +907,7 @@ export default {
 
       }).then((response) => {
         this.downloadShareFile(response.data.data, this.processingFileInfo);
-        
+
         console.log(response)
       }).catch((error) => {
         globalErrorNotify(this, error);
@@ -1118,6 +1118,10 @@ export default {
 .post-func li{
   display: inline-block;
   margin-left: 0.5em
+}
+.post-func li:hover{
+  cursor: pointer;
+  color: red;
 }
 .post:hover .post-func{
   opacity: 1;
