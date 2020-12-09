@@ -1051,6 +1051,7 @@ export default {
   flex-direction: column;
   border-bottom: 2px dashed var(--line-color);
   margin: 1em 0;
+  width: 90%;
 }
 .post:nth-last-child(2) .post-body{
   border-bottom: 0;
