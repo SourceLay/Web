@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Sidebar/>
+    <!-- <Sidebar/> -->
     <div class="content">
       <TopHeader/>
       <HeaderSentinel/>
@@ -12,13 +12,13 @@
 </template>
 
 <script>
-import Sidebar from './components/Sidebar.vue'
+// import Sidebar from './components/Sidebar.vue'
 import TopHeader from './components/Header.vue'
 import HeaderSentinel from "@/components/HeaderSentinel";
 export default {
   components: {
     HeaderSentinel,
-    Sidebar,
+    // Sidebar,
     TopHeader
   },
   methods: {
