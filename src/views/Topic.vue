@@ -275,6 +275,68 @@ export default {
       })
     })
   },
+  beforeRouteUpdate(to, from, next) {
+    if (from.params.id !== to.params.id) {
+      axios.get(
+        dzq({
+          name: 'threads/' + to.params.id,
+          include: [
+            'firstPost',
+            'category',
+            'user.groups',
+            'firstPost.likedUsers',
+            'firstPost.file',
+            'firstPost.fileShare',
+          ]
+        })
+      ).then((topic) => {
+        //获取楼层数据
+        let floor = 1, page = 1
+        if(location.search.substr(0, 3) === '?n='){
+          floor = parseInt(location.search.substr(3))
+          page = Math.ceil((floor - 1) / 20)
+        }
+        if(floor >= topic.data.data.attributes.postCount || floor < 0 || !floor){
+          floor = 1
+          page = 1
+        }
+        //获取回复
+        axios.get(
+          dzq({
+            name: 'posts',
+            filter: {
+              // isDeleted: 'no',
+              thread: to.params.id
+            },
+            include: [
+              'user',
+              'user.groups',
+              'likedUsers',
+              'file',
+              'fileShare',
+            ],
+            page: {
+              number: page,
+              limit: 20
+            }
+          })
+        ).then((post) => {
+            let included = new IncludedHelper(topic.data.included);
+            this.category = included.get(
+              'categories.' + topic.data.data.relationships.category.data.id
+            )
+            this.threadId = to.params.id;
+            this.formatData = {};
+            this.selfPostFloor = [];
+            this.$forceUpdate();
+
+            this.getData(topic.data, post.data, page, floor)
+            document.title = topic.data.data.attributes.title;
+        })
+      })
+    }
+    next();
+  },
   components: {
     Editor
   },
