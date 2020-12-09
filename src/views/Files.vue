@@ -143,6 +143,7 @@ export default {
     next((vm) => {
           vm.getData(path);
     })
+    document.title = "我的文件";
   },
   beforeRouteUpdate(to, from, next){
     let path = to.params.path;

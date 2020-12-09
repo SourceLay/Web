@@ -81,6 +81,7 @@ export default {
     // this.GetSelfFile();
     this.loading = true;
     this.GetAllFile();
+    document.title = "分享大厅";
   },
   watch: {
     isSelf(newVal) {
