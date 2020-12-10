@@ -120,7 +120,7 @@ export function getPostTitle(title, category = null) {
       let id = category.id;
       let name = names[names.length - 1];
 
-      final =  `<a href="/forums/${id}"><span>[${name}]</span></name>` + final;
+      final =  `<a href="/forums/${id}"><span>[${name}]</span></a>` + final;
     }
 
     return '<div>' + final + '</div>' + s.substring(last_valid).trim();
