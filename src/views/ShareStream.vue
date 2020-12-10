@@ -75,6 +75,7 @@ import {dzq} from "@/public";
 import IncludedHelper from '../helpers/includedHelper'
 import {globalSuccessNotify, globalErrorNotify} from "@/helpers/globalNotify";
 import post from '@/components/Forum/post.vue'
+import store from '../store/index'
 
 export default {
   created() {
@@ -207,6 +208,11 @@ export default {
           ).catch(err=>globalErrorNotify(this,err))
         },
         downloadFile:function (detail) {
+            if(store.state.status === 'guest'){
+                globalErrorNotify(this, "请登陆后重试。");
+                return;
+            }
+
             axios.get(detail.downloadLink, { responseType: 'blob' })
                 .then(response => {
                   const blob = new Blob([response.data], { type: detail.type ?? 'application/octet-stream' })
@@ -225,6 +231,11 @@ export default {
             this.showDetail=true;
         },
         like:function(id, isLiked){
+          if(store.state.status === 'guest'){
+              globalErrorNotify(this, "请登陆后重试。");
+              return;
+          }
+          
           var that = this;
           axios.patch(dzq({
             name: 'sourcelay/fileshare/' + id

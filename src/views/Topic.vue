@@ -760,6 +760,11 @@ export default {
       console.log(event);
 
       if (event.srcElement.tagName.toLowerCase() === "div" && event.srcElement.attributes.class?.value === "xbbcode-flieshare-block") {
+        if(store.state.status === 'guest'){
+          globalErrorNotify(this, "请登陆后重试。");
+          return;
+        }
+
         let shareId = Number(event.srcElement.attributes.shareid?.value);
         if (typeof(shareId) === 'undefined' || shareId === null) {
           globalErrorNotify(this, "请刷新页面后重试。");

@@ -141,7 +141,7 @@ export default {
     let path = to.params.path;
     console.log(path);
     next((vm) => {
-          vm.getData(path);
+        vm.getData(path);
     })
     document.title = "我的文件";
   },
@@ -165,6 +165,10 @@ export default {
         else if(this.selectedCount==0)this.$refs.mutilOpBar.style.opacity=0;
     },
     getData: function(path){
+        if(store.state.status === 'guest'){
+          globalErrorNotify(this, "请登陆后重试。");
+          return;
+        }
 
         if (typeof(path) === 'undefined' || path === null || path === '') {
             path = '';
@@ -286,6 +290,11 @@ export default {
         this.$router.push({path: path});
     },
     uploadFile: function(e){
+        if(store.state.status === 'guest'){
+          globalErrorNotify(this, "请登陆后重试。");
+          return;
+        }
+
         console.log(e);
         if (e.target.files.length <= 0) {
             return;
@@ -351,6 +360,11 @@ export default {
     },
     // 点击确认新建文件夹后的逻辑
     handleNewFolderReturn() {
+        if(store.state.status === 'guest'){
+          globalErrorNotify(this, "请登陆后重试。");
+          return;
+        }
+        
         // TODO 判定输入是否有效
         if (this.newFolderName === '') {
             alert('文件夹不能为空')
