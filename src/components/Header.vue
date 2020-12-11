@@ -1,7 +1,7 @@
 <template>
   <div @mouseleave="maybeHideLoginBox" :class="[headerAbove ? 'header-above' : '', $route.name === 'Home' ? '' : 'fourm-header', 'header']">
     <div class="content">
-      <img @click="$route.name == 'Home' ? '' : $router.push('/')" style="width: 5%;margin-left: -5.5%;margin-right: 1em;" src="https://res.cloudinary.com/paracraft/image/upload/sourcelay/SourceLayLogo/SourceLayLOGO5.png">
+      <img @click="$route.name == 'Home' ? '' : $router.push('/')" style="width: 5%;margin-left: -5.5%;margin-right: 1em;" src="/statics/SourceLayLogo/SourceLayLOGO5.png">
       <div v-if="$route.name !== 'Search'" class="search">
         <form>
           <input type="text" style="display: none;">
