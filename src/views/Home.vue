@@ -52,16 +52,16 @@
           <li v-for="(item, index) in postInfoList" :key="index">
               <span class="post-num">{{index + 1}}</span>
               <router-link v-if="item.tid > 0" :to="{path: '/forums/topics/' + item.tid}">
-                <span>{{item.title}}</span>
+                {{item.title}}
               </router-link>
               <div v-if="item.tid === 0">
-                <span>{{item.title}}</span>
+                {{item.title}}
               </div>
               <!-- <router-link v-if="item.tid > 0" :to="{path: '/forums/topics/' + item.tid}">
-                <span class="post-writer">{{item.author}}</span>
+                <div class="post-writer">{{item.author}}</div>
               </router-link> -->
               <!-- <div v-if="item.tid === 0"> -->
-                <span class="post-writer">{{item.author}}</span>
+                <div class="post-writer">{{item.author}}</div>
               <!-- </div> -->
           </li>
         </ul>
