@@ -32,6 +32,17 @@ export default {
   margin: 1em 0;
   border-radius: 0.2em;
 }
+.posts a{
+    color: var(--link-normal);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+.posts a:hover {
+    color: var(--link-highlight);
+}
+.posts a:visited {
+    color: var(--link-visited);
+}
 .part-title{
   display: inline-block;
   font-size: 1.25em;

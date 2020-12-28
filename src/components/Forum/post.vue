@@ -1,34 +1,36 @@
 <template>
-  <li @click="goPost(post.id)" class="post">
-    <UserCard style="display: none" ref="userCard" />
-    <div class="post-tag">
-      <p :class="['tag', getPostTag(post.relationships.user.data.id, post.attributes.title, post.attributes.isEssence)]"></p>
-    </div>
-    <div class="post-title">
-      <h2 v-html="getPostTitle(post.attributes.title)"></h2>
-      <p>{{getContent(included['posts.' + post.relationships.firstPost.data.id].attributes.content)}}</p>
-    </div>
-    <div class="post-other">
-      <div class="post-info">
-        <p>
-          作者：
-          <span class="user" :data-id="post.relationships.user.data.id" tippy-user>
-            {{included['users.' + post.relationships.user.data.id].attributes.username}}
-          </span>
-        </p>
-        <p>{{post.attributes.postCount}} 回复 / {{post.attributes.viewCount}} 浏览</p>
+  <router-link :to="{path: '/forums/topics/' + post.id}">
+    <li class="post">
+      <UserCard style="display: none" ref="userCard" />
+      <div class="post-tag">
+        <p :class="['tag', getPostTag(post.relationships.user.data.id, post.attributes.title, post.attributes.isEssence)]"></p>
       </div>
-      <div class="post-time">
-        <p>
-          最后一次回复：
-          <span class="user" :data-id="post.relationships.lastPostedUser.data.id" tippy-user>
-            {{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}
-          </span>
-        </p>
-        <p class="time" v-html="getTime(post.attributes.updatedAt)" :data-tippy-content="new Date(post.attributes.updatedAt).toLocaleString()"></p>
+      <div class="post-title">
+        <h2 v-html="getPostTitle(post.attributes.title)"></h2>
+        <p>{{getContent(included['posts.' + post.relationships.firstPost.data.id].attributes.content)}}</p>
       </div>
-    </div>
-  </li>
+      <div class="post-other">
+        <div class="post-info">
+          <p>
+            作者：
+            <span class="user" :data-id="post.relationships.user.data.id" tippy-user>
+              {{included['users.' + post.relationships.user.data.id].attributes.username}}
+            </span>
+          </p>
+          <p>{{post.attributes.postCount}} 回复 / {{post.attributes.viewCount}} 浏览</p>
+        </div>
+        <div class="post-time">
+          <p>
+            最后一次回复：
+            <span class="user" :data-id="post.relationships.lastPostedUser.data.id" tippy-user>
+              {{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}
+            </span>
+          </p>
+          <p class="time" v-html="getTime(post.attributes.updatedAt)" :data-tippy-content="new Date(post.attributes.updatedAt).toLocaleString()"></p>
+        </div>
+      </div>
+    </li>
+  </router-link>
 </template>
 
 <script>
@@ -51,11 +53,6 @@ export default {
     ...mapMutations([
       'setData'
     ]),
-    goPost (id) {
-      this.$router.push({
-        path: '/forums/topics/' + id
-      })
-    },
     getContent(content) {
       return XBBCODE().process({
         text: content,
@@ -103,8 +100,6 @@ export default {
   cursor: pointer;
 }
 .post a{
-  display: contents;
-  color: inherit;
   text-decoration: none;
 }
 .post:hover{
