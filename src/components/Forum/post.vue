@@ -1,42 +1,43 @@
 <template>
-  <router-link :to="{path: '/forums/topics/' + post.id}">
-    <li class="post">
-      <UserCard style="display: none" ref="userCard" />
-      <div class="post-tag">
-        <p :class="['tag', getPostTag(post.relationships.user.data.id, post.attributes.title, post.attributes.isEssence)]"></p>
+  <li @click="goPost(post.id)" class="post">
+    <UserCard style="display: none" ref="userCard" />
+    <div class="post-tag">
+      <p :class="['tag', getPostTag(post.relationships.user.data.id, post.attributes.title, post.attributes.isEssence)]"></p>
+    </div>
+    <div class="post-title">
+      <h2>
+        <div v-html="getPostTItleTags()"/>
+        <router-link :to="{path: '/forums/topics/' + post.id}">{{postTitle.title}}</router-link>
+      </h2>
+      <p>{{getContent(included['posts.' + post.relationships.firstPost.data.id].attributes.content)}}</p>
+    </div>
+    <div class="post-other">
+      <div class="post-info">
+        <p>
+          作者：
+          <span class="user" :data-id="post.relationships.user.data.id" tippy-user>
+            {{included['users.' + post.relationships.user.data.id].attributes.username}}
+          </span>
+        </p>
+        <p>{{post.attributes.postCount}} 回复 / {{post.attributes.viewCount}} 浏览</p>
       </div>
-      <div class="post-title">
-        <h2 v-html="getPostTitle(post.attributes.title)"></h2>
-        <p>{{getContent(included['posts.' + post.relationships.firstPost.data.id].attributes.content)}}</p>
+      <div class="post-time">
+        <p>
+          最后一次回复：
+          <span class="user" :data-id="post.relationships.lastPostedUser.data.id" tippy-user>
+            {{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}
+          </span>
+        </p>
+        <p class="time" v-html="getTime(post.attributes.updatedAt)" :data-tippy-content="new Date(post.attributes.updatedAt).toLocaleString()"></p>
       </div>
-      <div class="post-other">
-        <div class="post-info">
-          <p>
-            作者：
-            <span class="user" :data-id="post.relationships.user.data.id" tippy-user>
-              {{included['users.' + post.relationships.user.data.id].attributes.username}}
-            </span>
-          </p>
-          <p>{{post.attributes.postCount}} 回复 / {{post.attributes.viewCount}} 浏览</p>
-        </div>
-        <div class="post-time">
-          <p>
-            最后一次回复：
-            <span class="user" :data-id="post.relationships.lastPostedUser.data.id" tippy-user>
-              {{included['users.' + post.relationships.lastPostedUser.data.id].attributes.username}}
-            </span>
-          </p>
-          <p class="time" v-html="getTime(post.attributes.updatedAt)" :data-tippy-content="new Date(post.attributes.updatedAt).toLocaleString()"></p>
-        </div>
-      </div>
-    </li>
-  </router-link>
+    </div>
+  </li>
 </template>
 
 <script>
 import UserCard from '@/components/UserCard.vue'
 import { mapMutations } from 'vuex'
-import { getPostTitle, getPostTag, getTime } from '@/public'
+import { getPostTitleObj, getPostTag, getTime } from '@/public'
 import tippy from 'tippy.js';
 import XBBCODE from '../../xbbcode'
 import 'tippy.js/dist/tippy.css'; // optional for styling
@@ -46,13 +47,29 @@ export default {
   components: {
     UserCard
   },
+  data() {
+    return {
+      postTitle: {
+        tags: '',
+        title: ''
+      }
+    }
+  },
   methods: {
-    getPostTitle,
+    getPostTitleObj,
+    getPostTItleTags() {
+      return this.postTitle.tags;
+    },
     getPostTag,
     getTime,
     ...mapMutations([
       'setData'
     ]),
+    goPost (id) {
+      this.$router.push({
+        path: '/forums/topics/' + id
+      })
+    },
     getContent(content) {
       return XBBCODE().process({
         text: content,
@@ -63,7 +80,10 @@ export default {
     }
   },
   mounted () {
+    this.postTitle = this.getPostTitleObj(this.post.attributes.title);
+
     let vue = this
+
     tippy('[tippy-user]', {
       onShow(instance) {
         vue.setData({
@@ -79,6 +99,7 @@ export default {
       theme: 'user-card',
       delay: 100
     })
+
     tippy('[data-tippy-content]', {
       delay: 100
     })
@@ -100,6 +121,8 @@ export default {
   cursor: pointer;
 }
 .post a{
+  display: contents;
+  color: inherit;
   text-decoration: none;
 }
 .post:hover{
