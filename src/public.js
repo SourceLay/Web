@@ -126,6 +126,60 @@ export function getPostTitle(title, category = null) {
     return '<div>' + final + '</div>' + s.substring(last_valid).trim();
   }
 }
+//获取帖子标题对象
+export function getPostTitleObj(title, category = null) {
+  if(['[公告]', '[活动]', '[版规]'].includes(title.slice(0, 4))){
+    return title.slice(4)
+  }else{
+    let s = title;
+    let check_status = false;
+    let check_str = '';
+    let tags = [];
+    let last_valid = 0;
+    let i = 0;
+    for (i = 0; i < s.length; i++) {
+      let c = s[i];
+      if (check_status) {
+        check_str = check_str + c;
+        if (c === ']') {
+          if (!['[公告]', '[活动]', '[版规]'].includes(check_str)) {	// 这里可以判断一下 check_str 是否合法，如果
+            tags.push(check_str);
+            check_status = false;
+            last_valid = i + 1;
+          } else {
+            break;
+          }
+        } else if (c === '[') {	// 这里表示标签中不允许出现的符号
+          break;
+        }
+      } else {
+        if (c === '[') {
+          check_str = '[';
+          check_status = true;
+        }
+        else if (c === ' ') {
+          continue;
+        }
+        else break;
+      }
+    }
+    let final = ''
+    tags.forEach(tag => {
+      final += "<a href=\"/search?q=tag:" + tag.replace(/\[|\]/g, '') + "\"><span>" + tag + "</span></a>"
+    })
+
+    if (category !== null) {
+      let names = category.attributes.name.split('.');
+      let id = category.id;
+      let name = names[names.length - 1];
+
+      final =  `<a href="/forums/${id}"><span>[${name}]</span></a>` + final;
+    }
+
+    return {tags: final, title: s.substring(last_valid).trim() };
+  }
+}
+
 export function dzq(e) {
   let url = ''
   let parts = []
