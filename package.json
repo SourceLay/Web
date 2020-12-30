@@ -10,16 +10,16 @@
   "dependencies": {
     "@wenyan/highlight": "^0.1.2",
     "axios": "^0.19.2",
-    "core-js": "^3.6.4",
-    "mathjax-full": "^3.0.5",
+    "core-js": "^3.8.1",
+    "mathjax-full": "^3.1.2",
     "nprogress": "^0.2.0",
     "prismjs": "^1.22.0",
-    "register-service-worker": "^1.7.1",
-    "tippy.js": "^6.2.5",
-    "vue": "^2.6.11",
+    "register-service-worker": "^1.7.2",
+    "tippy.js": "^6.2.7",
+    "vue": "^2.6.12",
     "vue-axios": "^2.1.5",
-    "vue-router": "^3.3.4",
-    "vuex": "^3.5.1",
+    "vue-router": "^3.4.9",
+    "vuex": "^3.6.0",
     "xbbcode-parser": "^0.1.2"
   },
   "devDependencies": {
@@ -32,7 +32,7 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.12"
   },
   "eslintConfig": {
     "root": true,
